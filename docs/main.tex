@@ -1,0 +1,234 @@
+%%
+%% This is file `sample-sigconf-authordraft.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `all,proceedings,bibtex,authordraft')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-sigconf-authordraft.tex.
+%% 
+%% For distribution of the original source see the terms
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%% The first command in your LaTeX source must be the \documentclass
+%% command.
+%%
+%% For submission and review of your manuscript please change the
+%% command to \documentclass[manuscript, screen, review]{acmart}.
+%%
+%% When submitting camera ready or to TAPS, please change the command
+%% to \documentclass[sigconf]{acmart} or whichever template is required
+%% for your publication.
+%%
+%%
+\documentclass[acmsmall,screen,nonacm]{acmart}
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%\usepackage{amssymb}
+\usepackage{mathpartir}
+\usepackage{amsmath}
+
+%\usepackage{syntax}
+
+\usepackage{booktabs,tabularx,caption}
+\usepackage{listings}
+\usepackage{listings-rust}%
+\usepackage{xcolor}
+\usepackage{algorithmicx}%
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}%
+\usepackage{pifont}
+\usepackage{colortbl} % For coloring table cells
+\usepackage{tikz}[node]%
+\usepackage{wrapfig}
+\usepackage{tcolorbox}%
+\usepackage{colortbl}
+\usepackage[table]{xcolor}
+\usepackage[nomessages]{fp}% http://ctan.org/pkg/fp
+\usepackage{xfp}%
+\usepackage{placeins}%
+\usepackage{xspace}
+\usepackage{adjustbox}
+\usepackage{ulem}%
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage{bbm}
+
+%Added by Jiayu Zhou 20251203 to help indentation
+%\setlength{\parindent}{0pt} 
+%\setlength{\parskip}{0.3em}
+
+%TODO: Is This Alloweed?
+\usepackage{enumitem}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\definecolor{myBlue}{RGB}{47,124,196}
+\definecolor{myPurple}{RGB}{155,89,182}
+\definecolor{myGreen}{RGB}{39,174,96}
+\definecolor{myOrange}{RGB}{211,84,0}
+\definecolor{myGray}{RGB}{100,100,100}
+\definecolor{myNumber}{RGB}{192,57,43}
+
+\definecolor{onyx}{rgb}{0.06, 0.06, 0.07}
+\definecolor{charcoal}{rgb}{0.1, 0.1, 0.1}
+
+\newcommand{\cellcolortale}[1]{\cellcolor{teal!\fpeval{#1*0.6}}}
+\newcommand{\cellcolorred}[1]{\cellcolor{red!\fpeval{#1*0.6}}}
+
+% skeded distribution
+
+\lstdefinelanguage{Runwai}{
+    keywords=[1]{circuit, let, in, if, then, else, iter},
+    keywords=[2]{assert_eq, lookup, is_first_row, is_last_row, is_transition},
+    keywords=[3]{F, Z, toF, toZ},
+    keywords=[4]{trace, curr, next},
+    keywordstyle=[1]\color{myBlue}\bfseries,
+    keywordstyle=[2]\color{myOrange}\bfseries,
+    keywordstyle=[3]\color{myGreen}\bfseries,
+    keywordstyle=[4]\color{myPurple}\bfseries,
+    identifierstyle=\color{black},
+    commentstyle=\color{gray}\ttfamily,
+    stringstyle=\color{orange}\ttfamily,
+    sensitive=true,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+}
+\lstset{
+    language=Runwai,
+    basicstyle=\ttfamily\footnotesize,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={\%*}{*)}
+}
+\lstdefinestyle{Runwaistyle}{
+    backgroundcolor=\color{gray!0},
+    rulecolor=\color{gray!0},
+}
+
+\newlength{\maxlen}
+\newcommand{\databar}[3][green!25]{%
+  \settowidth{\maxlen}{#3}%
+  \addtolength{\maxlen}{\tabcolsep}%
+  \FPeval\result{round(#2/#3:4)}%
+  \rlap{\color{green!25}\hspace*{-.5\tabcolsep}\rule[-.05\ht\strutbox]{\result\maxlen}{.95\ht\strutbox}}%
+  \makebox[\dimexpr\maxlen-\tabcolsep][r]{#2}%
+}
+
+\renewcommand{\lstlistingname}{Code}
+
+% Define colors for check and cross
+\newcommand{\cmark}{\textcolor{green!70!black}{\ding{51}}} % Checkmark
+\newcommand{\xmark}{\textcolor{red}{\ding{55}}} % Cross
+%\newcommand{\partialcircle}{\textcolor{blue!70}{\circle}} % Half-filled circle
+\newcommand{\dangerous}{\textcolor{red!80!black}{\textbf{Yes}}}
+\newcommand{\safe}{\textcolor{green!80!black}{\textbf{No}}}
+
+\newcommand*\partialcircle[1][0.85ex]{%
+  \begin{tikzpicture}
+  \draw[fill=green!70] (0,0)-- (90:#1) arc (90:270:#1) -- cycle ;
+  \draw (0,0) circle (#1);
+  \end{tikzpicture}}
+
+\newcommand*\threequartercircle[1][0.85ex]{%
+  \begin{tikzpicture}
+    \draw[fill=green!70] (0,0) -- (90:#1) arc (90:360:#1) -- cycle;
+    \draw (0,0) circle (#1);
+  \end{tikzpicture}%
+}
+
+\newcommand{\rqbox}[2]{
+    \begin{tcolorbox}[colback=gray!10,colframe=black,boxrule=0.5pt]
+        %\textbf{#1}\\[2pt]
+        #2
+    \end{tcolorbox}
+}
+
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{MiniLean: Implementing Interactive Theorem Prover from Scratch}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Hideaki Takahashi}
+\email{ht2673@columbia.edu}
+\affiliation{%
+  \institution{Columbia University}
+  %\city{New York}
+  %\state{New York}
+  \country{USA}
+}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+    TBD
+\end{abstract}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+
+Interactive theorem prover has been gaining much attention recently, especially due to the rise of AI-driven coding.
+
+\section{Basic}
+
+\end{document}
+
+\endinput
+%%
+%% End of file `sample-sigconf-authordraft.tex'.

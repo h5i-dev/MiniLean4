@@ -75,7 +75,7 @@
 \usepackage{placeins}%
 \usepackage{xspace}
 \usepackage{adjustbox}
-\usepackage{ulem}%
+\usepackage[normalem]{ulem}% normalem keeps \emph as italics
 \usepackage{amsthm}
 \usepackage{hyperref}
 \usepackage{bbm}
@@ -91,6 +91,19 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}[theorem]
 \newtheorem{lemma}[theorem]{Lemma}
+
+% Notation for the core type theory
+\newcommand{\Sort}[1]{\mathsf{Sort}\;#1}
+\newcommand{\tPi}[3]{\Pi(#1{:}#2).\,#3}
+\newcommand{\tLam}[3]{\lambda(#1{:}#2).\,#3}
+\newcommand{\subst}[3]{#1[#2 \mapsto #3]}
+\newcommand{\FV}{\mathrm{FV}}
+\newcommand{\dom}{\mathrm{dom}}
+\newcommand{\alphaeq}{=_{\alpha}}
+\newcommand{\betared}{\to_{\beta}}
+\newcommand{\conv}{\equiv}
+\newcommand{\ctxok}[1]{\vdash #1\;\mathsf{ok}}
+\newcommand{\rulename}[1]{\;(\textsc{#1})}
 
 \definecolor{myBlue}{RGB}{47,124,196}
 \definecolor{myPurple}{RGB}{155,89,182}
@@ -192,7 +205,7 @@
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{MiniLean: Implementing Interactive Theorem Prover from Scratch}
+\title{Implementing Interactive Theorem Prover from Scratch}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -221,11 +234,640 @@
 %% information and builds the first part of the formatted document.
 \maketitle
 
-\section{Introduction}
+%\section{Introduction}
 
-Interactive theorem prover has been gaining much attention recently, especially due to the rise of AI-driven coding.
+%Interactive theorem prover has been gaining much attention recently, especially due to the rise of AI-driven coding.
 
-\section{Basic}
+\section{Propositions as Types}
+\label{sec:curry-howard}
+
+A theorem prover has to decide whether a proof is correct. A proof written in English cannot be checked by a computer, 
+so we need a way to write proofs as data, together with a precise rule that tells correct proofs from incorrect ones.
+The idea that makes this possible is known as \emph{propositions as types}, or the 
+\emph{Curry--Howard correspondence}~\cite{howard1995formulae}. It says that proofs can be written as programs, and 
+that checking a proof is the same as type checking a program. This section builds up the idea in four steps, starting 
+from what a proof is.
+
+\subsection{Step 1: A Proof Is Something You Can Hand Over}
+
+Think of a proof as the evidence you would hand to a skeptical reader to convince them that a statement holds.
+What evidence is needed depends on the shape of the statement.
+\begin{itemize}
+  \item To convince someone of ``$A$ and $B$'', you hand over two things: evidence for $A$ and evidence for $B$.
+  \item To convince someone of ``$A$ implies $B$'', you cannot hand over evidence for $A$, because $A$ might not hold.
+        Instead you hand over a \emph{method}: whenever someone gives you evidence for $A$, the method turns it into evidence for $B$.
+  \item To convince someone of ``for every number $n$, $P(n)$'', you hand over a method that, given any $n$, produces evidence for $P(n)$.
+  \item For ``false'', there is nothing to hand over. That is what makes it false.
+\end{itemize}
+The important point is that proofs are \emph{objects}: they can be built, combined, and transformed into other proofs.
+
+\subsection{Step 2: A Method Is a Function}
+
+Start with something familiar.
+A function such as $\mathit{length}$ turns any string into a number, and we record this by writing $\mathit{length} : \mathsf{String} \to \mathsf{Nat}$.
+The arrow is read ``the type of functions from strings to numbers''.
+
+Now take two everyday statements:
+\begin{center}
+$R$ = ``it is raining'' \qquad $W$ = ``the street is wet''.
+\end{center}
+By Step 1, a proof of ``$R$ implies $W$'' is a method that turns any evidence that it is raining into evidence that the street is wet.
+If we also use the letter $R$ for the collection of all evidence for $R$, and likewise for $W$, then that method is simply a function from $R$ to $W$:
+\[
+\mathit{proof} : R \to W.
+\]
+So the arrow of logic (``implies'') and the arrow of function types are \emph{the same arrow}.
+A proof of an implication is a function.
+
+\paragraph{Some proofs, written as functions.}
+We write $x \mapsto e$ for the function that takes an input $x$ and returns $e$.
+Here $P$, $A$, $B$, $C$ stand for arbitrary statements.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Statement} & \textbf{Proof} & \textbf{In words} \\
+\midrule
+$P \to P$ & $h \mapsto h$ & Given evidence $h$ for $P$, hand $h$ back. \\[2pt]
+$A \to (B \to A)$ & $a \mapsto (b \mapsto a)$ & Given $a$ for $A$, then $b$ for $B$, ignore $b$ and return $a$. \\[2pt]
+$(A \to B) \to (B \to C) \to (A \to C)$ & $f \mapsto g \mapsto a \mapsto g(f(a))$ & Turn $a$ into evidence for $B$ with $f$, then into evidence for $C$ with $g$. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The second row shows how to handle two premises: a function that takes $a$ and returns \emph{another function} that takes $b$.
+The third row is the familiar fact that implication is transitive, and its proof is function composition.
+
+\paragraph{A statement with no proof.}
+Now try to prove ``$P$ implies $Q$'' for two unrelated statements $P$ and $Q$.
+We would need a function $p \mapsto \;?$ where $?$ is evidence for $Q$.
+The only thing we have is $p$, which is evidence about $P$, not $Q$.
+There is nothing to put in place of $?$.
+No function exists, just as no proof exists.
+
+In most programming languages a function can still \emph{claim} to return evidence for $Q$ by crashing or by running forever.
+Such a function never actually delivers anything, so it is not evidence.
+A type theory meant for proofs must forbid these functions, and the system in this paper does: every well-typed term finishes computing (\S\ref{sec:properties}).
+
+\subsection{Step 3: A Proposition Is the Type of Its Proofs}
+
+Step 2 suggests a precise definition.
+We identify a proposition with the \emph{type of its proofs}:
+\begin{center}
+\emph{a proof of $A$ is a term $t$ with $t : A$, and $A$ is true when the type $A$ has at least one element.}
+\end{center}
+This is a change of viewpoint from everyday programming, where a proposition is usually a \texttt{bool}.
+A \texttt{bool} only says \emph{whether} something holds.
+A type says what counts as \emph{evidence} that it holds, and its elements are those pieces of evidence.
+The kernel never has to decide whether a statement is true, which is impossible in general.
+It only has to check that a given piece of evidence has the right type, which is easy.
+
+\subsection{Step 4: Quantifying Over Propositions}
+
+In Step 2, $h \mapsto h$ proves $P \to P$ for whatever statement $P$ is.
+But ``for whatever $P$ is'' was only said in the surrounding English; it was not part of the statement.
+To make ``for every proposition $P$'' part of the statement itself, we let $P$ be an input too.
+The proof first receives \emph{which} proposition $P$ is meant, and then evidence $h$ for it:
+\[
+P \mapsto (h \mapsto h).
+\]
+The rest of this paper uses the standard notation for such functions.
+We write $\lambda(x{:}A).\,e$ for $x \mapsto e$, recording the type $A$ of the input, and $\Pi$ for the type of such functions.
+In this notation, the statement ``for every proposition $P$, $P$ implies $P$'' is
+\[
+\tPi{P}{\Sort{0}}{P \to P},
+\]
+and its proof is
+\[
+\tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}.
+\]
+$\Sort{0}$ is the type whose elements are propositions, so $P : \Sort{0}$ says ``$P$ is a proposition''.
+The following sections define each of these pieces precisely.
+
+\subsection{Summary}
+
+Table~\ref{tab:curry-howard} collects the correspondence.
+The right column is what a kernel implements; the left column is what it means.
+In particular, the rules of logic become typing rules: using a hypothesis is a variable, proving an implication by assuming its premise is a $\lambda$, and modus ponens is function application (\S\ref{sec:typing}).
+
+\begin{table}[ht]
+\centering
+\caption{The Curry--Howard correspondence.}
+\label{tab:curry-howard}
+\begin{tabular}{ll}
+\toprule
+\textbf{Logic} & \textbf{Programs} \\
+\midrule
+proposition $A$ & type $A$ \\
+proof of $A$ & term $t$ with $t : A$ \\
+$A$ is true & type $A$ has an element \\
+$A$ implies $B$ & function type $A \to B$ \\
+$A$ and $B$ & pair type $A \times B$ \\
+false & a type with no elements \\
+for every $x$ in $A$, $B$ holds & dependent function type $\tPi{x}{A}{B}$ \\
+\midrule
+using a hypothesis & variable \\
+proving $A \to B$ by assuming $A$ & $\lambda$-abstraction \\
+modus ponens & function application \\
+checking a proof & type checking \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Pairs do not appear in the core theory of this paper; they are listed only to connect with Step 1.
+
+\section{Syntax}
+\label{sec:syntax}
+
+We work with a small dependent type theory with five kinds of terms.
+
+\begin{definition}[Terms]
+Let $x, y, z$ range over an infinite set of variable names and $u, v$ over natural numbers.
+Terms are given by the grammar
+\[
+s, t, A, B \;::=\; \Sort{u} \;\mid\; x \;\mid\; \tPi{x}{A}{B} \;\mid\; \tLam{x}{A}{t} \;\mid\; t\;s
+\]
+\end{definition}
+
+\begin{itemize}
+  \item $\Sort{u}$ is a \emph{universe}: a type whose elements are themselves types (\S\ref{sec:universes}).
+  \item $x$ is a variable.
+  \item $\tPi{x}{A}{B}$ is the \emph{type} of functions that take an argument $x$ of type $A$ and return a value of type $B$, where $B$ may mention $x$.
+  \item $\tLam{x}{A}{t}$ is a function \emph{value}: it takes $x$ of type $A$ and returns $t$.
+  \item $t\;s$ applies the function $t$ to the argument $s$. Application associates to the left: $f\,a\,b$ means $(f\,a)\,b$.
+\end{itemize}
+
+When $x$ does not occur in $B$, we write $A \to B$ for $\tPi{x}{A}{B}$.
+The arrow associates to the right: $A \to B \to C$ means $A \to (B \to C)$.
+So a single constructor $\Pi$ covers both implication and universal quantification.
+This is the standard design in dependent type theory: Lean, Coq, and Agda all have a single $\Pi$ (or $\forall$) in their kernels and treat $A \to B$ as notation.
+
+The grammar has no separate category for types.
+A type is simply a term whose type is a universe.
+This is necessary because, with dependent types, values appear inside types (as in $\mathsf{Vec}\;n$) and types are passed around as values (as $P$ is in the example above).
+The price is that the grammar alone cannot rule out nonsense such as using a $\lambda$-abstraction as a type; the type checker has to do it.
+
+\paragraph{Pi and Lambda.}
+$\Pi$ and $\lambda$ have the same shape but live at different levels.
+$\tLam{x}{A}{t}$ is a function, while $\tPi{x}{A}{B}$ is the type of such functions.
+In the body position, $\lambda$ holds the value that is returned and $\Pi$ holds the type of that value.
+\[
+\underbrace{\tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}}_{\text{a proof}}
+\;:\;
+\underbrace{\tPi{P}{\Sort{0}}{P \to P}}_{\text{a proposition}}
+\;:\;
+\underbrace{\Sort{1}}_{\text{a universe}}
+\]
+
+\paragraph{Implementation.}
+In Rust the grammar becomes one recursive enum. Subterms are boxed because a recursive type must have a finite size.
+
+\begin{lstlisting}[language=Rust, style=colouredRust, numbers=none]
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Term {
+    Sort(u64),
+    Var(String),
+    Pi(String, Box<Term>, Box<Term>),
+    Lam(String, Box<Term>, Box<Term>),
+    App(Box<Term>, Box<Term>),
+}
+\end{lstlisting}
+
+\section{Free Variables and Substitution}
+\label{sec:subst}
+
+$\Pi$ and $\lambda$ \emph{bind} their variable: in $\tLam{x}{A}{t}$, occurrences of $x$ inside $t$ refer to the argument.
+The binder's scope is the body only; $x$ is not bound in the annotation $A$.
+
+\begin{definition}[Free variables]
+\begin{align*}
+\FV(\Sort{u}) &= \emptyset &
+\FV(\tPi{x}{A}{B}) &= \FV(A) \cup (\FV(B) \setminus \{x\}) \\
+\FV(x) &= \{x\} &
+\FV(\tLam{x}{A}{t}) &= \FV(A) \cup (\FV(t) \setminus \{x\}) \\
+\FV(t\;s) &= \FV(t) \cup \FV(s)
+\end{align*}
+\end{definition}
+
+The typing rule for application (\S\ref{sec:typing}) needs to replace a variable with a term.
+We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences of $x$ in $t$ with $s$.
+The only subtle case is a binder. Consider
+\[
+\subst{(\tLam{y}{A}{x})}{x}{y}.
+\]
+The body says ``ignore the argument and return the outer $x$''.
+Replacing $x$ by $y$ naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: the free $y$ has been \emph{captured} by the binder.
+Substitution must avoid this by renaming the binder first.
+
+\begin{definition}[Capture-avoiding substitution]
+For $\square \in \{\Pi, \lambda\}$:
+\begin{align*}
+\subst{x}{x}{s} &= s \\
+\subst{y}{x}{s} &= y && (y \neq x) \\
+\subst{\Sort{u}}{x}{s} &= \Sort{u} \\
+\subst{(t_1\;t_2)}{x}{s} &= \subst{t_1}{x}{s}\;\;\subst{t_2}{x}{s} \\
+\subst{(\square(x{:}A).\,B)}{x}{s} &= \square(x{:}\subst{A}{x}{s}).\,B
+  && \text{($x$ is shadowed)} \\
+\subst{(\square(y{:}A).\,B)}{x}{s} &= \square(y{:}\subst{A}{x}{s}).\,\subst{B}{x}{s}
+  && (y \neq x,\; y \notin \FV(s)) \\
+\subst{(\square(y{:}A).\,B)}{x}{s} &= \square(z{:}\subst{A}{x}{s}).\,\subst{(\subst{B}{y}{z})}{x}{s}
+  && (y \neq x,\; y \in \FV(s),\; z \text{ fresh})
+\end{align*}
+Here ``$z$ fresh'' means $z \notin \FV(s) \cup \FV(B) \cup \{x\}$.
+\end{definition}
+
+\section{Alpha-Equivalence}
+\label{sec:alpha}
+
+The names of bound variables carry no meaning.
+$\tLam{x}{A}{x}$ and $\tLam{y}{A}{y}$ are the same function, and
+$\tPi{P}{\Sort{0}}{P \to P}$ and $\tPi{Q}{\Sort{0}}{Q \to Q}$ are the same proposition.
+Terms that differ only in the names of bound variables are called \emph{$\alpha$-equivalent}.
+
+\begin{definition}[$\alpha$-equivalence]
+$\alphaeq$ is the smallest congruence on terms that contains, for $\square \in \{\Pi, \lambda\}$,
+\[
+\square(x{:}A).\,B \;\alphaeq\; \square(y{:}A).\,\subst{B}{x}{y}
+\qquad \text{whenever } y \notin \FV(B).
+\]
+\end{definition}
+
+This definition is easy to state but not directly executable, since it does not say which names to choose.
+An implementation instead walks both terms in lockstep and remembers, for each side, the list of binders passed so far.
+A bound variable is then identified by \emph{which} binder it refers to, not by its name.
+We write $E_1; E_2 \vdash s \alphaeq t$, where $E_1$ and $E_2$ are lists of names.
+Let $\mathit{idx}(E, x)$ be the position of the last occurrence of $x$ in $E$, counted from the right starting at $0$, or undefined if $x \notin E$.
+Taking the \emph{last} occurrence handles shadowing: in $\tLam{x}{A}{\tLam{x}{B}{x}}$ the body refers to the inner $x$.
+
+\begin{figure}[ht]
+\footnotesize
+\centering
+\begin{mathpar}
+\inferrule{\quad}{E_1; E_2 \vdash \Sort{u} \alphaeq \Sort{u}}\rulename{$\alpha$-Sort}
+
+\inferrule{\mathit{idx}(E_1, x) = \mathit{idx}(E_2, y) = i}{E_1; E_2 \vdash x \alphaeq y}\rulename{$\alpha$-Bound}
+
+\inferrule{x \notin E_1 \\ x \notin E_2}{E_1; E_2 \vdash x \alphaeq x}\rulename{$\alpha$-Free}
+
+\inferrule{E_1; E_2 \vdash A \alphaeq A' \\ E_1, x; E_2, y \vdash B \alphaeq B'}{E_1; E_2 \vdash \tPi{x}{A}{B} \alphaeq \tPi{y}{A'}{B'}}\rulename{$\alpha$-Pi}
+
+\inferrule{E_1; E_2 \vdash A \alphaeq A' \\ E_1, x; E_2, y \vdash t \alphaeq t'}{E_1; E_2 \vdash \tLam{x}{A}{t} \alphaeq \tLam{y}{A'}{t'}}\rulename{$\alpha$-Lam}
+
+\inferrule{E_1; E_2 \vdash t_1 \alphaeq t_1' \\ E_1; E_2 \vdash t_2 \alphaeq t_2'}{E_1; E_2 \vdash t_1\;t_2 \alphaeq t_1'\;t_2'}\rulename{$\alpha$-App}
+\end{mathpar}
+\caption{Algorithmic $\alpha$-equivalence. Two closed or open terms are $\alpha$-equivalent iff $\cdot\,;\cdot \vdash s \alphaeq t$.}
+\label{fig:alpha}
+\end{figure}
+
+Free variables are compared by name ($\alpha$-Free), and bound variables by position ($\alpha$-Bound).
+A variable that is bound on one side and free on the other is never equal to anything, which is why there is no rule for that case.
+Because both sides descend through binders together, $E_1$ and $E_2$ always have the same length.
+So comparing positions counted from the right is the same as comparing positions counted from the left, and an implementation may store each list as a map from names to binding depths, provided it restores the previous entry when it leaves a binder.
+
+Using positions instead of names everywhere gives the \emph{de Bruijn representation}~\cite{debruijn1972nameless}, in which $\alpha$-equivalent terms are syntactically identical.
+We keep names in this text because they are easier to read.
+
+\section{Reduction and Conversion}
+\label{sec:conversion}
+
+Applying a $\lambda$-abstraction computes by substitution:
+\[
+(\tLam{x}{A}{t})\;s \;\betared\; \subst{t}{x}{s}.
+\]
+A subterm of the form $(\tLam{x}{A}{t})\;s$ is called a \emph{$\beta$-redex}, and we also allow this step anywhere inside a term.
+A term with no $\beta$-redex is in \emph{normal form}.
+
+Computation can make two different-looking types equal.
+If $\mathit{Id} = \tLam{X}{\Sort{0}}{X}$, then a proof of $\mathit{Id}\;P$ should also be a proof of $P$, since $\mathit{Id}\;P \betared P$.
+This is captured by \emph{definitional equality} (or \emph{conversion}).
+
+\begin{definition}[Conversion]
+$s \conv t$ is the smallest equivalence relation that contains $\alphaeq$ and $\betared$ and is closed under all term constructors.
+\end{definition}
+
+To decide $s \conv t$, the kernel normalizes both terms and compares the results with $\alphaeq$.
+This is correct because $\beta$-reduction is confluent: different reduction orders cannot lead to different normal forms.
+It also requires every well-typed term to \emph{have} a normal form.
+That is true for the system in this section, but it is a deep theorem (strong normalization)~\cite{barendregt1992lambda}.
+A practical kernel also caps the number of reduction steps, so that a bug cannot make it loop forever.
+
+\section{Universes: Why $\mathsf{Sort}\;u$?}
+\label{sec:universes}
+
+\paragraph{Types need types.}
+Every $\Pi$ and $\lambda$ carries the type $A$ of its variable, and the typing rules require $A$ to be a type.
+To state ``for every proposition $P$'', we bind $P$ with $\Pi$ or $\lambda$, so we need a type for $P$ itself: a type whose elements are propositions.
+That is a universe.
+In $\tPi{P}{\Sort{0}}{P \to P}$, the annotation $\Sort{0}$ says ``$P$ ranges over propositions''.
+
+Without universes, a proposition variable could only be an assumption placed in the context from outside:
+\[
+P : \Sort{0} \vdash \tLam{h}{P}{h} : P \to P
+\qquad\text{versus}\qquad
+\vdash \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}} : \tPi{P}{\Sort{0}}{P \to P}.
+\]
+The left judgment proves $P \to P$ for one fixed $P$.
+The right one is a single closed term that proves it for every $P$, and it can be applied later to any particular proposition.
+The second form needs $\Sort{0}$ to be a well-typed term, so $\Sort{0}$ needs a type.
+
+\paragraph{Type is not a Type.}
+The simplest choice would be a single universe $\mathsf{Type}$ with $\mathsf{Type} : \mathsf{Type}$.
+This is inconsistent: Girard showed that it allows a closed term of every type, including $\tPi{P}{\mathsf{Type}}{P}$, which corresponds to the proposition False~\cite{girard1972interpretation,hurkens1995simplification}.
+The argument is a type-theoretic analogue of Russell's paradox about the set of all sets.
+A kernel with $\mathsf{Type} : \mathsf{Type}$ would accept a proof of every statement.
+
+\paragraph{A hierarchy.}
+We avoid the paradox by never letting a universe contain itself.
+Instead, each universe lives in the next one:
+\[
+\Sort{0} : \Sort{1} : \Sort{2} : \cdots
+\]
+This is the rule \textsc{T-Sort} below.
+Each level exists to hold the level beneath it.
+In practice a few levels suffice; higher levels appear when one quantifies over large collections, such as the category of all small categories.
+
+\paragraph{Where a $\Pi$ type lives.}
+A $\Pi$ type lives in the larger of the universes of its domain and codomain (rule \textsc{T-Pi}).
+So $P \to P$ lives in $\Sort{0}$ when $P : \Sort{0}$, but $\tPi{P}{\Sort{0}}{P \to P}$ lives in $\Sort{1}$, because it quantifies over all of $\Sort{0}$.
+A type that quantifies over a universe is never a member of that universe.
+This property is called \emph{predicativity}.
+
+\paragraph{Comparison with Lean.}
+In Lean~\cite{moura2021lean4}, $\Sort{0}$ is $\mathsf{Prop}$ and $\Sort{(u+1)}$ is $\mathsf{Type}\;u$.
+$\mathsf{Prop}$ has two extra features that our $\Sort{0}$ does not:
+\emph{proof irrelevance} (any two proofs of the same proposition are equal) and \emph{impredicativity}
+($\forall\,(P : \mathsf{Prop}),\, P \to P$ is again in $\mathsf{Prop}$, not one level up).
+Lean also has \emph{universe polymorphism}, so definitions can be stated once for all levels $u$.
+In our system every level is a concrete number and every level follows the same rules.
+
+\begin{table}[ht]
+\centering
+\caption{Design choices for universes.}
+\label{tab:universes}
+\begin{tabular}{lll}
+\toprule
+\textbf{Design} & \textbf{What can be quantified over} & \textbf{Drawback} \\
+\midrule
+No universes & values only & cannot say ``for every proposition'' \\
+$\mathsf{Type} : \mathsf{Type}$ & everything & inconsistent \\
+Two sorts $\ast : \square$ & $\ast$ only & $\square$ itself has no type \\
+$\Sort{u} : \Sort{(u+1)}$ & any level & levels must be tracked \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Typing Rules}
+\label{sec:typing}
+
+\paragraph{Contexts and judgments.}
+A \emph{context} $\Gamma$ is an ordered list of assumptions $x_1 : A_1, \ldots, x_n : A_n$.
+The order matters: $A_i$ may mention $x_1, \ldots, x_{i-1}$, as in $P : \Sort{0}, h : P$.
+We use two judgments:
+\begin{itemize}
+  \item $\ctxok{\Gamma}$: the context $\Gamma$ is well formed.
+  \item $\Gamma \vdash t : A$: under the assumptions in $\Gamma$, the term $t$ has type $A$.
+\end{itemize}
+Read through Curry--Howard, $\Gamma \vdash t : A$ says that $t$ is a proof of $A$ from the hypotheses $\Gamma$.
+
+\begin{figure}[ht]
+\footnotesize
+\centering
+\begin{mathpar}
+\inferrule{\quad}{\ctxok{\cdot}}\rulename{C-Empty}
+
+\inferrule{\ctxok{\Gamma} \\ \Gamma \vdash A : \Sort{u} \\ x \notin \dom(\Gamma)}{\ctxok{\Gamma, x : A}}\rulename{C-Ext}
+\\
+\inferrule{\ctxok{\Gamma}}{\Gamma \vdash \Sort{u} : \Sort{(u+1)}}\rulename{T-Sort}
+
+\inferrule{\ctxok{\Gamma} \\ (x : A) \in \Gamma}{\Gamma \vdash x : A}\rulename{T-Var}
+\\
+\inferrule{\Gamma \vdash A : \Sort{u} \\ \Gamma, x : A \vdash B : \Sort{v}}{\Gamma \vdash \tPi{x}{A}{B} : \Sort{(\max(u, v))}}\rulename{T-Pi}
+
+\inferrule{\Gamma \vdash A : \Sort{u} \\ \Gamma, x : A \vdash t : B}{\Gamma \vdash \tLam{x}{A}{t} : \tPi{x}{A}{B}}\rulename{T-Lam}
+\\
+\inferrule{\Gamma \vdash f : \tPi{x}{A}{B} \\ \Gamma \vdash a : A}{\Gamma \vdash f\;a : \subst{B}{x}{a}}\rulename{T-App}
+
+\inferrule{\Gamma \vdash t : A \\ \Gamma \vdash B : \Sort{u} \\ A \conv B}{\Gamma \vdash t : B}\rulename{T-Conv}
+\end{mathpar}
+\caption{Well-formed contexts and typing rules.}
+\label{fig:typing}
+\end{figure}
+
+We read each rule from the bottom up, as a recipe for checking a term.
+
+\begin{description}
+  \item[\textsc{C-Empty}, \textsc{C-Ext}.]
+    A context is built one assumption at a time, and each new assumption must have a type as its type.
+    The side condition $x \notin \dom(\Gamma)$ forbids shadowing inside a context.
+    Since we work up to $\alpha$-equivalence, this is no restriction on terms: a binder that would shadow can always be renamed first.
+    \S\ref{sec:capture} shows why this condition matters.
+  \item[\textsc{T-Sort}.]
+    Every universe lives in the next one (\S\ref{sec:universes}).
+  \item[\textsc{T-Var}.]
+    A variable has the type it was assumed to have. Logically, this is ``use a hypothesis''.
+  \item[\textsc{T-Pi}.]
+    $\tPi{x}{A}{B}$ is a type if $A$ is a type and $B$ is a type once we assume $x : A$.
+    It lives in the larger of the two universes.
+    Logically, this rule says when $A \to B$ and $\forall x{:}A.\,B$ are well-formed propositions.
+  \item[\textsc{T-Lam}.]
+    To build a function from $A$ to $B$, assume $x : A$ and build $t : B$.
+    Logically, this is the introduction rule for $\to$ and $\forall$: to prove $A \to B$, assume $A$ and prove $B$.
+    Note that $B$ may mention $x$, and it is kept as is in the resulting $\Pi$ type.
+  \item[\textsc{T-App}.]
+    If $f$ maps each $x : A$ to an element of $B$, and $a : A$, then $f\;a$ has type $B$ with $x$ replaced by $a$.
+    Logically, this is modus ponens when $B$ does not mention $x$, and instantiation of a universal statement when it does.
+    For example, if $f : \tPi{n}{\mathsf{Nat}}{n + 0 = n}$, then $f\;3 : 3 + 0 = 3$.
+  \item[\textsc{T-Conv}.]
+    Types that are equal up to computation are interchangeable.
+    This is the only rule that is not determined by the shape of $t$.
+\end{description}
+
+\paragraph{Why application matters.}
+Without \textsc{T-App}, a hypothesis can be returned but never used.
+Roughly, the provable propositions are then those whose conclusion is literally one of the hypotheses, such as $P \to Q \to P$.
+Composition, $(P \to Q) \to (Q \to R) \to P \to R$, has the proof
+$\tLam{f}{P \to Q}{\tLam{g}{Q \to R}{\tLam{p}{P}{g\,(f\,p)}}}$, which needs application.
+
+\section{A Type Checking Algorithm}
+\label{sec:algorithm}
+
+The rules in Figure~\ref{fig:typing} define which judgments hold, but they are not yet an algorithm,
+because \textsc{T-Conv} can be applied at any point.
+The standard solution splits type checking into two mutually recursive functions~\cite{barendregt1992lambda}:
+\textsc{Infer} computes the type of a term, and \textsc{Check} verifies a term against an expected type.
+Conversion is used only where two types must be compared: in \textsc{Check}, and when a type must have a particular shape (a $\Pi$ or a $\mathsf{Sort}$).
+
+\begin{algorithm}[ht]
+\footnotesize
+\caption{Type inference and checking.}
+\label{alg:infer}
+\begin{algorithmic}[1]
+\Function{Infer}{$\Gamma, t$}
+  \If{$t = \Sort{u}$} \Return $\Sort{(u+1)}$
+  \ElsIf{$t = x$}
+    \If{$(x : A) \in \Gamma$} \Return $A$ \Else\ \textbf{fail} ``unbound variable'' \EndIf
+  \ElsIf{$t = \tPi{x}{A}{B}$}
+    \State $u \gets \Call{InferSort}{\Gamma, A}$
+    \State $(x', B') \gets \Call{Freshen}{\Gamma, x, B}$
+    \State $v \gets \Call{InferSort}{(\Gamma, x' : A), B'}$
+    \State \Return $\Sort{(\max(u, v))}$
+  \ElsIf{$t = \tLam{x}{A}{s}$}
+    \State $\Call{InferSort}{\Gamma, A}$
+    \State $(x', s') \gets \Call{Freshen}{\Gamma, x, s}$
+    \State $B \gets \Call{Infer}{(\Gamma, x' : A), s'}$
+    \State \Return $\tPi{x'}{A}{B}$
+  \ElsIf{$t = f\;a$}
+    \State $T \gets \textsc{Normalize}(\textsc{Infer}(\Gamma, f))$
+    \If{$T = \tPi{x}{A}{B}$}
+      \State $\Call{Check}{\Gamma, a, A}$
+      \State \Return $\subst{B}{x}{a}$
+    \Else\ \textbf{fail} ``not a function''
+    \EndIf
+  \EndIf
+\EndFunction
+\Statex
+\Function{Check}{$\Gamma, t, T$}
+  \State $T' \gets \Call{Infer}{\Gamma, t}$
+  \If{$\textsc{Normalize}(T') \alphaeq \textsc{Normalize}(T)$} \Return
+  \Else\ \textbf{fail} ``type mismatch''
+  \EndIf
+\EndFunction
+\Statex
+\Function{InferSort}{$\Gamma, A$}
+  \State $T \gets \textsc{Normalize}(\textsc{Infer}(\Gamma, A))$
+  \If{$T = \Sort{u}$} \Return $u$ \Else\ \textbf{fail} ``expected a type'' \EndIf
+\EndFunction
+\Statex
+\Function{Freshen}{$\Gamma, x, b$}
+  \If{$x \in \dom(\Gamma)$}
+    \State choose $x' \notin \dom(\Gamma) \cup \FV(b)$
+    \State \Return $(x', \subst{b}{x}{x'})$
+  \Else\ \Return $(x, b)$
+  \EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Some remarks on Algorithm~\ref{alg:infer}:
+\begin{itemize}
+  \item Each case corresponds to exactly one rule of Figure~\ref{fig:typing}, so the algorithm is \emph{syntax-directed}.
+    Finding a proof may be hard, but checking a given proof is mechanical.
+  \item \textsc{InferSort} implements the premises of the form $\Gamma \vdash A : \Sort{u}$.
+    It is also how the kernel decides whether a term is a type at all: $A$ is a type exactly when its type normalizes to a universe.
+    A $\lambda$-abstraction can never be a type, because its inferred type is always a $\Pi$.
+  \item \textsc{Freshen} renames a binder whose name is already in the context, implementing the side condition of \textsc{C-Ext}.
+  \item Starting from the empty context, every context the algorithm builds is well formed, because each assumption is added only after \textsc{InferSort} succeeds.
+    A caller that starts from a non-empty context must check that context separately.
+  \item Termination depends on \textsc{Normalize} terminating, which holds for well-typed terms by strong normalization (\S\ref{sec:conversion}).
+\end{itemize}
+
+\section{Worked Examples}
+\label{sec:examples}
+
+\paragraph{The identity proof.}
+Let $\Gamma_1 = P : \Sort{0}$ and $\Gamma_2 = \Gamma_1, h : P$.
+Omitting the well-formedness premises $\ctxok{\Gamma}$, the derivation of the opening example is
+\[
+\footnotesize
+\inferrule*[right=T-Lam]
+  {\inferrule*[right=T-Sort]{ }{\cdot \vdash \Sort{0} : \Sort{1}} \\
+   \inferrule*[right=T-Lam]
+     {\inferrule*[right=T-Var]{ }{\Gamma_1 \vdash P : \Sort{0}} \\
+      \inferrule*[right=T-Var]{ }{\Gamma_2 \vdash h : P}}
+     {\Gamma_1 \vdash \tLam{h}{P}{h} : P \to P}}
+  {\cdot \vdash \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}} : \tPi{P}{\Sort{0}}{P \to P}}
+\]
+Algorithm~\ref{alg:infer} produces the type $\tPi{P}{\Sort{0}}{\tPi{h}{P}{P}}$.
+It is $\alpha$-equivalent to the stated type, because $P \to P$ abbreviates $\tPi{\_}{P}{P}$ and the names $h$ and $\_$ do not occur in the body.
+
+A wrong proof is rejected.
+For $\tLam{P}{\Sort{0}}{\tLam{h}{P}{P}}$, the body $P$ has type $\Sort{0}$, not $P$, so \textsc{Check} reports a type mismatch.
+
+\paragraph{Using a theorem.}
+Let $\mathit{id} = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$ and $\Gamma = Q : \Sort{0}$.
+By \textsc{T-App},
+\[
+\inferrule*[right=T-App]
+  {\Gamma \vdash \mathit{id} : \tPi{P}{\Sort{0}}{P \to P} \\ \Gamma \vdash Q : \Sort{0}}
+  {\Gamma \vdash \mathit{id}\;Q : \subst{(P \to P)}{P}{Q}}
+\]
+and $\subst{(P \to P)}{P}{Q} = Q \to Q$.
+Applying a proof of a universal statement to a particular proposition yields a proof about that proposition, and substitution computes what is being proved.
+
+\paragraph{An exercise.}
+Prove $\tPi{P}{\Sort{0}}{\tPi{Q}{\Sort{0}}{P \to Q \to P}}$.
+One answer is
+\[
+\tLam{P}{\Sort{0}}{\tLam{Q}{\Sort{0}}{\tLam{p}{P}{\tLam{q}{Q}{p}}}}.
+\]
+The proof never uses $q$; this system allows hypotheses to go unused.
+
+\section{A Pitfall: Variable Capture in Contexts}
+\label{sec:capture}
+
+It is tempting to drop the side condition $x \notin \dom(\Gamma)$ and let a new assumption simply shadow an old one, as most programming languages do.
+Doing so makes the kernel unsound.
+Consider
+\[
+t = \tLam{x}{\Sort{0}}{\tLam{y}{x}{\tLam{x}{\Sort{0}}{y}}}.
+\]
+The variable $y$ has the \emph{outer} $x$ as its type, and the innermost $\lambda$ ignores its argument.
+So the correct type of $t$ is
+\[
+\tPi{x}{\Sort{0}}{\tPi{y}{x}{\tPi{x'}{\Sort{0}}{x}}}.
+\]
+A checker without \textsc{Freshen} looks up $y$ in the context $x : \Sort{0}, y : x, x : \Sort{0}$ and returns its type, the bare name $x$.
+At that point $x$ refers to the inner binder, and the checker returns
+\[
+\tPi{x}{\Sort{0}}{\tPi{y}{x}{\tPi{x}{\Sort{0}}{x}}},
+\]
+which says ``from any element of any type, produce an element of every type''.
+Given $A : \Sort{0}$ and $a : A$, the term $t\;A\;a$ then has type $\tPi{B}{\Sort{0}}{B}$, a proof of False.
+Any extension of the system with an inhabited base type, such as $\mathsf{Nat}$ with $0 : \mathsf{Nat}$, provides such $A$ and $a$ in the empty context.
+
+The problem is the same as in substitution (\S\ref{sec:subst}): a name is moved into a scope where it means something else.
+It affects any representation that identifies variables by name, whether the context is a list or a hash map.
+There are three common remedies:
+\begin{enumerate}
+  \item Reject shadowing outright. This is the simplest option, but the reserved name $\_$ used by $A \to B$ must be exempt and never added to the context.
+  \item Rename on entry, as \textsc{Freshen} does.
+  \item Represent bound variables by position (de Bruijn indices~\cite{debruijn1972nameless}) or use the \emph{locally nameless} style, in which bound variables are indices and free variables carry unique identifiers. Lean 4 takes the latter approach.
+\end{enumerate}
+A test suite should include $t$ above and check that the kernel either rejects it or assigns it the correct type.
+
+\section{Properties}
+\label{sec:properties}
+
+We state, without proof, the standard properties of this system.
+It is an instance of a Pure Type System with a predicative hierarchy, and the proofs can be found in Barendregt~\cite{barendregt1992lambda}.
+
+\begin{theorem}[Uniqueness of types]
+If $\Gamma \vdash t : A$ and $\Gamma \vdash t : B$, then $A \conv B$.
+\end{theorem}
+
+\begin{theorem}[Type correctness]
+If $\Gamma \vdash t : A$, then either $A = \Sort{u}$ for some $u$, or $\Gamma \vdash A : \Sort{u}$ for some $u$.
+\end{theorem}
+
+\begin{theorem}[Subject reduction]
+If $\Gamma \vdash t : A$ and $t \betared t'$, then $\Gamma \vdash t' : A$.
+\end{theorem}
+
+\begin{theorem}[Strong normalization]
+If $\Gamma \vdash t : A$, then every sequence of $\beta$-reductions starting from $t$ is finite.
+\end{theorem}
+
+Together these give the two guarantees we want from a kernel.
+\emph{Decidability}: Algorithm~\ref{alg:infer} terminates on every input, so whether a proof is correct can always be determined.
+\emph{Consistency}: there is no closed term of type $\tPi{P}{\Sort{0}}{P}$.
+By strong normalization and subject reduction, such a term would have a normal form of the same type.
+That normal form must be $\tLam{P}{\Sort{0}}{s}$ with $P : \Sort{0} \vdash s : P$ and $s$ normal.
+A normal term is a universe, a $\Pi$, a $\lambda$, or a variable applied to arguments, and none of these can have type $P$ in that context:
+the only variable available is $P$ itself, whose type is $\Sort{0}$, not $P$.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{ref}
 
 \end{document}
 

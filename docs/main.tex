@@ -242,140 +242,52 @@
 \label{sec:curry-howard}
 
 A theorem prover has to decide whether a proof is correct. A proof written in English cannot be checked by a computer, 
-so we need a way to write proofs as data, together with a precise rule that tells correct proofs from incorrect ones.
-The idea that makes this possible is known as \emph{propositions as types}, or the 
-\emph{Curry--Howard correspondence}~\cite{howard1995formulae}. It says that proofs can be written as programs, and 
-that checking a proof is the same as type checking a program. This section builds up the idea in four steps, starting 
-from what a proof is.
+and the Curry--Howard correspondence is exactly the concept that connects logic with programming:
+\emph{propositions are types, and proofs are programs}.
+A proposition $A$ is true if we can construct a term $t$ of type $A$, written $t : A$.
 
-\subsection{Step 1: A Proof Is Something You Can Hand Over}
+For example, consider the proposition $A \to B$ (``$A$ implies $B$'').
+To prove it, we assume $A$ and construct a proof of $B$.
+This is exactly a function that takes a value of type $A$ and returns a value of type $B$.
+Thus, logical implication corresponds to a function type. Here are three examples, where $\lambda x.\,e$ denotes a 
+function taking $x$ and returning $e$:
 
-Think of a proof as the evidence you would hand to a skeptical reader to convince them that a statement holds.
-What evidence is needed depends on the shape of the statement.
-\begin{itemize}
-  \item To convince someone of ``$A$ and $B$'', you hand over two things: evidence for $A$ and evidence for $B$.
-  \item To convince someone of ``$A$ implies $B$'', you cannot hand over evidence for $A$, because $A$ might not hold.
-        Instead you hand over a \emph{method}: whenever someone gives you evidence for $A$, the method turns it into evidence for $B$.
-  \item To convince someone of ``for every number $n$, $P(n)$'', you hand over a method that, given any $n$, produces evidence for $P(n)$.
-  \item For ``false'', there is nothing to hand over. That is what makes it false.
-\end{itemize}
-The important point is that proofs are \emph{objects}: they can be built, combined, and transformed into other proofs.
-
-\subsection{Step 2: A Method Is a Function}
-
-Start with something familiar.
-A function such as $\mathit{length}$ turns any string into a number, and we record this by writing $\mathit{length} : \mathsf{String} \to \mathsf{Nat}$.
-The arrow is read ``the type of functions from strings to numbers''.
-
-Now take two everyday statements:
-\begin{center}
-$R$ = ``it is raining'' \qquad $W$ = ``the street is wet''.
-\end{center}
-By Step 1, a proof of ``$R$ implies $W$'' is a method that turns any evidence that it is raining into evidence that the street is wet.
-If we also use the letter $R$ for the collection of all evidence for $R$, and likewise for $W$, then that method is simply a function from $R$ to $W$:
 \[
-\mathit{proof} : R \to W.
+\begin{array}{rcll}
+P \to P
+&:& \lambda p.\,p
+& \text{Return the assumption.}\\[4pt]
+A \to B \to A
+&:& \lambda a.\,\lambda b.\,a
+& \text{Ignore the second argument.}\\[4pt]
+(A \to B) \to (B \to C) \to A \to C
+&:& \lambda f.\,\lambda g.\,\lambda a.\,g(f(a))
+& \text{Compose two functions.}
+\end{array}
 \]
-So the arrow of logic (``implies'') and the arrow of function types are \emph{the same arrow}.
-A proof of an implication is a function.
 
-\paragraph{Some proofs, written as functions.}
-We write $x \mapsto e$ for the function that takes an input $x$ and returns $e$.
-Here $P$, $A$, $B$, $C$ stand for arbitrary statements.
-
-\begin{center}
-\small
-\begin{tabularx}{\linewidth}{@{}llX@{}}
-\toprule
-\textbf{Statement} & \textbf{Proof} & \textbf{In words} \\
-\midrule
-$P \to P$ & $h \mapsto h$ & Given evidence $h$ for $P$, hand $h$ back. \\[2pt]
-$A \to (B \to A)$ & $a \mapsto (b \mapsto a)$ & Given $a$ for $A$, then $b$ for $B$, ignore $b$ and return $a$. \\[2pt]
-$(A \to B) \to (B \to C) \to (A \to C)$ & $f \mapsto g \mapsto a \mapsto g(f(a))$ & Turn $a$ into evidence for $B$ with $f$, then into evidence for $C$ with $g$. \\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-The second row shows how to handle two premises: a function that takes $a$ and returns \emph{another function} that takes $b$.
-The third row is the familiar fact that implication is transitive, and its proof is function composition.
-
-\paragraph{A statement with no proof.}
-Now try to prove ``$P$ implies $Q$'' for two unrelated statements $P$ and $Q$.
-We would need a function $p \mapsto \;?$ where $?$ is evidence for $Q$.
-The only thing we have is $p$, which is evidence about $P$, not $Q$.
-There is nothing to put in place of $?$.
-No function exists, just as no proof exists.
-
-In most programming languages a function can still \emph{claim} to return evidence for $Q$ by crashing or by running forever.
-Such a function never actually delivers anything, so it is not evidence.
-A type theory meant for proofs must forbid these functions, and the system in this paper does: every well-typed term finishes computing (\S\ref{sec:properties}).
-
-\subsection{Step 3: A Proposition Is the Type of Its Proofs}
-
-Step 2 suggests a precise definition.
-We identify a proposition with the \emph{type of its proofs}:
-\begin{center}
-\emph{a proof of $A$ is a term $t$ with $t : A$, and $A$ is true when the type $A$ has at least one element.}
-\end{center}
-This is a change of viewpoint from everyday programming, where a proposition is usually a \texttt{bool}.
-A \texttt{bool} only says \emph{whether} something holds.
-A type says what counts as \emph{evidence} that it holds, and its elements are those pieces of evidence.
-The kernel never has to decide whether a statement is true, which is impossible in general.
-It only has to check that a given piece of evidence has the right type, which is easy.
-
-\subsection{Step 4: Quantifying Over Propositions}
-
-In Step 2, $h \mapsto h$ proves $P \to P$ for whatever statement $P$ is.
-But ``for whatever $P$ is'' was only said in the surrounding English; it was not part of the statement.
-To make ``for every proposition $P$'' part of the statement itself, we let $P$ be an input too.
-The proof first receives \emph{which} proposition $P$ is meant, and then evidence $h$ for it:
+The same idea extends to universal quantification.
+To prove ``for every $x : A$, $B(x)$ holds'', we construct a function
+that takes any $x : A$ and returns a proof of $B(x)$. Unlike an ordinary function type $A \to B$, the return type $B(x)$
+may depend on the input $x$. This is called a \emph{dependent function type},
+written
 \[
-P \mapsto (h \mapsto h).
+\Pi(x : A).\,B(x).
 \]
-The rest of this paper uses the standard notation for such functions.
-We write $\lambda(x{:}A).\,e$ for $x \mapsto e$, recording the type $A$ of the input, and $\Pi$ for the type of such functions.
-In this notation, the statement ``for every proposition $P$, $P$ implies $P$'' is
+For example, ``every proposition implies itself'' is expressed as
 \[
 \tPi{P}{\Sort{0}}{P \to P},
 \]
-and its proof is
+where $\Sort{0}$ is the type of propositions. Its proof is simply
 \[
-\tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}.
+\tLam{P}{\Sort{0}}{\tLam{p}{P}{p}}.
 \]
-$\Sort{0}$ is the type whose elements are propositions, so $P : \Sort{0}$ says ``$P$ is a proposition''.
-The following sections define each of these pieces precisely.
 
-\subsection{Summary}
-
-Table~\ref{tab:curry-howard} collects the correspondence.
-The right column is what a kernel implements; the left column is what it means.
-In particular, the rules of logic become typing rules: using a hypothesis is a variable, proving an implication by assuming its premise is a $\lambda$, and modus ponens is function application (\S\ref{sec:typing}).
-
-\begin{table}[ht]
-\centering
-\caption{The Curry--Howard correspondence.}
-\label{tab:curry-howard}
-\begin{tabular}{ll}
-\toprule
-\textbf{Logic} & \textbf{Programs} \\
-\midrule
-proposition $A$ & type $A$ \\
-proof of $A$ & term $t$ with $t : A$ \\
-$A$ is true & type $A$ has an element \\
-$A$ implies $B$ & function type $A \to B$ \\
-$A$ and $B$ & pair type $A \times B$ \\
-false & a type with no elements \\
-for every $x$ in $A$, $B$ holds & dependent function type $\tPi{x}{A}{B}$ \\
-\midrule
-using a hypothesis & variable \\
-proving $A \to B$ by assuming $A$ & $\lambda$-abstraction \\
-modus ponens & function application \\
-checking a proof & type checking \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Pairs do not appear in the core theory of this paper; they are listed only to connect with Step 1.
+This gives us the central idea behind a theorem prover:
+\emph{proving a theorem means constructing a term of the required type,
+and verifying a proof means type-checking that term}.
+The kernel implements these typing rules rather than reasoning about
+truth directly.
 
 \section{Syntax}
 \label{sec:syntax}

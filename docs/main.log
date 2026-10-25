@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  25 OCT 2026 14:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  25 OCT 2026 15:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**main.tex ref.bib
+**main.tex
 (./main.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -1484,161 +1484,160 @@ LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
 (Font)              scaled to size 10.0pt on input line 241.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
 (Font)              scaled to size 10.0pt on input line 246.
-LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 10.0pt on input line 247.
-
-Package natbib Warning: Citation `howard1995formulae' on page 1 undefined on in
-put line 247.
-
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 10.0pt on input line 256.
+(Font)              scaled to size 10.0pt on input line 247.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `LinuxLibertineT-TLF' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 7.3pt on input line 256.
+(Font)              scaled to size 7.3pt on input line 247.
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 10.0pt on input line 267.
-LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 7.3pt on input line 267.
-LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 5.5pt on input line 267.
+LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
+(Font)              scaled to size 7.3pt on input line 259.
+LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
+(Font)              scaled to size 5.5pt on input line 259.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 7.3pt on input line 267.
+(Font)              scaled to size 7.3pt on input line 279.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 5.5pt on input line 267.
+(Font)              scaled to size 5.5pt on input line 279.
+LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
+(Font)              scaled to size 10.0pt on input line 297.
  [1.1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/tex
 mf-dist/fonts/enc/dvips/libertine/lbtn_25tcsq.enc}{/usr/share/texlive/texmf-dis
 t/fonts/enc/dvips/libertine/lbtn_76gpa5.enc}{/usr/share/texlive/texmf-dist/font
 s/enc/dvips/libertine/lbtn_7grukw.enc}{/usr/share/texlive/texmf-dist/fonts/enc/
-dvips/libertine/lbtn_nh77jq.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
-libertine/lbtn_kijugd.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libert
-ine/lbtn_oexx6f.enc}]
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 32
-0.
+dvips/libertine/lbtn_oexx6f.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
+libertine/lbtn_ncsllp.enc}]
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 33
+8.
  (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 320.
+(Font)              scaled to size 10.0pt on input line 338.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `zi4' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 8.0pt on input line 376.
- [2.2{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-4.enc}]
-LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
-(Font)              scaled to size 10.0pt on input line 385.
-LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 7.3pt on input line 416.
-LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 5.5pt on input line 416.
- [3.3{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_ncsllp.enc}]
 
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 427.
+(Font)              using `T1/zi4/m/n' instead on input line 339.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.0pt on input line 427.
+(Font)              scaled to size 10.0pt on input line 339.
 LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
-(Font)              scaled to size 10.0pt on input line 428.
+(Font)              scaled to size 10.0pt on input line 340.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 7.3pt on input line 476.
+(Font)              scaled to size 7.3pt on input line 388.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 5.5pt on input line 476.
-[4.4]
+(Font)              scaled to size 5.5pt on input line 388.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 6.2pt on input line 507.
+(Font)              scaled to size 8.0pt on input line 388.
+[2.2{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-4.enc}]
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 8.0pt on input line 507.
+(Font)              scaled to size 10.0pt on input line 412.
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 6.2pt on input line 507.
+(Font)              scaled to size 7.3pt on input line 412.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
+(Font)              scaled to size 5.5pt on input line 412.
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
+(Font)              scaled to size 6.2pt on input line 419.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
+(Font)              scaled to size 8.0pt on input line 419.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
+(Font)              scaled to size 6.2pt on input line 419.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
-(Font)              scaled to size 8.0pt on input line 507.
+(Font)              scaled to size 8.0pt on input line 419.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 6.2pt on input line 507.
+(Font)              scaled to size 6.2pt on input line 419.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
+(Font)              scaled to size 9.0pt on input line 431.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/it' will be
+(Font)              scaled to size 9.0pt on input line 431.
 
 
-Class acmart Warning: A possible image without description on input line 521.
+Class acmart Warning: A possible image without description on input line 433.
 
+LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
+(Font)              scaled to size 10.0pt on input line 440.
 
-Package natbib Warning: Citation `debruijn1972nameless' on page 5 undefined on 
-input line 528.
+Package natbib Warning: Citation `debruijn1972nameless' on page 3 undefined on 
+input line 440.
 
+[3.3{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_kijugd.enc}{/
+usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_nh77jq.enc}]
 
-Package natbib Warning: Citation `barendregt1992lambda' on page 5 undefined on 
-input line 552.
+Package natbib Warning: Citation `barendregt1992lambda' on page 4 undefined on 
+input line 464.
 
-[5.5]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 555.
+(hyperref)                removing `math shift' on input line 467.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 555.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 467.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77695pt
-(hyperref)                removed on input line 555.
+(hyperref)                removed on input line 467.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 555.
+(hyperref)                removing `math shift' on input line 467.
 
 
-Package natbib Warning: Citation `girard1972interpretation' on page 6 undefined
- on input line 576.
+Package natbib Warning: Citation `girard1972interpretation' on page 4 undefined
+ on input line 488.
 
 
-Package natbib Warning: Citation `hurkens1995simplification' on page 6 undefine
-d on input line 576.
+Package natbib Warning: Citation `hurkens1995simplification' on page 4 undefine
+d on input line 488.
 
 
-Package natbib Warning: Citation `moura2021lean4' on page 6 undefined on input 
-line 597.
+Package natbib Warning: Citation `moura2021lean4' on page 4 undefined on input 
+line 509.
 
+[4.4]
 
-Class acmart Warning: A possible image without description on input line 655.
+Class acmart Warning: A possible image without description on input line 567.
 
-[6.6]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/sc' will be
-(Font)              scaled to size 10.0pt on input line 660.
+(Font)              scaled to size 10.0pt on input line 572.
+[5.5{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_tlukpt.enc}]
 
+Package natbib Warning: Citation `barendregt1992lambda' on page 6 undefined on 
+input line 609.
 
-Package natbib Warning: Citation `barendregt1992lambda' on page 7 undefined on 
-input line 697.
-
-[7.7{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_tlukpt.enc}]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 703.
+put line 615.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 8.0pt on input line 706.
+(Font)              scaled to size 8.0pt on input line 618.
 
-[8.8]
-
-LaTeX Font Warning: Command \Small invalid in math mode on input line 772.
+LaTeX Font Warning: Command \Small invalid in math mode on input line 684.
 
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
-(Font)              scaled to size 9.0pt on input line 779.
-[9.9]
+(Font)              scaled to size 9.0pt on input line 691.
 
-Package natbib Warning: Citation `debruijn1972nameless' on page 10 undefined on
- input line 835.
+Underfull \vbox (badness 1412) has occurred while \output is active []
+
+ [6.6]
+[7.7]
+
+Package natbib Warning: Citation `debruijn1972nameless' on page 8 undefined on 
+input line 747.
 
 
-Package natbib Warning: Citation `barendregt1992lambda' on page 10 undefined on
- input line 843.
+Package natbib Warning: Citation `barendregt1992lambda' on page 8 undefined on 
+input line 755.
 
 No file main.bbl.
 
@@ -1652,7 +1651,7 @@ File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 )
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/se-utf8.def
 File: se-utf8.def 2019/11/29 v1.12 stringenc: UTF-8
-) [10.10]
+) [8.8]
 (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
@@ -1663,16 +1662,16 @@ L3 programming layer <2024-01-22>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 7DBB268DC77C91CF8A4DE40ACA6AD6A2;3201.
+(rerunfilecheck)             Checksum: FBA02D6C21BA7AC7A83BD3D2CCBA7590;1877.
  ) 
 Here is how much of TeX's memory you used:
- 39517 strings out of 474222
- 709770 string characters out of 5748733
- 2003975 words of memory out of 5000000
- 60158 multiletter control sequences out of 15000+600000
- 875903 words of font info for 597 fonts, out of 8000000 for 9000
+ 39447 strings out of 474222
+ 708113 string characters out of 5748733
+ 2002975 words of memory out of 5000000
+ 60144 multiletter control sequences out of 15000+600000
+ 863800 words of font info for 567 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 90i,28n,131p,7891b,2362s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,28n,131p,7883b,2363s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4
 b.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata
 -zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMath
@@ -1689,10 +1688,10 @@ ive/texmf-dist/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/public/newtx/txsym.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newt
 x/txsys.pfb>
-Output written on main.pdf (10 pages, 546847 bytes).
+Output written on main.pdf (8 pages, 535259 bytes).
 PDF statistics:
- 296 PDF objects out of 1000 (max. 8388607)
- 243 compressed objects within 3 object streams
- 68 named destinations out of 1000 (max. 500000)
- 175269 words of extra memory for PDF output out of 184870 (max. 10000000)
+ 260 PDF objects out of 1000 (max. 8388607)
+ 209 compressed objects within 3 object streams
+ 58 named destinations out of 1000 (max. 500000)
+ 167037 words of extra memory for PDF output out of 184870 (max. 10000000)
 

@@ -116,6 +116,7 @@
 \newcommand{\iotared}{\to_{\iota}}
 \newcommand{\deltared}{\to_{\delta}}
 \newcommand{\hole}[1]{?_{#1}}
+\newcommand{\db}[2]{\lfloor #1 \rfloor_{#2}}
 
 \definecolor{myBlue}{RGB}{47,124,196}
 \definecolor{myPurple}{RGB}{155,89,182}
@@ -396,6 +397,7 @@ of bound variables are called \emph{$\alpha$-equivalent}.
 
 
 \begin{definition}[$\alpha$-equivalence]
+\label{def:alpha}
 
 $\alphaeq$ is the smallest congruence on terms containing, for $\square \in \{\Pi, \lambda\}$,
 
@@ -408,10 +410,23 @@ $\alphaeq$ is the smallest congruence on terms containing, for $\square \in \{\P
 
 This definition is easy to state but not directly executable, since it does not say which names to choose. An implementation 
 instead walks both terms in lockstep and remembers, for each side, the list of binders passed so far. A bound variable is 
-then identified by \emph{which} binder it refers to, not by its name. We write $E_1; E_2 \vdash s \alphaeq t$, where $E_1$ 
-and $E_2$ are lists of names. Let $\mathit{idx}(E, x)$ be the position of the last occurrence of $x$ in $E$, counted from 
-the right starting at $0$, or undefined if $x \notin E$. Taking the \emph{last} occurrence handles shadowing: 
-in $\tLam{x}{A}{\tLam{x}{B}{x}}$ the body refers to the inner $x$.
+then identified by \emph{which} binder it refers to, not by its name.
+
+To describe this walk, we use a judgment of the form $E_1; E_2 \vdash s \alphaeq t$, where $E_1$ and $E_2$ are lists of names.
+The list $E_1$ records the binders that enclose $s$, from the outermost to the innermost, and $E_2$ records those that enclose $t$.
+The judgment reads: ``$s$, placed inside the binders $E_1$, and $t$, placed inside the binders $E_2$, are the same term up to the names
+of bound variables''. Two lists are needed because the two terms may use different names for corresponding binders.
+For example, comparing $\tLam{x}{A}{\tLam{y}{B}{x}}$ with $\tLam{a}{A}{\tLam{b}{B}{a}}$ passes two binders on each side and arrives at
+\[
+x, y;\; a, b \vdash x \alphaeq a,
+\]
+which holds because $x$ and $a$ both refer to the outer of the two binders. Comparing two whole terms starts from empty lists,
+$\cdot\,;\cdot \vdash s \alphaeq t$. The same symbol $\alphaeq$ appears in Definition~\ref{def:alpha} and in the judgment;
+the prefix $E_1; E_2 \vdash$ distinguishes the judgment, and Theorem~\ref{thm:alpha} below shows that the two agree.
+
+To say ``the same binder'' precisely, let $\mathit{idx}(E, x)$ be the position of the last occurrence of $x$ in $E$, counted from
+the right starting at $0$, or undefined if $x \notin E$. In the example, $\mathit{idx}(x, y;\, x) = \mathit{idx}(a, b;\, a) = 1$.
+Taking the \emph{last} occurrence handles shadowing: in $\tLam{x}{A}{\tLam{x}{B}{x}}$ the body refers to the inner $x$.
 
 \begin{figure}[ht]
 
@@ -433,7 +448,7 @@ in $\tLam{x}{A}{\tLam{x}{B}{x}}$ the body refers to the inner $x$.
 \inferrule{E_1; E_2 \vdash t_1 \alphaeq t_1' \\ E_1; E_2 \vdash t_2 \alphaeq t_2'}{E_1; E_2 \vdash t_1\;t_2 \alphaeq t_1'\;t_2'}\rulename{$\alpha$-App}
 \end{mathpar}
 
-\caption{Algorithmic $\alpha$-equivalence. Two closed or open terms are $\alpha$-equivalent iff $\cdot\,;\cdot \vdash s \alphaeq t$.}
+\caption{Algorithmic $\alpha$-equivalence. By Theorem~\ref{thm:alpha}, two terms $s$ and $t$ are $\alpha$-equivalent iff $\cdot\,;\cdot \vdash s \alphaeq t$.}
 
 \label{fig:alpha}
 
@@ -447,6 +462,18 @@ through binders together, $E_1$ and $E_2$ always have the same length. So compar
 as comparing positions counted from the left, and an implementation may store each list as a map from names to binding depths, 
 provided it restores the previous entry when it leaves a binder. Using positions instead of names everywhere gives the 
 \emph{de Bruijn representation}~\cite{debruijn1972nameless}, in which $\alpha$-equivalent terms are syntactically identical.
+
+The rules of Figure~\ref{fig:alpha} are a different definition from Definition~\ref{def:alpha}, so we must check that they agree.
+
+\begin{theorem}[Correctness of algorithmic $\alpha$-equivalence]
+\label{thm:alpha}
+For all terms $s$ and $t$, $s \alphaeq t$ in the sense of Definition~\ref{def:alpha} if and only if $\cdot\,;\cdot \vdash s \alphaeq t$ is derivable by the rules of Figure~\ref{fig:alpha}.
+\end{theorem}
+
+\noindent The idea of the proof is that both sides say the same thing: $s$ and $t$ have the same de Bruijn representation.
+For the algorithm this is almost immediate, since its rules compare positions exactly as de Bruijn indices do.
+For Definition~\ref{def:alpha}, the key fact is that renaming a bound variable does not change the de Bruijn representation.
+Appendix~\ref{app:alpha} gives the full proof.
 
 
 \section{Reduction and Conversion}
@@ -1456,6 +1483,143 @@ Each case builds the typing derivation shown in the right column of Figure~\ref{
     and Lemma~\ref{lem:formula-type} gives $\Gamma \vdash \psi^\ast : \Sort{0}$.
     \textsc{T-App} gives $\Gamma \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast} = (\subst{\varphi}{P}{\psi})^\ast$. \qedhere
 \end{itemize}
+\end{proof}
+
+\section{Proof of Theorem~\ref{thm:alpha}}
+\label{app:alpha}
+
+Both sides of Theorem~\ref{thm:alpha} turn out to say the same thing: $s$ and $t$ have the same de Bruijn representation.
+We first define that representation, and then relate it to the algorithm (Lemma~\ref{lem:alpha-alg}) and to the definition (Lemma~\ref{lem:alpha-def}).
+
+\paragraph{Nameless terms.}
+A \emph{nameless term} is built like a term, except that binders carry no names and a bound variable is written as a number $\#i$:
+\[
+d ::= \Sort{u} \mid \#i \mid x \mid \Pi\,d.\,d \mid \lambda\,d.\,d \mid d\;d
+\]
+Free variables keep their names.
+For a list of names $E$, the nameless form $\db{t}{E}$ of a term $t$ that occurs under the binders $E$ is
+\[
+\begin{array}{r@{\;}l@{\qquad}r@{\;}l}
+\db{\Sort{u}}{E} &= \Sort{u} &
+\db{x}{E} &= \begin{cases} \#\mathit{idx}(E, x) & \text{if } x \in E, \\ x & \text{otherwise,} \end{cases} \\[10pt]
+\db{\tPi{x}{A}{B}}{E} &= \Pi\,\db{A}{E}.\,\db{B}{E, x} &
+\db{\tLam{x}{A}{t}}{E} &= \lambda\,\db{A}{E}.\,\db{t}{E, x} \\[4pt]
+\db{t_1\;t_2}{E} &= \db{t_1}{E}\;\db{t_2}{E}.
+\end{array}
+\]
+Equality of nameless terms is plain syntactic equality.
+Note that $\db{t}{E}$ has the same outermost shape as $t$, except that a variable may become either a number or a name.
+Constants (\S\ref{sec:constants}) are left unchanged, like universes, and are compared by name; they add only trivial cases below.
+
+\begin{lemma}[The algorithm compares nameless forms]
+\label{lem:alpha-alg}
+For all $E_1$, $E_2$, $s$, and $t$: $E_1; E_2 \vdash s \alphaeq t$ is derivable if and only if $\db{s}{E_1} = \db{t}{E_2}$.
+\end{lemma}
+
+\begin{proof}
+By induction on $s$, for all $t$, $E_1$, and $E_2$.
+For each shape of $s$, exactly one rule of Figure~\ref{fig:alpha} can conclude the judgment, and its premises match the equations for $\db{\cdot}{}$.
+\begin{itemize}
+  \item If $s = \Sort{u}$, both sides hold exactly when $t = \Sort{u}$, by $\alpha$-Sort.
+  \item If $s = x$, the nameless forms can be equal only if $t$ is a variable $y$.
+    If $x \in E_1$, then $\db{x}{E_1} = \#\mathit{idx}(E_1, x)$, and equality holds exactly when $y \in E_2$ and $\mathit{idx}(E_2, y) = \mathit{idx}(E_1, x)$, which is the premise of $\alpha$-Bound.
+    If $x \notin E_1$, then $\db{x}{E_1} = x$, and equality holds exactly when $y \notin E_2$ and $y = x$, which is the premise of $\alpha$-Free.
+    A number never equals a name, matching the absence of a rule for a variable that is bound on one side only.
+  \item If $s = \tPi{x}{A}{B}$, equality holds exactly when $t = \tPi{y}{A'}{B'}$ with $\db{A}{E_1} = \db{A'}{E_2}$ and $\db{B}{E_1, x} = \db{B'}{E_2, y}$.
+    By the induction hypothesis, these are the premises of $\alpha$-Pi.
+    The cases $\lambda$ and application are the same. \qedhere
+\end{itemize}
+\end{proof}
+
+The definition of $\alphaeq$ involves substitution, so we need two facts about how nameless forms behave under renaming.
+The first says that $\db{t}{E}$ depends on $E$ only through the free variables of $t$.
+
+\begin{lemma}[Agreement]
+\label{lem:alpha-agree}
+If $\mathit{idx}(E_1, v) = \mathit{idx}(E_2, v)$ for every $v \in \FV(t)$, with both sides possibly undefined, then $\db{t}{E_1} = \db{t}{E_2}$.
+\end{lemma}
+
+\begin{proof}
+By induction on $t$, for all $E_1$ and $E_2$.
+The variable case is the assumption.
+Under a binder $x$, the lists $E_1, x$ and $E_2, x$ again agree on the free variables of the body:
+$x$ has position $0$ in both, and any other free variable has its position increased by one in both, or stays undefined in both.
+\end{proof}
+
+The second says that renaming a binder does not change the nameless form.
+We use that substituting a variable for a variable preserves the size of a term, even when binders are renamed; this is a routine induction.
+
+\begin{lemma}[Renaming]
+\label{lem:alpha-rename}
+Let $y \neq x$, $y \notin \FV(B)$, and $x, y \notin E'$.
+Then $\db{B}{E, x, E'} = \db{\subst{B}{x}{y}}{E, y, E'}$ for every list $E$.
+\end{lemma}
+
+\begin{proof}
+By induction on the size of $B$, for all $E$ and $E'$.
+Write $L_x = E, x, E'$ and $L_y = E, y, E'$; they differ only in one entry, at the same position.
+\begin{itemize}
+  \item If $B = x$, then $\subst{B}{x}{y} = y$. Since $x, y \notin E'$, both $\mathit{idx}(L_x, x)$ and $\mathit{idx}(L_y, y)$ equal the length of $E'$.
+  \item If $B = v \neq x$, then $v \neq y$ because $y \notin \FV(B)$, and $\subst{B}{x}{y} = v$.
+    The position of $v$ is the same in $L_x$ and $L_y$, or undefined in both.
+  \item Universes and applications are immediate from the definitions and the induction hypothesis.
+  \item Let $B = \tPi{w}{C}{D}$; the case of $\lambda$ is the same.
+    The annotation $C$ is handled by the induction hypothesis in each case below, so we consider only the body.
+    There are three cases, following the definition of substitution.
+    \begin{itemize}
+      \item \emph{$w = x$.} Then $\subst{B}{x}{y} = \tPi{x}{\subst{C}{x}{y}}{D}$, and we need $\db{D}{L_x, x} = \db{D}{L_y, x}$.
+        We apply Lemma~\ref{lem:alpha-agree}.
+        The variable $x$ has position $0$ in both lists.
+        Any other $v \in \FV(D)$ differs from $y$, since $y \notin \FV(B)$, so its position is the same in both lists, or undefined in both.
+      \item \emph{$w \notin \{x, y\}$.} Then $\subst{B}{x}{y} = \tPi{w}{\subst{C}{x}{y}}{\subst{D}{x}{y}}$.
+        The induction hypothesis for $D$, with $E'$ extended by $w$, gives $\db{D}{L_x, w} = \db{\subst{D}{x}{y}}{L_y, w}$.
+      \item \emph{$w = y$.} The binder would capture $y$, so substitution renames it to a fresh $z \notin \FV(D) \cup \{x, y\}$:
+        $\subst{B}{x}{y} = \tPi{z}{\subst{C}{x}{y}}{\subst{(\subst{D}{y}{z})}{x}{y}}$.
+        The induction hypothesis for $D$, renaming its last binder $y$ to $z$, gives $\db{D}{L_x, y} = \db{\subst{D}{y}{z}}{L_x, z}$.
+        The induction hypothesis for $\subst{D}{y}{z}$, which has the size of $D$ and no free $y$, with $E'$ extended by $z$,
+        gives $\db{\subst{D}{y}{z}}{L_x, z} = \db{\subst{(\subst{D}{y}{z})}{x}{y}}{L_y, z}$. \qedhere
+    \end{itemize}
+\end{itemize}
+\end{proof}
+
+\begin{lemma}[The definition compares nameless forms]
+\label{lem:alpha-def}
+If $s \alphaeq t$ in the sense of Definition~\ref{def:alpha}, then $\db{s}{E} = \db{t}{E}$ for every $E$.
+Conversely, if $\db{s}{E} = \db{t}{E}$ for some $E$, then $s \alphaeq t$.
+\end{lemma}
+
+\begin{proof}
+For the first part, let $s \sim t$ mean that $\db{s}{E} = \db{t}{E}$ for every $E$.
+This relation is an equivalence, and it is a congruence, because $\db{\cdot}{}$ is defined constructor by constructor.
+It contains the defining equation of Definition~\ref{def:alpha}:
+if $y \notin \FV(B)$, then $\db{\tPi{x}{A}{B}}{E} = \Pi\,\db{A}{E}.\,\db{B}{E, x}$ and $\db{\tPi{y}{A}{\subst{B}{x}{y}}}{E} = \Pi\,\db{A}{E}.\,\db{\subst{B}{x}{y}}{E, y}$,
+and the bodies are equal by Lemma~\ref{lem:alpha-rename} with $E'$ empty (the case $y = x$ is trivial).
+Since $\alphaeq$ is the smallest congruence containing that equation, $s \alphaeq t$ implies $s \sim t$.
+
+For the converse, we use induction on the size of $s$, for all $t$ and $E$.
+\begin{itemize}
+  \item If $s$ is a variable, so is $t$.
+    If both nameless forms are $\#i$, both variables are the entry at position $i$ of $E$, so $s = t$.
+    If both are names, then $s = t$ directly.
+  \item Universes and applications follow from the induction hypothesis and the congruence of $\alphaeq$.
+  \item Let $s = \tPi{x}{A}{B}$, so that $t = \tPi{y}{A'}{B'}$ with $\db{A}{E} = \db{A'}{E}$ and $\db{B}{E, x} = \db{B'}{E, y}$.
+    The induction hypothesis gives $A \alphaeq A'$.
+    For the bodies, choose $z \notin \FV(B) \cup \FV(B') \cup \{x, y\}$.
+    Lemma~\ref{lem:alpha-rename} with $E'$ empty gives $\db{B}{E, x} = \db{\subst{B}{x}{z}}{E, z}$ and $\db{B'}{E, y} = \db{\subst{B'}{y}{z}}{E, z}$,
+    so $\db{\subst{B}{x}{z}}{E, z} = \db{\subst{B'}{y}{z}}{E, z}$.
+    Since $\subst{B}{x}{z}$ has the size of $B$, the induction hypothesis gives $\subst{B}{x}{z} \alphaeq \subst{B'}{y}{z}$.
+    Then
+    \[
+    \tPi{x}{A}{B} \;\alphaeq\; \tPi{z}{A}{\subst{B}{x}{z}} \;\alphaeq\; \tPi{z}{A'}{\subst{B'}{y}{z}} \;\alphaeq\; \tPi{y}{A'}{B'},
+    \]
+    by the defining equation, by congruence, and by the defining equation read backwards.
+    The case of $\lambda$ is the same. \qedhere
+\end{itemize}
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:alpha}]
+If $s \alphaeq t$, then $\db{s}{\cdot} = \db{t}{\cdot}$ by Lemma~\ref{lem:alpha-def}, and $\cdot\,;\cdot \vdash s \alphaeq t$ by Lemma~\ref{lem:alpha-alg}.
+Conversely, if $\cdot\,;\cdot \vdash s \alphaeq t$, then $\db{s}{\cdot} = \db{t}{\cdot}$ by Lemma~\ref{lem:alpha-alg}, and $s \alphaeq t$ by Lemma~\ref{lem:alpha-def}.
 \end{proof}
 
 \end{document}

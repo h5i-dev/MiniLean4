@@ -320,19 +320,16 @@ There is no separate syntax for types: whether a term is a valid
 type is determined by the type checker.
 
 \section{Free Variables and Substitution}
-
 \label{sec:subst}
 
 
 
-$\Pi$ and $\lambda$ \emph{bind} their variable: in $\tLam{x}{A}{t}$, occurrences of $x$ inside $t$ refer to the argument.
-
-The binder's scope is the body only; $x$ is not bound in the annotation $A$.
-
+$\Pi$ and $\lambda$ \emph{bind} their variable: in $\tLam{x}{A}{t}$, occurrences of $x$ 
+inside $t$ refer to the argument. The binder's scope is the body only; $x$ is not bound 
+in the annotation $A$.
 
 
 \begin{definition}[Free variables]
-
 \begin{align*}
 \FV(\Sort{u}) &= \emptyset &
 \FV(\tPi{x}{A}{B}) &= \FV(A) \cup (\FV(B) \setminus \{x\}) \\
@@ -340,27 +337,20 @@ The binder's scope is the body only; $x$ is not bound in the annotation $A$.
 \FV(\tLam{x}{A}{t}) &= \FV(A) \cup (\FV(t) \setminus \{x\}) \\
 \FV(t\;s) &= \FV(t) \cup \FV(s)
 \end{align*}
-
 \end{definition}
 
-
-
-The typing rule for application (\S\ref{sec:typing}) needs to replace a variable with a term.
-
-We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences of $x$ in $t$ with $s$.
-
-The only subtle case is a binder. Consider
+The typing rule for application (\S\ref{sec:typing}) needs to replace a variable with 
+a term. We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences 
+of $x$ in $t$ with $s$. The only subtle case is a binder. Consider
 
 \[
 \subst{(\tLam{y}{A}{x})}{x}{y}.
 \]
 
-The body says ``ignore the argument and return the outer $x$''.
-
-Replacing $x$ by $y$ naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: the free $y$ has been \emph{captured} by the binder.
-
-Substitution must avoid this by renaming the binder first.
-
+The body says ``ignore the argument and return the outer $x$''. Replacing $x$ by $y$ 
+naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: 
+the free $y$ has been \emph{captured} by the binder. Substitution must avoid this 
+by renaming the binder first.
 
 
 \begin{definition}[Capture-avoiding substitution]
@@ -380,10 +370,9 @@ For $\square \in \{\Pi, \lambda\}$:
   && (y \neq x,\; y \in \FV(s),\; z \text{ fresh})
 \end{align*}
 
-Here ``$z$ fresh'' means $z \notin \FV(s) \cup \FV(B) \cup \{x\}$.
+\noindent Here ``$z$ fresh'' means $z \notin \FV(s) \cup \FV(B) \cup \{x\}$.
 
 \end{definition}
-
 
 
 \section{Alpha-Equivalence}
@@ -1128,13 +1117,14 @@ The binder's scope is the body only; $x$ is not bound in the annotation $A$.
 
 The typing rule for application (\S\ref{sec:typing}) needs to replace a variable with a term.
 We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences of $x$ in $t$ with $s$.
-The only subtle case is a binder. Consider
-\[
-\subst{(\tLam{y}{A}{x})}{x}{y}.
-\]
-The body says ``ignore the argument and return the outer $x$''.
-Replacing $x$ by $y$ naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: the free $y$ has been \emph{captured} by the binder.
-Substitution must avoid this by renaming the binder first.
+
+%The only subtle case is a binder. Consider
+%\[
+%\subst{(\tLam{y}{A}{x})}{x}{y}.
+%\]
+%The body says ``ignore the argument and return the outer $x$''.
+%Replacing $x$ by $y$ naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: the free $y$ has been \emph{captured} by the binder.
+%Substitution must avoid this by renaming the binder first.
 
 \begin{definition}[Capture-avoiding substitution]
 For $\square \in \{\Pi, \lambda\}$:

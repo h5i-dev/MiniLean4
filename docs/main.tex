@@ -501,6 +501,7 @@ First, $\beta$-reduction is confluent: different reduction orders cannot lead to
 Second, every well-typed term \emph{has} a normal form, so normalization terminates.
 The second fact holds for our system, but it is a deep theorem (strong normalization)~\cite{barendregt1992lambda}.
 A practical kernel also caps the number of reduction steps, so that a bug cannot make it loop forever.
+Algorithm~\ref{alg:normalize} in \S\ref{sec:iota-data} gives \textsc{Normalize} in full; for the system so far, only its $\beta$ case is needed.
 
 \section{Typing Rules}
 \label{sec:typing}
@@ -1053,7 +1054,7 @@ inductive Eq {A : Sort u} : A -> A -> Prop where
 \end{lstlisting}
 make the kernel add a type, its constructors, and a \emph{recursor} that eliminates it, together with computation rules for the recursor.
 A general kernel derives all of these from the declaration.
-We add the two types above by hand, which shows the ingredients without the machinery for arbitrary declarations.
+We first add the two types above by hand, which shows the ingredients, and then explain in \S\ref{sec:iota-data} how they become data that a fixed kernel processes.
 
 \subsection{Constants and Definitions}
 \label{sec:constants}
@@ -1201,12 +1202,107 @@ The kernel checks it with Algorithm~\ref{alg:infer}.
 Each argument is checked against the corresponding part of the type of $\NatRec{0}$, instantiated with $M_0$, and every comparison succeeds after normalization.
 Writing such terms by hand is tedious, and finding the right motive is the hard part; tactics (\S\ref{sec:tactics}) automate both.
 
+\subsection{Computation Rules as Data}
+\label{sec:iota-data}
+
+Figure~\ref{fig:nat-eq} writes each $\iota$-rule as a separate equation, which suggests that every new inductive type needs new reduction code in the kernel.
+It does not.
+A kernel stores the $\iota$-rules as data in the signature, next to the recursor, and a single piece of code applies them for every inductive type.
+
+Each recursor entry records the position of its \emph{major premise}, the argument whose constructor decides which rule applies,
+and a list of \emph{rules}, one per constructor.
+A rule names the constructor, the number of its \emph{fields} (the arguments that the constructor stores, as opposed to the type parameters it merely carries),
+and a right-hand side $\mathit{rhs}$, an ordinary term.
+Each constructor entry records how many leading arguments are parameters.
+For our two recursors, the data is as follows; type annotations on $\lambda$ are omitted.
+\begin{center}
+\footnotesize
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{Recursor} & \textbf{Major} & \textbf{Constructor} & \textbf{Params} & \textbf{Fields} & $\mathit{rhs}$ \\
+\midrule
+$\NatRec{u}$ & 4th & $\zero$ & 0 & 0 & $\lambda M\,z\,s.\; z$ \\
+& & $\tsucc$ & 0 & 1 & $\lambda M\,z\,s\,n.\; s\;n\;(\NatRec{u}\;M\;z\;s\;n)$ \\
+$\EqRec{u,v}$ & 6th & $\refl{u}$ & 2 & 0 & $\lambda A\,a\,M\,m\,b.\; m$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The $\mathit{rhs}$ takes the arguments before the major premise, then the fields of the constructor.
+For example, $\NatRec{u}\;M\;z\;s\;(\tsucc\;n)$ selects the second rule and becomes
+$(\lambda M\,z\,s\,n.\; s\;n\;(\NatRec{u}\;M\;z\;s\;n))\;M\;z\;s\;n$, which $\beta$-reduces to the right-hand side of the second equation in Figure~\ref{fig:nat-eq}.
+
+Algorithm~\ref{alg:normalize} defines \textsc{Normalize}, which Algorithm~\ref{alg:infer} has used without definition.
+It is built from \textsc{Whnf}, which reduces only the head of a term until no rule applies there, giving its \emph{weak head normal form}.
+A term is viewed as a \emph{spine} $h\;a_1 \cdots a_n$: a head $h$ that is not an application, applied to $n \ge 0$ arguments.
+
+\begin{algorithm}[ht]
+\footnotesize
+\caption{Normalization by $\beta$, $\delta$, and $\iota$.}
+\label{alg:normalize}
+\begin{algorithmic}[1]
+\Function{Whnf}{$t$}
+  \Loop
+    \State write $t$ as a spine $h\;a_1 \cdots a_n$
+    \If{$h = \tLam{x}{A}{b}$ and $n \ge 1$} \Comment{$\beta$}
+      \State $t \gets (\subst{b}{x}{a_1})\;a_2 \cdots a_n$
+    \ElsIf{$h = c$ and $(c : C \mathrel{:=} d) \in \Sigma$} \Comment{$\delta$}
+      \State $t \gets d\;a_1 \cdots a_n$
+    \ElsIf{$h = c$ is a recursor with major position $p \le n$} \Comment{$\iota$}
+      \State $k\;b_1 \cdots b_j \gets \Call{Whnf}{a_p}$
+      \If{$k$ is a constructor with a rule $r$ of $c$, and $k$ has $q$ parameters}
+        \State $t \gets r.\mathit{rhs}\;a_1 \cdots a_{p-1}\;b_{q+1} \cdots b_j\;a_{p+1} \cdots a_n$
+      \Else\ \Return $t$ \Comment{stuck, e.g.\ on a variable}
+      \EndIf
+    \Else\ \Return $t$
+    \EndIf
+  \EndLoop
+\EndFunction
+\Statex
+\Function{Normalize}{$t$}
+  \State $t \gets \Call{Whnf}{t}$
+  \If{$t = \tPi{x}{A}{B}$} \Return $\tPi{x}{\Call{Normalize}{A}}{\Call{Normalize}{B}}$
+  \ElsIf{$t = \tLam{x}{A}{b}$} \Return $\tLam{x}{\Call{Normalize}{A}}{\Call{Normalize}{b}}$
+  \Else\ write $t$ as a spine $h\;a_1 \cdots a_n$ and \Return $h\;\Call{Normalize}{a_1} \cdots \Call{Normalize}{a_n}$
+  \EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\noindent Algorithm~\ref{alg:normalize} has the following properties.
+\begin{itemize}
+  \item The $\iota$ case contains no reference to $\Nat$ or $\Eq{}$. It reads the major position and the rules from the signature, so adding an inductive type adds rows of data, not code.
+  \item The major premise is put in weak head normal form before the rules are consulted, because it may become a constructor only after computation, as in $2 + 1$ above.
+    If it does not, for instance because it is a variable, the term is stuck and stays as it is; this is why $0 + n$ does not reduce.
+  \item \textsc{Whnf} alone is enough when a caller only needs to see the outermost shape of a type, such as a $\Pi$ in the application case of \textsc{Infer}.
+    Practical kernels use \textsc{Whnf} there and compare types lazily instead of normalizing them fully; Algorithm~\ref{alg:infer} normalizes fully for simplicity.
+\end{itemize}
+For the system of \S\S\ref{sec:syntax}--\ref{sec:properties}, which has no constants, only the $\beta$ case is ever used.
+Termination of the loop for well-typed terms is strong normalization.
+
+\subsection{General Inductive Types}
+
+In Lean, a user never writes the rows above.
+When it accepts an \texttt{inductive} declaration, the kernel generates the type former, the constructors, the recursor with its type, and the rules, all from the shapes of the constructors.
+For \texttt{Nat}, it generates exactly the entries of Figure~\ref{fig:nat-eq} and the table above.
+For \texttt{Eq}, it generates the dependent recursor \texttt{Eq.rec}, from which \texttt{Eq.ndrec} is then defined.
+So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and Algorithm~\ref{alg:normalize} runs their rules.
+
+The procedure must also reject some declarations.
+The declaration
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+inductive Bad where
+  | mk : (Bad -> False) -> Bad
+\end{lstlisting}
+mentions \texttt{Bad} to the left of an arrow in the type of a constructor argument.
+Case analysis on it would let one define $f : \mathtt{Bad} \to \mathtt{False}$ by $f\;(\mathtt{mk}\;g) = g\;(\mathtt{mk}\;g)$.
+Then $f\;(\mathtt{mk}\;f)$ is a closed term of type $\mathtt{False}$, and it reduces to itself, so it has no normal form.
+The self-application is the same kind of self-reference as in Russell's paradox (\S\ref{sec:typetype}).
+Lean therefore requires every constructor argument to mention the type being defined only \emph{strictly positively}, that is, never to the left of an arrow.
+
 \subsection{Changes to the Kernel and Its Properties}
 
-The algorithm changes in three places.
-\textsc{Infer} gains a case for constants, which looks up the type in $\Sigma$.
-\textsc{Normalize} unfolds definitions by $\delta$, and applies an $\iota$-rule when the argument it inspects (the \emph{major premise}: the number for $\NatRec{}$, the proof for $\EqRec{}$) normalizes to a constructor.
-The major premise must be normalized first, since it may become $\zero$ or $\tsucc$ only after computation, as in $2 + 1$ above.
+\textsc{Infer} gains a case for constants, which looks up the type in $\Sigma$, and \textsc{Normalize} is Algorithm~\ref{alg:normalize}.
 \textsc{Check} is unchanged: it still normalizes both types and compares them up to $\alpha$-equivalence.
 
 The $\iota$-rules do not overlap with each other or with $\beta$, so reduction remains confluent.

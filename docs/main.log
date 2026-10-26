@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 19:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 19:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1546,107 +1546,121 @@ Class acmart Warning: A possible image without description on input line 455.
 
 [3.3{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_kijugd.enc}]
 
-Class acmart Warning: A possible image without description on input line 546.
+Class acmart Warning: A possible image without description on input line 547.
 
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 10.0pt on input line 551.
+(Font)              scaled to size 10.0pt on input line 552.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/sc' will be
-(Font)              scaled to size 10.0pt on input line 551.
+(Font)              scaled to size 10.0pt on input line 552.
 [4.4{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_tlukpt.enc}{/
 usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_nh77jq.enc}]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 584.
+(hyperref)                removing `math shift' on input line 585.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 584.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 585.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77695pt
-(hyperref)                removed on input line 584.
+(hyperref)                removed on input line 585.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 584.
+(hyperref)                removing `math shift' on input line 585.
 
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 8.0pt on input line 619.
+(Font)              scaled to size 8.0pt on input line 620.
 
-Class acmart Warning: A possible image without description on input line 638.
+Class acmart Warning: A possible image without description on input line 639.
 
 [5.5]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 670.
+(hyperref)                removing `math shift' on input line 671.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 670.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 671.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 2.77695pt
-(hyperref)                removed on input line 670.
+(hyperref)                removed on input line 671.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 670.
+(hyperref)                removing `math shift' on input line 671.
 
 [6.6] [7.7]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
-(Font)              scaled to size 9.0pt on input line 758.
+(Font)              scaled to size 9.0pt on input line 759.
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 810.
+put line 811.
  [8.8]
 
-LaTeX Font Warning: Command \Small invalid in math mode on input line 881.
+LaTeX Font Warning: Command \Small invalid in math mode on input line 882.
 
 
 Underfull \vbox (badness 7981) has occurred while \output is active []
 
  [9.9]
 
-LaTeX Font Warning: Command \Small invalid in math mode on input line 953.
+LaTeX Font Warning: Command \Small invalid in math mode on input line 954.
 
 [10.10] [11.11]
 LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 10
-46.
+47.
  (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 1046.
+(Font)              scaled to size 10.0pt on input line 1047.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `zi4' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 8.0pt on input line 1046.
+(Font)              scaled to size 8.0pt on input line 1047.
 
 [12.12{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-4.enc}]
 
-Class acmart Warning: A possible image without description on input line 1123.
+Class acmart Warning: A possible image without description on input line 1124.
 
 [13.13]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1181.
+(hyperref)                removing `math shift' on input line 1182.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1181.
+(hyperref)                removing `math shift' on input line 1182.
 
 [14.14]
+Overfull \hbox (15.67485pt too wide) in paragraph at lines 1231--1234
+[][] \OML/nxlmi/m/it/10 M z s \LMS/ntxsy/m/n/10 น[] \OML/nxlmi/m/it/10 n\LMS/nt
+xsy/m/n/10 บ$ \T1/LinuxLibertineT-TLF/m/n/10 (-20) se-lects the sec-ond rule an
+d be-comes $\LMS/ntxsy/m/n/10 น\OML/nxlmi/m/it/10 ^^UM z s n: s n \LMS/ntxsy/m/
+n/10 น[][] \OML/nxlmi/m/it/10 M z s n\LMS/ntxsy/m/n/10 บบ \OML/nxlmi/m/it/10 M 
+z s n$\T1/LinuxLibertineT-TLF/m/n/10 (-20) ,
+ []
+
+[15.15]
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 7.3pt on input line 1298.
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 5.5pt on input line 1298.
+ [16.16]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 1253.
+(Font)              using `T1/zi4/m/n' instead on input line 1349.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.0pt on input line 1263.
-[15.15]
-Overfull \hbox (15.19101pt too wide) in paragraph at lines 1318--1323
+(Font)              scaled to size 10.0pt on input line 1359.
+[17.17]
+Overfull \hbox (15.19101pt too wide) in paragraph at lines 1414--1419
 \T1/LinuxLibertineT-TLF/m/n/10 (-20) With the mo-tive $\OML/nxlmi/m/it/10 M \U/
 ntxmia/m/it/10 = \OML/nxlmi/m/it/10 ^^U\LMS/ntxsy/m/n/10 น\OML/nxlmi/m/it/10 z[
 ][]\LMS/ntxsy/m/n/10 บ\OML/nxlmi/m/it/10 : T\LMS/ntxsy/m/n/10 ป\OML/nxlmi/m/it/
@@ -1657,19 +1671,18 @@ TLF/m/n/10 (-20) and $\U/ntxmia/m/it/10 ^^E\LMS/ntxsy/m/n/10 น\OML/nxlmi/m/it/1
 0 k[][]\LMS/ntxsy/m/n/10 บ\OML/nxlmi/m/it/10 : M k \LMS/ntxsy/m/n/10 !
  []
 
-[16.16]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1362.
+(hyperref)                removing `math shift' on input line 1458.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1362.
+(hyperref)                removing `math shift' on input line 1458.
 
-[17.17]
+[18.18]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 8.0pt on input line 1413.
- [18.18] [19.19] [20.20]
+(Font)              scaled to size 8.0pt on input line 1509.
+ [19.19] [20.20] [21.21] [22.22]
 
 Class acmart Warning: Some images may lack descriptions.
 
@@ -1678,7 +1691,7 @@ File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 )
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/se-utf8.def
 File: se-utf8.def 2019/11/29 v1.12 stringenc: UTF-8
-) [21.21]
+) [23.23]
 (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
@@ -1689,16 +1702,16 @@ L3 programming layer <2024-01-22>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 26CD9068A83D57631E6D62D3C4EE6A3B;6166.
+(rerunfilecheck)             Checksum: C92F4329B043C3577A21D80B9774440C;6597.
  ) 
 Here is how much of TeX's memory you used:
- 38784 strings out of 474222
- 702430 string characters out of 5748733
- 1987975 words of memory out of 5000000
- 59223 multiletter control sequences out of 15000+600000
- 898100 words of font info for 680 fonts, out of 8000000 for 9000
+ 38817 strings out of 474222
+ 702959 string characters out of 5748733
+ 1994975 words of memory out of 5000000
+ 59243 multiletter control sequences out of 15000+600000
+ 899087 words of font info for 684 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 90i,28n,131p,7883b,1221s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,28n,131p,7883b,2138s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4
 r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI.p
 fb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI5.pfb
@@ -1709,15 +1722,16 @@ share/texlive/texmf-dist/fonts/type1/public/libertine/LinBiolinumTB.pfb></usr/s
 hare/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineT.pfb></usr/sh
 are/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTB.pfb></usr/sh
 are/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTI.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/public/newtx/txexas.pfb></usr/share/texlive/
-texmf-dist/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dist/fo
-nts/type1/public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
-blic/txfonts/txsyc.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/
-txsym.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsys.pfb>
-Output written on main.pdf (21 pages, 617972 bytes).
+are/texlive/texmf-dist/fonts/type1/public/newtx/NewTXMI7.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/newtx/txexas.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfon
+ts/txsyc.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsym.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsys.pfb>
+Output written on main.pdf (23 pages, 631021 bytes).
 PDF statistics:
- 571 PDF objects out of 1000 (max. 8388607)
- 502 compressed objects within 6 object streams
- 146 named destinations out of 1000 (max. 500000)
- 183589 words of extra memory for PDF output out of 184870 (max. 10000000)
+ 612 PDF objects out of 1000 (max. 8388607)
+ 539 compressed objects within 6 object streams
+ 154 named destinations out of 1000 (max. 500000)
+ 184629 words of extra memory for PDF output out of 184870 (max. 10000000)
 

@@ -41,11 +41,11 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.4}A Hierarchy with an Impredicative Bottom}{7}{subsection.7.4}\protected@file@percent }
 \newlabel{sec:hierarchy}{{7.4}{7}{A Hierarchy with an Impredicative Bottom}{subsection.7.4}{}}
 \@writefile{toc}{\contentsline {paragraph}{Propositions are impredicative.}{7}{section*.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Types are predicative.}{7}{section*.8}\protected@file@percent }
 \citation{coquand1988calculus}
 \citation{hurkens1995simplification}
 \citation{moura2021lean4}
 \citation{barendregt1992lambda}
+\@writefile{toc}{\contentsline {paragraph}{Types are predicative.}{8}{section*.8}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Why this is safe.}{8}{section*.9}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Comparison with Lean}{8}{subsection.7.5}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Design choices for universes.}}{8}{table.caption.10}\protected@file@percent }
@@ -56,7 +56,7 @@
 \newlabel{alg:infer}{{1}{9}{Type inference and checking}{algorithm.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {9}Worked Examples}{9}{section.9}\protected@file@percent }
 \newlabel{sec:examples}{{9}{9}{Worked Examples}{section.9}{}}
-\@writefile{toc}{\contentsline {paragraph}{The identity proof.}{9}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The identity proof.}{10}{section*.11}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{A wrong proof.}{10}{section*.12}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Conversion.}{10}{section*.13}\protected@file@percent }
 \citation{debruijn1972nameless}
@@ -73,8 +73,8 @@
 \newlabel{sec:inductive}{{12}{12}{Inductive Types: Natural Numbers and Equality}{section.12}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {12.1}Constants and Definitions}{12}{subsection.12.1}\protected@file@percent }
 \newlabel{sec:constants}{{12.1}{12}{Constants and Definitions}{subsection.12.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.2}Natural Numbers}{12}{subsection.12.2}\protected@file@percent }
-\newlabel{sec:nat}{{12.2}{12}{Natural Numbers}{subsection.12.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.2}Natural Numbers}{13}{subsection.12.2}\protected@file@percent }
+\newlabel{sec:nat}{{12.2}{13}{Natural Numbers}{subsection.12.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Constants for natural numbers and equality (top) and their $\iota $-rules (bottom).}}{13}{figure.caption.15}\protected@file@percent }
 \newlabel{fig:nat-eq}{{4}{13}{Constants for natural numbers and equality (top) and their $\iota $-rules (bottom)}{figure.caption.15}{}}
 \@writefile{toc}{\contentsline {paragraph}{Recursion.}{13}{section*.16}\protected@file@percent }
@@ -87,19 +87,22 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {12.4}Example: $0 + n = n$}{14}{subsection.12.4}\protected@file@percent }
 \newlabel{sec:zero-add}{{12.4}{14}{Example: $0 + n = n$}{subsection.12.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {12.5}Changes to the Kernel and Its Properties}{14}{subsection.12.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13}Tactics: Building Proof Terms Interactively}{14}{section.13}\protected@file@percent }
-\newlabel{sec:tactics}{{13}{14}{Tactics: Building Proof Terms Interactively}{section.13}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {13}Tactics: Building Proof Terms Interactively}{15}{section.13}\protected@file@percent }
+\newlabel{sec:tactics}{{13}{15}{Tactics: Building Proof Terms Interactively}{section.13}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {13.1}Goals and Proof States}{15}{subsection.13.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {13.2}Basic Tactics}{15}{subsection.13.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\texttt  {intro x}.}{15}{section*.19}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\texttt  {exact t}.}{15}{section*.20}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\texttt  {apply f}.}{15}{section*.21}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {change T'}.}{15}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {change T'}.}{16}{section*.22}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\texttt  {rfl}.}{16}{section*.23}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {13.3}Induction}{16}{subsection.13.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {13.4}Rewriting}{16}{subsection.13.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{When the motive is ill typed.}{16}{section*.24}\protected@file@percent }
 \citation{moura2021lean4}
+\@writefile{toc}{\contentsline {paragraph}{When the motive is ill typed.}{17}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.5}Example: $0 + n = n$ with Tactics}{17}{subsection.13.5}\protected@file@percent }
+\newlabel{sec:zero-add-tactics}{{13.5}{17}{Example: $0 + n = n$ with Tactics}{subsection.13.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.6}Why Tactics Need Not Be Trusted}{17}{subsection.13.6}\protected@file@percent }
 \bibcite{carneiro2019type}{{1}{}{{}}{{}}}
 \bibcite{coquand1988calculus}{{2}{}{{}}{{}}}
 \bibcite{luo1990extended}{{3}{}{{}}{{}}}
@@ -107,17 +110,14 @@
 \bibcite{barendregt1992lambda}{{5}{}{{}}{{}}}
 \bibcite{debruijn1972nameless}{{6}{}{{}}{{}}}
 \bibcite{girard1972interpretation}{{7}{}{{}}{{}}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.5}Example: $0 + n = n$ with Tactics}{17}{subsection.13.5}\protected@file@percent }
-\newlabel{sec:zero-add-tactics}{{13.5}{17}{Example: $0 + n = n$ with Tactics}{subsection.13.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.6}Why Tactics Need Not Be Trusted}{17}{subsection.13.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{17}{section*.26}\protected@file@percent }
 \bibcite{hurkens1995simplification}{{8}{}{{}}{{}}}
 \bibcite{moura2021lean4}{{9}{}{{}}{{}}}
+\@writefile{toc}{\contentsline {section}{References}{18}{section*.26}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {A}Proof of Theorem\nonbreakingspace \ref {thm:alpha}}{18}{appendix.A}\protected@file@percent }
 \newlabel{app:alpha}{{A}{18}{Proof of Theorem~\ref {thm:alpha}}{appendix.A}{}}
 \@writefile{toc}{\contentsline {paragraph}{Nameless terms.}{18}{section*.27}\protected@file@percent }
 \newlabel{lem:alpha-alg}{{7}{18}{The algorithm compares nameless forms}{theorem.7}{}}
-\newlabel{lem:alpha-agree}{{8}{18}{Agreement}{theorem.8}{}}
+\newlabel{lem:alpha-agree}{{8}{19}{Agreement}{theorem.8}{}}
 \newlabel{lem:alpha-rename}{{9}{19}{Renaming}{theorem.9}{}}
 \newlabel{lem:alpha-def}{{10}{19}{The definition compares nameless forms}{theorem.10}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {B}Proof of Theorem\nonbreakingspace \ref {thm:pat}}{20}{appendix.B}\protected@file@percent }

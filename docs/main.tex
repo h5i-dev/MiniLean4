@@ -693,8 +693,13 @@ Suppose we replace all universes by a single universe $\mathsf{Type}$ that conta
 \]
 Translate $\forall P.\,\varphi$ as $\tPi{P}{\mathsf{Type}}{\varphi^\ast}$.
 Then $P$ ranges over a collection that contains $\mathsf{Type}$ itself and every type built from it.
-Such a collection is the type-theoretic analogue of the set of all sets, and Russell's paradox can be replayed in it.
-Girard showed that the system then has a closed term
+Such a collection is the type-theoretic analogue of the set of all sets, and naive set theory shows that such collections lead to contradictions.
+The best-known example is \emph{Russell's paradox}.
+Let $R = \{\, x \mid x \notin x \,\}$ be the set of all sets that are not members of themselves.
+If $R \in R$, then $R$ fails the condition, so $R \notin R$; if $R \notin R$, then $R$ satisfies the condition, so $R \in R$.
+Either way we reach a contradiction, and the culprit is a collection that may contain itself.
+Type theory has no membership test like $x \notin x$, so Russell's argument does not carry over word for word.
+Girard instead adapted a related paradox about the collection of all well-orderings, due to Burali-Forti, and showed that the system has a closed term
 \[
 \vdash t_{\mathrm{G}} : \tPi{P}{\mathsf{Type}}{P},
 \]

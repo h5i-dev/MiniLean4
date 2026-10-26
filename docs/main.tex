@@ -104,6 +104,18 @@
 \newcommand{\conv}{\equiv}
 \newcommand{\ctxok}[1]{\vdash #1\;\mathsf{ok}}
 \newcommand{\rulename}[1]{\;(\textsc{#1})}
+\newcommand{\imax}{\mathrm{imax}}
+\newcommand{\Nat}{\mathsf{Nat}}
+\newcommand{\zero}{\mathsf{zero}}
+\newcommand{\tsucc}{\mathsf{succ}}
+\newcommand{\add}{\mathsf{add}}
+\newcommand{\NatRec}[1]{\mathsf{Nat.rec}_{#1}}
+\newcommand{\Eq}[1]{\mathsf{Eq}_{#1}}
+\newcommand{\refl}[1]{\mathsf{refl}_{#1}}
+\newcommand{\EqRec}[1]{\mathsf{Eq.ndrec}_{#1}}
+\newcommand{\iotared}{\to_{\iota}}
+\newcommand{\deltared}{\to_{\delta}}
+\newcommand{\hole}[1]{?_{#1}}
 
 \definecolor{myBlue}{RGB}{47,124,196}
 \definecolor{myPurple}{RGB}{155,89,182}
@@ -491,7 +503,7 @@ Read through Curry--Howard, $\Gamma \vdash t : A$ says that $t$ is a proof of $A
 \inferrule{\ctxok{\Gamma} \\ (x : A) \in \Gamma}{\Gamma \vdash x : A}\rulename{T-Var}
 \\
 \and
-\inferrule{\Gamma \vdash A : \Sort{u} \\ \Gamma, x : A \vdash B : \Sort{v}}{\Gamma \vdash \tPi{x}{A}{B} : \Sort{(\max(u, v))}}\rulename{T-Pi}
+\inferrule{\Gamma \vdash A : \Sort{u} \\ \Gamma, x : A \vdash B : \Sort{v}}{\Gamma \vdash \tPi{x}{A}{B} : \Sort{\imax(u, v)}}\rulename{T-Pi}
 \and
 \inferrule{\Gamma \vdash A : \Sort{u} \\ \Gamma, x : A \vdash t : B}{\Gamma \vdash \tLam{x}{A}{t} : \tPi{x}{A}{B}}\rulename{T-Lam}
 \\
@@ -518,7 +530,8 @@ We read each rule from the bottom up, as a recipe for checking a term.
     A variable has the type it was assumed to have. Logically, this is ``use a hypothesis''.
   \item[\textsc{T-Pi}.]
     $\tPi{x}{A}{B}$ is a type if $A$ is a type and $B$ is a type once we assume $x : A$.
-    It lives in the larger of the two universes (\S\ref{sec:universes}).
+    It lives in the larger of the two universes, except that it is a proposition whenever $B$ is one;
+    $\imax(u, v)$ is $0$ if $v = 0$ and $\max(u, v)$ otherwise (\S\ref{sec:hierarchy}).
     Logically, this rule says when $A \to B$ and $\forall x{:}A.\,B$ are well-formed propositions.
   \item[\textsc{T-Lam}.]
     To build a function from $A$ to $B$, assume $x : A$ and build $t : B$.
@@ -527,7 +540,7 @@ We read each rule from the bottom up, as a recipe for checking a term.
   \item[\textsc{T-App}.]
     If $f$ maps each $x : A$ to an element of $B$, and $a : A$, then $f\;a$ has type $B$ with $x$ replaced by $a$.
     Logically, this is modus ponens when $B$ does not mention $x$, and instantiation of a universal statement when it does.
-    For example, if $f : \tPi{n}{\mathsf{Nat}}{n + 0 = n}$, then $f\;3 : 3 + 0 = 3$.
+    For example, if $f : \tPi{n}{\mathsf{Nat}}{n + 0 = n}$, then $f\;3 : 3 + 0 = 3$ (natural numbers are added in \S\ref{sec:inductive}).
   \item[\textsc{T-Conv}.]
     Types that are equal up to computation are interchangeable.
     This is the only rule that is not determined by the shape of $t$.
@@ -544,8 +557,8 @@ $\tLam{f}{P \to Q}{\tLam{g}{Q \to R}{\tLam{p}{P}{g\,(f\,p)}}}$, which needs appl
 
 The typing rules of \S\ref{sec:typing} are meant to be rules of logic.
 This section first makes that claim precise (\S\ref{sec:logic}).
-It then shows that the simplest choice of universes, a single universe that contains itself, breaks the claim (\S\ref{sec:typetype}),
-and that the hierarchy $\Sort{0} : \Sort{1} : \cdots$ restores it (\S\ref{sec:hierarchy}).
+It then shows that the simplest choice of universes, a single universe that contains itself, makes the system inconsistent (\S\ref{sec:typetype}),
+and that the hierarchy $\Sort{0} : \Sort{1} : \cdots$ with an impredicative bottom universe, as in Lean, avoids the problem (\S\ref{sec:hierarchy}).
 
 \subsection{The Typing Rules as a Logic}
 \label{sec:logic}
@@ -554,6 +567,7 @@ Consider the logic whose formulas are built from proposition variables $P, Q, \l
 \[
 \varphi, \psi ::= P \mid \varphi \to \psi \mid \forall P.\,\varphi
 \]
+This is second-order propositional logic.
 Its proofs are natural-deduction derivations of judgments $\Delta \vdash \varphi$, where $\Delta$ is a list of hypotheses.
 Each formula translates to a type, and each list of hypotheses to a context:
 \[
@@ -587,7 +601,7 @@ $\forall$-intro &
 $\inferrule{\Delta \vdash \varphi \\ P \notin \FV(\Delta)}{\Delta \vdash \forall P.\,\varphi}$ &
 $\inferrule{\Delta^\ast, P : \Sort{0} \vdash t : \varphi^\ast}{\Delta^\ast \vdash \tLam{P}{\Sort{0}}{t} : \tPi{P}{\Sort{0}}{\varphi^\ast}}\rulename{T-Lam}$ \\
 $\forall$-elim &
-$\inferrule{\Delta \vdash \forall P.\,\varphi \\ \psi \text{ has no } \forall}{\Delta \vdash \subst{\varphi}{P}{\psi}}$ &
+$\inferrule{\Delta \vdash \forall P.\,\varphi}{\Delta \vdash \subst{\varphi}{P}{\psi}}$ &
 $\inferrule{\Delta^\ast \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast} \\ \Delta^\ast \vdash \psi^\ast : \Sort{0}}{\Delta^\ast \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast}}\rulename{T-App}$
 \end{tabular}
 \caption{Natural deduction (left) and the typing rules that implement it (right). Premises that only check that a type is well formed are omitted.}
@@ -596,29 +610,32 @@ $\inferrule{\Delta^\ast \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast} \\ \Delta^\as
 
 Two details in the figure deserve comment.
 The side condition $P \notin \FV(\Delta)$ of $\forall$-intro is what lets $P : \Sort{0}$ be added after the hypotheses, since none of their types mention $P$.
-The side condition ``$\psi$ has no $\forall$'' of $\forall$-elim comes from the premise $\psi^\ast : \Sort{0}$:
-by \textsc{T-Pi}, $(\forall Q.\,\chi)^\ast = \tPi{Q}{\Sort{0}}{\chi^\ast}$ lives in $\Sort{1}$, not $\Sort{0}$.
-We return to this restriction in \S\ref{sec:hierarchy}.
+The $\forall$-elim row has the premise $\psi^\ast : \Sort{0}$, which holds for every formula $\psi$, including one that itself contains $\forall$.
+That is a consequence of how \textsc{T-Pi} assigns universes, and \S\ref{sec:hierarchy} explains why it is designed that way.
 
-\begin{theorem}[Propositions as types]
+\begin{theorem}[Proofs are terms]
 \label{thm:pat}
-$\Delta \vdash \varphi$ is provable if and only if $\Delta^\ast \vdash t : \varphi^\ast$ for some term $t$.
+If $\Delta \vdash \varphi$ is provable, then $\Delta^\ast \vdash t : \varphi^\ast$ for some term $t$.
 \end{theorem}
 
-\noindent From left to right, the figure turns each step of a proof into a step of a typing derivation, so every proof becomes a term.
-From right to left, strong normalization (\S\ref{sec:properties}) lets us assume $t$ is in normal form,
-and a normal term of type $\varphi^\ast$ is built only from variables, $\lambda$, and applications to terms or to types $\psi^\ast$, so it can be read back as a proof.
+\noindent The figure turns each step of a proof into a step of a typing derivation, so every proof becomes a term.
 Appendix~\ref{app:pat} states the theorem precisely and gives the full proof.
 
-The theorem is what makes a type checker a proof checker.
-In particular, define $\bot = \forall P.\,P$ (``everything holds'').
+The theorem says that the type checker can check every proof of the logic.
+For the type checker to be trustworthy, we also need the opposite guarantee: it must not accept a term for a proposition that the logic refutes.
+Define $\bot = \forall P.\,P$ (``everything holds'').
 No proof of $\bot$ exists: if each $P$ is read as true or false, every rule preserves truth under every reading, but $\forall P.\,P$ is false.
-By the theorem, no closed term has type
+The type theory should agree, that is, no closed term should have type
 \[
 \bot^\ast = \tPi{P}{\Sort{0}}{P}.
 \]
 This matters, because a closed $t : \bot^\ast$ would prove every proposition: $t\;C : C$ for every $C : \Sort{0}$.
-A design for universes is acceptable only if it keeps this theorem true.
+This property is called \emph{consistency}, and a design for universes is acceptable only if it keeps the system consistent.
+
+One might hope for the full converse of Theorem~\ref{thm:pat}: every term of type $\varphi^\ast$ comes from a proof of $\varphi$.
+That is a stronger property, called conservativity, and it is harder to establish here,
+because $\Sort{0}$ also contains types that are not translations of formulas, such as $\tPi{F}{\Sort{0} \to \Sort{0}}{F\;P \to F\;P}$, and a term may pass through them.
+We do not need it; consistency is enough.
 
 \subsection{What Is the Type of $\Sort{0}$?}
 
@@ -645,22 +662,21 @@ Suppose we replace all universes by a single universe $\mathsf{Type}$ that conta
 \inferrule{\Gamma \vdash A : \mathsf{Type} \\ \Gamma, x : A \vdash B : \mathsf{Type}}{\Gamma \vdash \tPi{x}{A}{B} : \mathsf{Type}}
 \]
 Translate $\forall P.\,\varphi$ as $\tPi{P}{\mathsf{Type}}{\varphi^\ast}$.
-Every translated formula now has type $\mathsf{Type}$, so the side condition ``$\psi$ has no $\forall$'' disappears, which looks like a gain.
-But $P$ now ranges over a collection that contains $\mathsf{Type}$ and every type built from it, including types that quantify over $\mathsf{Type}$ itself.
+Then $P$ ranges over a collection that contains $\mathsf{Type}$ itself and every type built from it.
 This is the type-theoretic analogue of the set of all sets, and Russell's paradox can be replayed.
 Girard showed that the system then has a closed term
 \[
 \vdash t_{\mathrm{G}} : \tPi{P}{\mathsf{Type}}{P},
 \]
 and Hurkens later found a short one~\cite{girard1972interpretation,hurkens1995simplification}.
-So the theorem of \S\ref{sec:logic} fails: $\bot$ has no proof, yet $\bot^\ast$ has a term, and a kernel built on these rules accepts a proof of every statement.
+So the system is inconsistent: $\bot$ has no proof, yet $\bot^\ast$ has a term, and a kernel built on these rules accepts a proof of every statement.
 
 The damage reaches the algorithm as well.
 Subject reduction still holds, so if $t_{\mathrm{G}}$ had a normal form, it would be a normal closed term of type $\tPi{P}{\mathsf{Type}}{P}$.
 The argument at the end of \S\ref{sec:properties} shows that no such normal term exists.
 Hence $t_{\mathrm{G}}$ has no normal form, strong normalization fails, and \textsc{Normalize} in Algorithm~\ref{alg:infer} can run forever.
 
-\subsection{A Hierarchy of Universes}
+\subsection{A Hierarchy with an Impredicative Bottom}
 \label{sec:hierarchy}
 
 The second answer is that $\Sort{0}$ lives in a larger universe, which lives in a larger one still:
@@ -669,55 +685,79 @@ The second answer is that $\Sort{0}$ lives in a larger universe, which lives in 
 \qquad\text{so}\qquad
 \Sort{0} : \Sort{1} : \Sort{2} : \cdots.
 \]
-Combined with \textsc{T-Pi}, this rule prevents exactly the self-reference that the paradox needs.
-A type that quantifies over $\Sort{u}$ has the form $\tPi{x}{\Sort{u}}{B}$, and \textsc{T-Sort} and \textsc{T-Pi} give it the type
+No universe contains itself.
+It remains to decide where a $\Pi$ type lives.
+\textsc{T-Pi} answers with the function $\imax$ used by Lean:
+\[
+\inferrule{\Gamma \vdash A : \Sort{u} \\ \Gamma, x : A \vdash B : \Sort{v}}{\Gamma \vdash \tPi{x}{A}{B} : \Sort{\imax(u, v)}}\rulename{T-Pi}
+\qquad
+\imax(u, v) =
+\begin{cases}
+0 & \text{if } v = 0, \\
+\max(u, v) & \text{otherwise.}
+\end{cases}
+\]
+The two cases behave differently.
+
+\paragraph{Propositions are impredicative.}
+If the body $B$ is a proposition ($v = 0$), the whole $\Pi$ is a proposition, whatever it quantifies over.
+In particular $(\forall P.\,\varphi)^\ast = \tPi{P}{\Sort{0}}{\varphi^\ast}$ is in $\Sort{0}$, although it quantifies over all of $\Sort{0}$.
+A universe that contains types quantifying over itself is called \emph{impredicative}.
+This is what makes $\forall$-elim unrestricted: a universal statement can be instantiated with any proposition, even itself.
+For example, with $\mathit{id} = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$,
+\[
+\mathit{id} : \tPi{P}{\Sort{0}}{P \to P}
+\qquad\text{and}\qquad
+\tPi{P}{\Sort{0}}{P \to P} : \Sort{0},
+\]
+so $\mathit{id}\;(\tPi{P}{\Sort{0}}{P \to P})\;\mathit{id}$ is well typed, with type $\tPi{P}{\Sort{0}}{P \to P}$.
+The same case makes $\forall n : \mathsf{Nat},\, n + 0 = n$ a proposition once natural numbers are added in \S\ref{sec:inductive}, even though $\mathsf{Nat}$ lives in $\Sort{1}$.
+
+\paragraph{Types are predicative.}
+If the body is not a proposition ($v \ge 1$), the $\Pi$ lives in the larger of the two universes.
+A type that quantifies over $\Sort{u}$ then lives in $\Sort{(\max(u+1, v))}$, which is never $\Sort{u}$:
 \[
 \inferrule*[right=T-Pi]
   {\inferrule*[right=T-Sort]{ }{\Gamma \vdash \Sort{u} : \Sort{(u+1)}} \\ \Gamma, x : \Sort{u} \vdash B : \Sort{v}}
   {\Gamma \vdash \tPi{x}{\Sort{u}}{B} : \Sort{(\max(u+1, v))}}
 \]
-Since $\max(u+1, v) \ge u + 1$, a type that quantifies over a universe is never a member of that universe.
 This property is called \emph{predicativity}.
-With it, the system is consistent and strongly normalizing (\S\ref{sec:properties}), so the theorem of \S\ref{sec:logic} holds.
-
-Predicativity has a price, and it is the side condition on $\forall$-elim.
-Let $\mathit{id} = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$, a proof of $\forall P.\,P \to P$.
-Logic lets us instantiate this theorem with itself to get $(\forall P.\,P \to P) \to (\forall P.\,P \to P)$, but the corresponding application is ill typed:
-\[
-\mathit{id} : \tPi{P}{\Sort{0}}{P \to P}
-\qquad\text{but}\qquad
-\tPi{P}{\Sort{0}}{P \to P} : \Sort{1},
-\]
-so \textsc{T-App}, which requires an argument of type $\Sort{0}$, rejects $\mathit{id}\;(\tPi{P}{\Sort{0}}{P \to P})$.
-Higher levels are what make up for this.
-The same proof can be written at $\Sort{1}$, as $\tLam{P}{\Sort{1}}{\tLam{h}{P}{h}}$, and that version does accept $\tPi{P}{\Sort{0}}{P \to P}$.
+For example, the identity on types $\tLam{A}{\Sort{1}}{\tLam{a}{A}{a}}$ has type $\tPi{A}{\Sort{1}}{A \to A}$, which lives in $\Sort{2}$,
+so it cannot be applied to its own type; a copy at $\Sort{2}$ can.
 Each level holds the level beneath it, and in practice a few levels suffice; higher levels appear when one quantifies over large collections, such as the category of all small categories.
+
+\paragraph{Why this is safe.}
+Impredicativity looks like the self-reference that \S\ref{sec:typetype} warned against, but it is confined:
+$\Sort{0}$ contains types that quantify over $\Sort{0}$, yet $\Sort{0}$ is not a member of itself.
+Coquand showed that one impredicative universe at the bottom is consistent~\cite{coquand1988calculus},
+whereas Girard's paradox can already be derived once two levels are impredicative~\cite{hurkens1995simplification}.
+With these rules the system is consistent and strongly normalizing (\S\ref{sec:properties}).
 
 \subsection{Comparison with Lean}
 
-In Lean~\cite{moura2021lean4}, $\Sort{0}$ is $\mathsf{Prop}$ and $\Sort{(u+1)}$ is $\mathsf{Type}\;u$.
-$\mathsf{Prop}$ has two extra features that our $\Sort{0}$ does not:
-\emph{proof irrelevance} (any two proofs of the same proposition are equal) and \emph{impredicativity}
-($\forall\,(P : \mathsf{Prop}),\, P \to P$ is again in $\mathsf{Prop}$, not one level up).
-Impredicativity removes the side condition on $\forall$-elim for propositions, and it stays consistent because it is confined to the bottom universe;
-it is $\mathsf{Type} : \mathsf{Type}$, not impredicativity by itself, that leads to Girard's paradox.
-Lean also has \emph{universe polymorphism}, so definitions can be stated once for all levels $u$.
-In our system every level is a concrete number and every level follows the same rules.
+In Lean~\cite{moura2021lean4}, $\Sort{0}$ is $\mathsf{Prop}$, $\Sort{(u+1)}$ is $\mathsf{Type}\;u$, and $\Pi$ types are assigned universes with $\imax$ exactly as above.
+Two differences remain.
+First, $\mathsf{Prop}$ in Lean has \emph{definitional proof irrelevance}: any two proofs of the same proposition are definitionally equal.
+Our conversion does not identify proofs; adding this would make conversion depend on types, so the simple ``normalize and compare'' check of \S\ref{sec:conversion} would no longer suffice.
+Second, Lean has \emph{universe polymorphism}, so definitions can be stated once for all levels $u$, and $\imax$ then matters for level variables as well.
+In our system every level is a concrete number.
 
 \begin{table}[ht]
 \centering
 \caption{Design choices for universes.}
 \label{tab:universes}
-\begin{tabular}{lll}
+\small
+\begin{tabularx}{\textwidth}{@{}l l X@{}}
 \toprule
-\textbf{Design} & \textbf{What can be quantified over} & \textbf{Drawback} \\
+\textbf{Design} & \textbf{Quantifies over} & \textbf{Drawback} \\
 \midrule
 No universes & values only & cannot say ``for every proposition'' \\
 $\mathsf{Type} : \mathsf{Type}$ & everything & inconsistent \\
 Two sorts $\ast : \square$ & $\ast$ only & $\square$ itself has no type \\
-$\Sort{u} : \Sort{(u+1)}$ & any level & levels must be tracked \\
+$\Sort{u} : \Sort{(u+1)}$ with $\max$ & any level & $\forall$ over propositions is not a proposition \\
+$\Sort{u} : \Sort{(u+1)}$ with $\imax$ (Lean) & any level & normalization is harder to prove \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 \section{A Type Checking Algorithm}
@@ -742,7 +782,7 @@ Conversion is used only where two types must be compared: in \textsc{Check}, and
     \State $u \gets \Call{InferSort}{\Gamma, A}$
     \State $(x', B') \gets \Call{Freshen}{\Gamma, x, B}$
     \State $v \gets \Call{InferSort}{(\Gamma, x' : A), B'}$
-    \State \Return $\Sort{(\max(u, v))}$
+    \State \Return $\Sort{\imax(u, v)}$
   \ElsIf{$t = \tLam{x}{A}{s}$}
     \State $\Call{InferSort}{\Gamma, A}$
     \State $(x', s') \gets \Call{Freshen}{\Gamma, x, s}$
@@ -877,7 +917,7 @@ In the typing rules, this step is an application of \textsc{T-Conv} at the root 
 \footnotesize
 \inferrule*[right=T-Conv]
   {\cdot \vdash t : \tPi{P}{\Sort{0}}{\mathit{Id}\;P \to \mathit{Id}\;P} \\
-   \cdot \vdash \tPi{P}{\Sort{0}}{P \to P} : \Sort{1} \\
+   \cdot \vdash \tPi{P}{\Sort{0}}{P \to P} : \Sort{0} \\
    \tPi{P}{\Sort{0}}{\mathit{Id}\;P \to \mathit{Id}\;P} \conv \tPi{P}{\Sort{0}}{P \to P}}
   {\cdot \vdash t : \tPi{P}{\Sort{0}}{P \to P}}
 \]
@@ -914,7 +954,7 @@ At that point $x$ refers to the inner binder, and the checker returns
 \]
 which says ``from any element of any type, produce an element of every type''.
 Given $A : \Sort{0}$ and $a : A$, the term $t\;A\;a$ then has type $\tPi{B}{\Sort{0}}{B}$, a proof of False.
-Any extension of the system with an inhabited base type, such as $\mathsf{Nat}$ with $0 : \mathsf{Nat}$, provides such $A$ and $a$ in the empty context.
+Such $A$ and $a$ exist even in the empty context: $A = \tPi{P}{\Sort{0}}{P \to P}$ is itself a proposition (\S\ref{sec:hierarchy}), and the identity function $a = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$ proves it.
 
 The problem is the same as in substitution (\S\ref{sec:subst}): a name is moved into a scope where it means something else.
 It affects any representation that identifies variables by name, whether the context is a list or a hash map.
@@ -930,7 +970,11 @@ A test suite should include $t$ above and check that the kernel either rejects i
 \label{sec:properties}
 
 We state, without proof, the standard properties of this system.
-It is an instance of a Pure Type System with a predicative hierarchy, and the proofs can be found in Barendregt~\cite{barendregt1992lambda}.
+It is a Pure Type System: the Calculus of Constructions~\cite{coquand1988calculus} with a hierarchy of predicative universes above its impredicative $\Sort{0}$,
+close to Luo's Extended Calculus of Constructions~\cite{luo1990extended}.
+The first three properties below hold for every functional Pure Type System~\cite{barendregt1992lambda}.
+Strong normalization is much harder in the presence of impredicativity and needs Girard's method of reducibility candidates~\cite{girard1972interpretation,coquand1988calculus,luo1990extended}.
+\S\ref{sec:inductive} revisits these properties after adding inductive types.
 
 \begin{theorem}[Uniqueness of types]
 If $\Gamma \vdash t : A$ and $\Gamma \vdash t : B$, then $A \conv B$.
@@ -956,8 +1000,370 @@ That normal form must be $\tLam{P}{\Sort{0}}{s}$ with $P : \Sort{0} \vdash s : P
 A normal term is a universe, a $\Pi$, a $\lambda$, or a variable applied to arguments, and none of these can have type $P$ in that context:
 the only variable available is $P$ itself, whose type is $\Sort{0}$, not $P$.
 
+\section{Inductive Types: Natural Numbers and Equality}
+\label{sec:inductive}
+
+So far the only types are universes and $\Pi$ types.
+This is enough for propositional logic, but not for mathematics: there are no numbers to reason about, and no way to state that two things are equal.
+Lean provides both through \emph{inductive types}.
+Declarations such as
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+inductive Nat where
+  | zero : Nat
+  | succ (n : Nat) : Nat
+
+inductive Eq {A : Sort u} : A -> A -> Prop where
+  | refl (a : A) : Eq a a
+\end{lstlisting}
+make the kernel add a type, its constructors, and a \emph{recursor} that eliminates it, together with computation rules for the recursor.
+A general kernel derives all of these from the declaration.
+We add the two types above by hand, which shows the ingredients without the machinery for arbitrary declarations.
+
+\subsection{Constants and Definitions}
+\label{sec:constants}
+
+Terms gain \emph{constants} $c$:
+\[
+t, A, B ::= \cdots \mid c
+\]
+A \emph{signature} $\Sigma$ lists each constant with its type, and some constants also with a body; those are \emph{definitions}.
+Two rules use the signature:
+\[
+\inferrule{\ctxok{\Gamma} \\ (c : C) \in \Sigma}{\Gamma \vdash c : C}\rulename{T-Const}
+\qquad\qquad
+c \deltared t \quad \text{if } (c : C \mathrel{:=} t) \in \Sigma.
+\]
+Before a constant is added, its type is checked to be a type in the empty context, and its body, if any, is checked against that type, as Lean does for each \texttt{def}.
+Constants are not variables: they are never bound, so $\FV(c) = \emptyset$ and substitution leaves them unchanged.
+Reduction now consists of $\beta$, $\delta$, and the $\iota$-rules introduced below, and conversion (\S\ref{sec:conversion}) is taken with respect to all three.
+
+\subsection{Natural Numbers}
+\label{sec:nat}
+
+Figure~\ref{fig:nat-eq} lists the constants for $\Nat$ and $\Eq{}$ and their $\iota$-rules.
+The recursor $\NatRec{u}$ takes a \emph{motive} $M$, which says what is to be built for each $n$,
+a value $z$ for $\zero$, and a step $s$ that turns a value for $n$ into a value for $\tsucc\;n$.
+The $\iota$-rules say that recursion unfolds along the constructors.
+As in Lean, where the recursor is \texttt{Nat.rec.\{u\}}, there is one recursor for each universe level; since we have no universe polymorphism, the level is a subscript.
+
+\begin{figure}[ht]
+\footnotesize
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}l@{\;:\;}l@{\qquad}l@{}}
+\toprule
+\multicolumn{2}{@{}l}{\textbf{Constant and type}} & \textbf{Lean} \\
+\midrule
+$\Nat$ & $\Sort{1}$ & \texttt{Nat} \\
+$\zero$ & $\Nat$ & \texttt{Nat.zero} \\
+$\tsucc$ & $\Nat \to \Nat$ & \texttt{Nat.succ} \\
+$\NatRec{u}$ & $\begin{array}[t]{@{}l@{}}\tPi{M}{\Nat \to \Sort{u}}{M\;\zero \to {}} \\ \quad (\tPi{n}{\Nat}{M\;n \to M\;(\tsucc\;n)}) \to \tPi{n}{\Nat}{M\;n}\end{array}$ & \texttt{Nat.rec} \\
+$\Eq{u}$ & $\tPi{A}{\Sort{u}}{A \to A \to \Sort{0}}$ & \texttt{Eq} \\
+$\refl{u}$ & $\tPi{A}{\Sort{u}}{\tPi{a}{A}{\Eq{u}\;A\;a\;a}}$ & \texttt{Eq.refl} \\
+$\EqRec{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{A \to \Sort{v}}{{}}}} \\ \quad M\;a \to \tPi{b}{A}{\Eq{u}\;A\;a\;b \to M\;b}\end{array}$ & \texttt{Eq.ndrec} \\
+\bottomrule
+\end{tabular}
+\[
+\begin{array}{r@{\;}c@{\;}l}
+\NatRec{u}\;M\;z\;s\;\zero &\iotared& z \\
+\NatRec{u}\;M\;z\;s\;(\tsucc\;n) &\iotared& s\;n\;(\NatRec{u}\;M\;z\;s\;n) \\
+\EqRec{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\iotared& m
+\end{array}
+\]
+\caption{Constants for natural numbers and equality (top) and their $\iota$-rules (bottom).}
+\label{fig:nat-eq}
+\end{figure}
+
+The same recursor does two jobs, depending on the level.
+
+\paragraph{Recursion.}
+At level $1$ with a constant motive, $\NatRec{1}$ defines functions by primitive recursion.
+Addition, defined by recursion on the second argument as in Lean, is the definition
+\[
+\add : \Nat \to \Nat \to \Nat \mathrel{:=} \tLam{m}{\Nat}{\tLam{n}{\Nat}{\NatRec{1}\;M\;m\;s\;n}},
+\]
+with the constant motive $M = \tLam{\_}{\Nat}{\Nat}$ and the step $s = \tLam{k}{\Nat}{\tLam{r}{\Nat}{\tsucc\;r}}$.
+We write $m + n$ for $\add\;m\;n$, and $0, 1, 2, \ldots$ for $\zero, \tsucc\;\zero, \ldots$.
+The kernel computes $2 + 1$ as
+\[
+\begin{array}{r@{\;}l}
+2 + 1
+&\to_{\delta\beta} \NatRec{1}\;M\;2\;s\;(\tsucc\;0)
+\;\iotared\; s\;0\;(\NatRec{1}\;M\;2\;s\;0) \\
+&\to_{\beta} \tsucc\;(\NatRec{1}\;M\;2\;s\;0)
+\;\iotared\; \tsucc\;2 = 3.
+\end{array}
+\]
+
+\paragraph{Induction.}
+At level $0$, the motive $M : \Nat \to \Sort{0}$ is a predicate on natural numbers, and the type of $\NatRec{0}$ reads as the induction principle:
+\[
+M\;\zero \to (\forall n.\; M\;n \to M\;(\tsucc\;n)) \to \forall n.\; M\;n.
+\]
+Recursion and induction are the same constant at different levels.
+Here the choice of $\imax$ in \S\ref{sec:hierarchy} is essential.
+The conclusion $\tPi{n}{\Nat}{M\;n}$ has type $\Sort{\imax(1, 0)} = \Sort{0}$, so ``$M\;n$ for every $n$'' is a proposition although $\Nat$ lives in $\Sort{1}$.
+With $\max$, it would live in $\Sort{1}$, and statements about numbers would not be propositions.
+
+\subsection{Equality}
+\label{sec:eq}
+
+For $a, b : A$, the type $\Eq{u}\;A\;a\;b$ is the proposition that $a$ and $b$ are equal; when $A$ is $\Nat$ we write it $a = b$.
+Its only constructor $\refl{u}$ proves $a = a$.
+The recursor $\EqRec{u,v}$ is Leibniz's principle: if $a = b$, then whatever holds of $a$ holds of $b$.
+It \emph{transports} $m : M\;a$ along a proof of $a = b$ to $M\;b$, and its $\iota$-rule says that transporting along $\refl{}$ does nothing.
+In a well-typed redex, $b$ and $c$ are both convertible to $a$, so the rule can ignore them.
+Lean's primitive recursor \texttt{Eq.rec} has a motive that may also depend on the proof of equality; Lean derives \texttt{Eq.ndrec} from it, and the non-dependent version is enough here.
+
+In Lean, the type argument of \texttt{Eq} is \emph{implicit}, written \texttt{\{A\}} above, and the elaborator fills it in.
+Our kernel sees only fully explicit terms, so we write every argument; filling them in is the job of the layer above the kernel (\S\ref{sec:tactics}).
+
+\paragraph{Definitional versus propositional equality.}
+There are now two notions of equality.
+Definitional equality $\conv$ is decided by the kernel by computation; propositional equality $\Eq{}$ is a type, whose proofs may require reasoning.
+The constructor $\refl{}$ connects them: by \textsc{T-Conv}, $\refl{u}\;A\;a : \Eq{u}\;A\;a\;b$ whenever $a \conv b$.
+For example,
+\[
+n + 0 \;\to_{\delta\beta}\; \NatRec{1}\;M\;n\;s\;\zero \;\iotared\; n,
+\]
+so $\refl{1}\;\Nat\;n : n + 0 = n$, and Lean proves this by \texttt{rfl}.
+In contrast, $0 + n \to_{\delta\beta} \NatRec{1}\;M\;0\;s\;n$ is stuck: $n$ is a variable, and the $\iota$-rules fire only on $\zero$ and $\tsucc$.
+So $0 + n = n$ is not provable by $\refl{}$ and needs induction.
+
+\subsection{Example: $0 + n = n$}
+\label{sec:zero-add}
+
+We prove $\tPi{n}{\Nat}{0 + n = n}$ by induction, using $\NatRec{0}$ with the motive $M_0 = \tLam{n}{\Nat}{0 + n = n}$.
+\begin{itemize}
+  \item \emph{Base.} We need $M_0\;0$, which is convertible to $0 + 0 = 0$. Since $0 + 0$ computes to $0$, the term $\refl{1}\;\Nat\;0$ works.
+  \item \emph{Step.} Given $k : \Nat$ and $\mathit{ih} : 0 + k = k$, we need $M_0\;(\tsucc\;k)$, that is, $0 + \tsucc\;k = \tsucc\;k$.
+    By the second $\iota$-rule, $0 + \tsucc\;k$ computes to $\tsucc\;(0 + k)$, so it suffices to prove $\tsucc\;(0 + k) = \tsucc\;k$.
+    We start from $\refl{1}\;\Nat\;(\tsucc\;(0 + k))$ and transport it along $\mathit{ih}$ with the motive $N = \tLam{b}{\Nat}{\tsucc\;(0 + k) = \tsucc\;b}$,
+    which replaces the second $0 + k$ by $k$:
+    \[
+    \mathit{step} = \tLam{k}{\Nat}{\tLam{\mathit{ih}}{0 + k = k}{
+      \EqRec{1,0}\;\Nat\;(0 + k)\;N\;(\refl{1}\;\Nat\;(\tsucc\;(0 + k)))\;k\;\mathit{ih}}}.
+    \]
+\end{itemize}
+The proof is
+\[
+\mathit{zero\_add} = \NatRec{0}\;M_0\;(\refl{1}\;\Nat\;0)\;\mathit{step} \;:\; \tPi{n}{\Nat}{0 + n = n}.
+\]
+The kernel checks it with Algorithm~\ref{alg:infer}.
+Each argument is checked against the corresponding part of the type of $\NatRec{0}$, instantiated with $M_0$, and every comparison succeeds after normalization.
+Writing such terms by hand is tedious, and finding the right motive is the hard part; tactics (\S\ref{sec:tactics}) automate both.
+
+\subsection{Changes to the Kernel and Its Properties}
+
+The algorithm changes in three places.
+\textsc{Infer} gains a case for constants, which looks up the type in $\Sigma$.
+\textsc{Normalize} unfolds definitions by $\delta$, and applies an $\iota$-rule when the argument it inspects (the \emph{major premise}: the number for $\NatRec{}$, the proof for $\EqRec{}$) normalizes to a constructor.
+The major premise must be normalized first, since it may become $\zero$ or $\tsucc$ only after computation, as in $2 + 1$ above.
+\textsc{Check} is unchanged: it still normalizes both types and compares them up to $\alpha$-equivalence.
+
+The $\iota$-rules do not overlap with each other or with $\beta$, so reduction remains confluent.
+Subject reduction, strong normalization, and consistency are known for the Calculus of Inductive Constructions~\cite{werner1994theorie}, of which our system is a small fragment.
+The short consistency argument of \S\ref{sec:properties} no longer suffices by itself, because normal forms now include stuck recursor applications;
+consistency follows from strong normalization by a more careful analysis of normal forms.
+Lean's full theory, with definitional proof irrelevance and general inductive types, has subtler metatheory~\cite{carneiro2019type}.
+
+\section{Tactics: Building Proof Terms Interactively}
+\label{sec:tactics}
+
+Lean users rarely write terms like $\mathit{zero\_add}$ by hand.
+They write a tactic script instead:
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+theorem zero_add (n : Nat) : 0 + n = n := by
+  induction n with
+  | zero => rfl
+  | succ k ih => rw [Nat.add_succ, ih]
+\end{lstlisting}
+Each tactic is a small program that builds part of the proof term.
+Tactics run outside the kernel.
+Their output is an ordinary term, which the kernel checks with Algorithm~\ref{alg:infer} like any other term.
+This section shows how the common tactics construct terms in our system.
+
+\subsection{Goals and Proof States}
+
+A \emph{goal} $\langle \Gamma \vdash \hole{m} : T \rangle$ asks for a term of type $T$ in the context $\Gamma$.
+The \emph{hole} $\hole{m}$ stands for the term still to be found; Lean calls it a \emph{metavariable}.
+A \emph{proof state} is a list of goals together with a \emph{partial proof term}, a term that may contain holes.
+
+To prove $T$, we start from the partial term $\hole{0}$ and the single goal $\langle \cdot \vdash \hole{0} : T \rangle$.
+A tactic works on the first goal $\langle \Gamma \vdash \hole{m} : T \rangle$.
+It \emph{assigns} to $\hole{m}$ a term that may contain fresh holes, and replaces the goal by one new goal for each fresh hole.
+When no goals remain, the partial term contains no holes, and the kernel checks it against $T$.
+A hole may sit under binders, as $\hole{1}$ does in $\tLam{x}{A}{\hole{1}}$, and the term that fills it may use those bound variables.
+That is why each goal carries its own context.
+
+Each tactic must make sure that its assignment has type $T$ in $\Gamma$, assuming each fresh hole is later filled with a term of the type its goal states.
+We write $\langle \Gamma \vdash \hole{m} : T \rangle \leadsto \text{new goals}$, followed by the assignment.
+
+\subsection{Basic Tactics}
+
+\paragraph{\texttt{intro x}.}
+If $T$ normalizes to a $\Pi$ type, the tactic moves its argument into the context:
+\[
+\langle \Gamma \vdash \hole{m} : \tPi{y}{A}{B} \rangle \;\leadsto\; \langle \Gamma, x : A \vdash \hole{1} : \subst{B}{y}{x} \rangle,
+\qquad
+\hole{m} \mathrel{:=} \tLam{x}{A}{\hole{1}}.
+\]
+The assignment has the right type by \textsc{T-Lam}.
+The name $x$ must not be in $\dom(\Gamma)$; otherwise the tactic must rename, for the reason given in \S\ref{sec:capture}.
+
+\paragraph{\texttt{exact t}.}
+The tactic closes the goal with a given term:
+\[
+\langle \Gamma \vdash \hole{m} : T \rangle \;\leadsto\; \text{no goals},
+\qquad
+\hole{m} \mathrel{:=} t,
+\]
+after running $\textsc{Check}(\Gamma, t, T)$ itself.
+The kernel would reject an ill-typed $t$ at the end anyway; checking early only gives a better error message.
+
+\paragraph{\texttt{apply f}.}
+If $f$ has type $A_1 \to \cdots \to A_n \to B$ with $B \conv T$, the tactic leaves the arguments as new goals:
+\[
+\langle \Gamma \vdash \hole{m} : T \rangle \;\leadsto\; \langle \Gamma \vdash \hole{1} : A_1 \rangle, \ldots, \langle \Gamma \vdash \hole{n} : A_n \rangle,
+\qquad
+\hole{m} \mathrel{:=} f\;\hole{1} \cdots \hole{n}.
+\]
+The assignment has type $B$ by $n$ uses of \textsc{T-App}, and type $T$ by \textsc{T-Conv}.
+When the type of $f$ is a dependent $\Pi$, later $A_i$ and $B$ mention earlier arguments, and the tactic must find those arguments by matching $B$ against $T$.
+Lean does this by \emph{unification}, solving for metavariables.
+Our restricted version handles only non-dependent arrows.
+
+\paragraph{\texttt{change T'}.}
+The tactic replaces the goal by a definitionally equal one:
+\[
+\langle \Gamma \vdash \hole{m} : T \rangle \;\leadsto\; \langle \Gamma \vdash \hole{1} : T' \rangle,
+\qquad
+\hole{m} \mathrel{:=} \hole{1},
+\]
+provided $T'$ is a type and $T' \conv T$.
+It adds nothing to the term; it only changes how the goal is displayed, and \textsc{T-Conv} justifies it.
+This matters for tactics such as \texttt{rw} below, which look for subterms syntactically.
+
+\paragraph{\texttt{rfl}.}
+If $T$ normalizes to $\Eq{u}\;A\;a\;b$ with $a \conv b$, the tactic closes the goal:
+\[
+\langle \Gamma \vdash \hole{m} : \Eq{u}\;A\;a\;b \rangle \;\leadsto\; \text{no goals},
+\qquad
+\hole{m} \mathrel{:=} \refl{u}\;A\;a.
+\]
+The assignment has type $\Eq{u}\;A\;a\;a$, which is convertible to the goal.
+This is the definitional equality of \S\ref{sec:eq} put to use.
+
+\subsection{Induction}
+
+Let $n : \Nat$ be a variable in $\Gamma$, and let $\Gamma \vdash T : \Sort{u}$.
+The tactic \texttt{induction n} abstracts $n$ in the goal to form the motive, and produces one goal per constructor:
+\[
+\begin{array}{l}
+\langle \Gamma \vdash \hole{m} : T \rangle
+\;\leadsto\;
+\langle \Gamma \vdash \hole{z} : \subst{T}{n}{\zero} \rangle,\;
+\langle \Gamma, k : \Nat, \mathit{ih} : \subst{T}{n}{k} \vdash \hole{s} : \subst{T}{n}{\tsucc\;k} \rangle, \\[4pt]
+\hole{m} \mathrel{:=} \NatRec{u}\;(\tLam{z}{\Nat}{\subst{T}{n}{z}})\;\hole{z}\;(\tLam{k}{\Nat}{\tLam{\mathit{ih}}{\subst{T}{n}{k}}{\hole{s}}})\;n.
+\end{array}
+\]
+With the motive $M = \tLam{z}{\Nat}{\subst{T}{n}{z}}$, the type of $\NatRec{u}\;M$ asks for $M\;\zero$ and $\tPi{k}{\Nat}{M\;k \to M\;(\tsucc\;k)}$, and the result has type $M\;n$.
+These are convertible to the types of the two goals and to $T$, by $\beta$.
+Three details need care.
+\begin{itemize}
+  \item The motive binds a fresh name $z$, not $n$: since $n$ is already in $\Gamma$, writing $\tLam{n}{\Nat}{T}$ would shadow it, which is the pitfall of \S\ref{sec:capture}.
+    Likewise $k$ and $\mathit{ih}$ must be fresh.
+  \item The level $u$ of the motive comes from the type of the goal, found by \textsc{InferSort}. For a proposition it is $0$, and $\NatRec{0}$ is induction.
+  \item If another hypothesis mentions $n$, for example $h : n = 2$, the new goals still contain $h$ about the original $n$, and $\mathit{ih}$ says nothing about it.
+    The goals are then correct but may be unprovable.
+    Lean's \texttt{induction} first moves such hypotheses into the goal (it \emph{reverts} them), so that they are part of the motive.
+    Our version requires that no other hypothesis mentions $n$.
+\end{itemize}
+
+\subsection{Rewriting}
+
+Let $h : \Eq{u}\;A\;a\;b$, and let the goal $T$ be a proposition.
+The tactic \texttt{rw [h]} replaces $a$ by $b$ in the goal in four steps.
+\begin{enumerate}
+  \item \emph{Abstract.} Choose a fresh $x$ and let $C$ be $T$ with every occurrence of $a$ replaced by $x$.
+    Occurrences are found up to $\alpha$-equivalence, not up to conversion,
+    and an occurrence under a binder that binds a free variable of $a$ is skipped, since there it denotes something else.
+  \item \emph{Check the motive.} Check that $\Gamma, x : A \vdash C : \Sort{0}$. This can fail, as shown below.
+  \item \emph{Build the term.} The new goal is $\subst{C}{x}{b}$, the goal with $a$ replaced by $b$:
+    \[
+    \begin{array}{l}
+    \langle \Gamma \vdash \hole{m} : T \rangle \;\leadsto\; \langle \Gamma \vdash \hole{1} : \subst{C}{x}{b} \rangle, \\[4pt]
+    \hole{m} \mathrel{:=} \EqRec{u,0}\;A\;a\;(\tLam{x}{A}{C \to T})\;(\tLam{p}{T}{p})\;b\;h\;\hole{1}.
+    \end{array}
+    \]
+  \item \emph{Try \texttt{rfl}.} Like Lean, close the new goal by \texttt{rfl} if possible.
+\end{enumerate}
+To see that the assignment has type $T$, write $N = \tLam{x}{A}{C \to T}$ for the motive.
+Since $\subst{C}{x}{a} = T$, the term $N\;a$ is convertible to $T \to T$, which the identity $\tLam{p}{T}{p}$ inhabits.
+Transport along $h$ then gives $N\;b$, which is convertible to $\subst{C}{x}{b} \to T$, and applying it to $\hole{1}$ gives $T$.
+Lean builds a different term, \texttt{Eq.mpr (congrArg (fun x => C) h)}, from the same idea.
+
+\paragraph{When the motive is ill typed.}
+Abstracting $a$ can break the goal.
+Let $\Gamma = n : \Nat,\; h : n = 2,\; q : n = 0$, and suppose we run \texttt{rw [h]} on the goal $\Eq{0}\;(n = 0)\;q\;q$, a statement about the proof $q$.
+Abstracting $n$ gives $C = \Eq{0}\;(x = 0)\;q\;q$, which is ill typed: $q$ has type $n = 0$, not $x = 0$, and $q$ itself cannot be abstracted.
+Step~2 fails, and Lean reports the same situation as ``motive is not type correct''.
+Without step~2, the tactic would produce a term that the kernel rejects.
+
+\subsection{Example: $0 + n = n$ with Tactics}
+
+In our system the proof of \S\ref{sec:zero-add} becomes the script
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+intro n
+induction n
+rfl
+change succ (0 + k) = succ k
+rw [ih]
+\end{lstlisting}
+The proof state evolves as follows.
+\begin{enumerate}
+  \item Initially there is one goal, $\langle \cdot \vdash \hole{0} : \tPi{n}{\Nat}{0 + n = n} \rangle$.
+  \item \texttt{intro n} assigns $\hole{0} \mathrel{:=} \tLam{n}{\Nat}{\hole{1}}$ and leaves $\langle n : \Nat \vdash \hole{1} : 0 + n = n \rangle$.
+  \item \texttt{induction n} assigns
+    \[
+    \hole{1} \mathrel{:=} \NatRec{0}\;(\tLam{z}{\Nat}{0 + z = z})\;\hole{2}\;(\tLam{k}{\Nat}{\tLam{\mathit{ih}}{0 + k = k}{\hole{3}}})\;n
+    \]
+    and leaves two goals: $\langle n : \Nat \vdash \hole{2} : 0 + 0 = 0 \rangle$ and $\langle n : \Nat, k : \Nat, \mathit{ih} : 0 + k = k \vdash \hole{3} : 0 + \tsucc\;k = \tsucc\;k \rangle$.
+  \item \texttt{rfl} closes the first goal with $\hole{2} \mathrel{:=} \refl{1}\;\Nat\;(0 + 0)$, since $0 + 0 \conv 0$.
+  \item In the second goal, $0 + k$ does not occur syntactically, so \texttt{rw [ih]} would find nothing.
+    \texttt{change} first exposes it, using $0 + \tsucc\;k \conv \tsucc\;(0 + k)$: it assigns $\hole{3} \mathrel{:=} \hole{4}$ with the goal $\hole{4} : \tsucc\;(0 + k) = \tsucc\;k$.
+    In Lean, the lemma \texttt{Nat.add\_succ} plays this role.
+  \item \texttt{rw [ih]} abstracts $0 + k$ to get $C = (\tsucc\;x = \tsucc\;k)$.
+    With $T = (\tsucc\;(0 + k) = \tsucc\;k)$ for the current goal, it assigns
+    \[
+    \hole{4} \mathrel{:=} \EqRec{1,0}\;\Nat\;(0 + k)\;(\tLam{x}{\Nat}{C \to T})\;(\tLam{p}{T}{p})\;k\;\mathit{ih}\;\hole{5}.
+    \]
+    The new goal $\hole{5} : \tsucc\;k = \tsucc\;k$ is closed at once by \texttt{rfl}, with $\hole{5} \mathrel{:=} \refl{1}\;\Nat\;(\tsucc\;k)$.
+\end{enumerate}
+No goals remain.
+Substituting the assignments into $\hole{0}$ gives a closed term, and the kernel runs $\textsc{Check}(\cdot, t, \tPi{n}{\Nat}{0 + n = n})$ on it.
+The term differs from the hand-written one of \S\ref{sec:zero-add} in two places:
+it starts with $\tLam{n}{\Nat}{\ldots\;n}$ because of \texttt{intro}, and its step uses the motive built by \texttt{rw}.
+Both are proofs of the same proposition, and the kernel does not care which one it receives.
+
+\subsection{Why Tactics Need Not Be Trusted}
+
+The kernel checks the final term, so tactics do not have to be correct for the system to be sound.
+A buggy tactic can fail, or it can produce an ill-typed term, which the kernel rejects; it cannot make the kernel accept a false theorem.
+The checks that tactics perform themselves, such as \textsc{Check} in \texttt{exact} or the motive check in \texttt{rw}, exist only to report errors early and clearly.
+The trusted part of the system is therefore small: Algorithm~\ref{alg:infer}, \textsc{Normalize}, and the signature of \S\ref{sec:inductive}.
+
+Lean's tactic framework is far richer than the one sketched here.
+It has metavariables solved by unification, an elaborator that fills in implicit arguments and expands notation such as \texttt{0 + n},
+an \texttt{induction} that reverts dependent hypotheses, and automation such as \texttt{simp}.
+All of this lives on the untrusted side: Lean's kernel, like ours, only ever sees complete terms~\cite{moura2021lean4}.
+
 %===============
 \begin{thebibliography}{9}
+\bibitem{carneiro2019type} M. Carneiro. \emph{The Type Theory of Lean}. Master's thesis, Carnegie Mellon University, 2019.
+\bibitem{coquand1988calculus} T. Coquand and G. Huet. The calculus of constructions. \emph{Information and Computation}, 76(2--3), 1988.
+\bibitem{luo1990extended} Z. Luo. \emph{An Extended Calculus of Constructions}. PhD thesis, University of Edinburgh, 1990.
+\bibitem{werner1994theorie} B. Werner. \emph{Une théorie des constructions inductives}. PhD thesis, Université Paris 7, 1994.
 \bibitem{barendregt1992lambda} H. P. Barendregt. Lambda calculi with types. In \emph{Handbook of Logic in Computer Science}, 1992.
 \bibitem{debruijn1972nameless} N. G. de Bruijn. Lambda calculus notation with nameless dummies, a tool for automatic formula manipulation. \emph{Indagationes Mathematicae}, 1972.
 \bibitem{girard1972interpretation} J.-Y. Girard. \emph{Interprétation fonctionnelle et élimination des coupures de l'arithmétique d'ordre supérieur}. PhD thesis, 1972.
@@ -984,7 +1390,7 @@ The rules of Figure~\ref{fig:logic} then read
 \and
 \inferrule{\Theta, P; \Delta \vdash \varphi \\ P \notin \Theta}{\Theta; \Delta \vdash \forall P.\,\varphi}
 \and
-\inferrule{\Theta; \Delta \vdash \forall P.\,\varphi \\ \psi \text{ has no } \forall \\ \FV(\psi) \subseteq \Theta}{\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}}
+\inferrule{\Theta; \Delta \vdash \forall P.\,\varphi \\ \FV(\psi) \subseteq \Theta}{\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}}
 \end{mathpar}
 The side condition $P \notin \FV(\Delta)$ of Figure~\ref{fig:logic} is now implied by $P \notin \Theta$.
 Formulas are taken up to $\alpha$-equivalence, and $\varphi^\ast \to \psi^\ast$ stands for $\tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x$ fresh.
@@ -999,75 +1405,42 @@ one assumption $P : \Sort{0}$ for each $P \in \Theta$ and one assumption $h : \c
 
 \begin{theorem}[Theorem~\ref{thm:pat}, precise form]
 \label{thm:pat-precise}
-If $\Gamma$ represents $(\Theta; \Delta)$, then
-$\Theta; \Delta \vdash \varphi$ if and only if $\Gamma \vdash t : \varphi^\ast$ for some term $t$.
+If $\Theta; \Delta \vdash \varphi$ and $\Gamma$ represents $(\Theta; \Delta)$, then $\Gamma \vdash t : \varphi^\ast$ for some term $t$.
 \end{theorem}
 
 \noindent The context $\Delta^\ast$ represents $(\Theta; \Delta)$ when $\Theta$ lists the free proposition variables;
 it is well formed by Lemma~\ref{lem:formula-type} below and \textsc{C-Ext}.
 So Theorem~\ref{thm:pat} is the special case $\Gamma = \Delta^\ast$.
 
-\paragraph{Facts about the type system.}
-Besides subject reduction and strong normalization (\S\ref{sec:properties}), the proof uses the following standard properties of Pure Type Systems~\cite{barendregt1992lambda}.
-
-\begin{lemma}
-\label{lem:pts}
-\leavevmode
-\begin{enumerate}[label=(\alph*)]
-  \item \emph{Context validity.} If $\Gamma \vdash t : T$, then $\ctxok{\Gamma}$.
-  \item \emph{Generation.} If $\Gamma \vdash t : T$, then, depending on the shape of $t$:
-    \begin{itemize}
-      \item if $t = x$, then $(x : A) \in \Gamma$ and $T \conv A$;
-      \item if $t = \Sort{u}$, then $T \conv \Sort{(u+1)}$;
-      \item if $t = \tPi{x}{A}{B}$, then $\Gamma \vdash A : \Sort{u}$, $\Gamma, x : A \vdash B : \Sort{v}$, and $T \conv \Sort{(\max(u, v))}$;
-      \item if $t = \tLam{x}{A}{s}$, then $\Gamma, x : A \vdash s : B$ and $T \conv \tPi{x}{A}{B}$ for some $B$;
-      \item if $t = f\;a$, then $\Gamma \vdash f : \tPi{x}{A}{B}$, $\Gamma \vdash a : A$, and $T \conv \subst{B}{x}{a}$ for some $A$ and $B$.
-    \end{itemize}
-  \item \emph{Confluence.} If $s \conv t$, then $s$ and $t$ reduce to a common term.
-    Consequently, two normal terms are convertible only if they are $\alpha$-equivalent;
-    $\tPi{x}{A}{B} \conv \tPi{x}{A'}{B'}$ implies $A \conv A'$ and $B \conv B'$;
-    and no two of a variable, a universe, and a $\Pi$ are convertible.
-  \item \emph{Substitution.} If $A \conv B$, then $\subst{A}{x}{a} \conv \subst{B}{x}{a}$.
-\end{enumerate}
-\end{lemma}
-
 \paragraph{Facts about the translation.}
-The following are routine inductions on formulas.
-Every $\varphi^\ast$ is a normal term, and it is a variable or a $\Pi$, never a universe.
 Translation commutes with substitution: $(\subst{\varphi}{P}{\psi})^\ast = \subst{\varphi^\ast}{P}{\psi^\ast}$.
-Translation is injective: if $\varphi^\ast \alphaeq \psi^\ast$, then $\varphi \alphaeq \psi$,
-because $(\forall P.\,\chi)^\ast$ has domain $\Sort{0}$ while the domain of $(\chi_1 \to \chi_2)^\ast$ is $\chi_1^\ast$, which is not a universe.
+This is a routine induction on $\varphi$.
 
-\begin{lemma}[Formulas are types]
+\begin{lemma}[Formulas are propositions]
 \label{lem:formula-type}
-If $\ctxok{\Gamma}$ and $(P : \Sort{0}) \in \Gamma$ for every $P \in \FV(\varphi)$,
-then $\Gamma \vdash \varphi^\ast : \Sort{u}$ for some $u$, and $u = 0$ when $\varphi$ has no $\forall$.
+If $\ctxok{\Gamma}$ and $(P : \Sort{0}) \in \Gamma$ for every $P \in \FV(\varphi)$, then $\Gamma \vdash \varphi^\ast : \Sort{0}$.
 \end{lemma}
 
 \begin{proof}
 By induction on $\varphi$.
 For $P$, use \textsc{T-Var}.
-For $\varphi \to \psi$, the induction hypothesis gives $\Gamma \vdash \varphi^\ast : \Sort{u}$,
+For $\varphi \to \psi$, the induction hypothesis gives $\Gamma \vdash \varphi^\ast : \Sort{0}$,
 so $\Gamma, x : \varphi^\ast$ is well formed by \textsc{C-Ext} for a fresh $x$.
-The induction hypothesis for $\psi$ in that context gives $\Sort{v}$, and \textsc{T-Pi} gives $\Sort{(\max(u, v))}$.
+The induction hypothesis for $\psi$ in that context gives $\Sort{0}$, and \textsc{T-Pi} gives $\Sort{\imax(0, 0)} = \Sort{0}$.
 For $\forall Q.\,\chi$, rename $Q$ so that $Q \notin \dom(\Gamma)$.
 \textsc{T-Sort} gives $\Gamma \vdash \Sort{0} : \Sort{1}$, so $\Gamma, Q : \Sort{0}$ is well formed,
-and \textsc{T-Pi} with the induction hypothesis for $\chi$ gives $\Sort{(\max(1, v))}$.
+and \textsc{T-Pi} with the induction hypothesis for $\chi$ gives $\Sort{\imax(1, 0)} = \Sort{0}$.
 \end{proof}
 
-\paragraph{From proofs to terms.}
+\noindent The last case is where impredicativity is used. With $\max$ in place of $\imax$, $(\forall Q.\,\chi)^\ast$ would live in $\Sort{1}$,
+and the $\forall$-elim case below would hold only for formulas $\psi$ without $\forall$.
 
-\begin{lemma}
-\label{lem:decorate}
-If $\Theta; \Delta \vdash \varphi$ and $\Gamma$ represents $(\Theta; \Delta)$, then $\Gamma \vdash t : \varphi^\ast$ for some $t$.
-\end{lemma}
-
-\begin{proof}
+\begin{proof}[Proof of Theorem~\ref{thm:pat-precise}]
 By induction on the derivation of $\Theta; \Delta \vdash \varphi$, for all $\Gamma$ at once.
 Each case builds the typing derivation shown in the right column of Figure~\ref{fig:logic}.
 \begin{itemize}
   \item \emph{Hypothesis.} $\Gamma$ contains $h : \varphi^\ast$, so $\Gamma \vdash h : \varphi^\ast$ by \textsc{T-Var}.
-  \item \emph{$\to$-intro.} By Lemma~\ref{lem:formula-type}, $\Gamma \vdash \varphi^\ast : \Sort{u}$.
+  \item \emph{$\to$-intro.} By Lemma~\ref{lem:formula-type}, $\Gamma \vdash \varphi^\ast : \Sort{0}$.
     For a fresh $h$, the context $\Gamma, h : \varphi^\ast$ is well formed and represents $(\Theta; \Delta, \varphi)$.
     The induction hypothesis gives $\Gamma, h : \varphi^\ast \vdash t : \psi^\ast$,
     and \textsc{T-Lam} gives $\Gamma \vdash \tLam{h}{\varphi^\ast}{t} : \tPi{h}{\varphi^\ast}{\psi^\ast}$.
@@ -1079,93 +1452,11 @@ Each case builds the typing derivation shown in the right column of Figure~\ref{
     By \textsc{T-Sort} and \textsc{C-Ext}, $\Gamma, P : \Sort{0}$ is well formed, and it represents $(\Theta, P; \Delta)$.
     The induction hypothesis gives $\Gamma, P : \Sort{0} \vdash t : \varphi^\ast$,
     and \textsc{T-Lam} gives $\Gamma \vdash \tLam{P}{\Sort{0}}{t} : \tPi{P}{\Sort{0}}{\varphi^\ast}$.
-  \item \emph{$\forall$-elim.} The induction hypothesis gives $\Gamma \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast}$.
-    Since $\psi$ has no $\forall$, Lemma~\ref{lem:formula-type} gives $\Gamma \vdash \psi^\ast : \Sort{0}$.
+  \item \emph{$\forall$-elim.} The induction hypothesis gives $\Gamma \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast}$,
+    and Lemma~\ref{lem:formula-type} gives $\Gamma \vdash \psi^\ast : \Sort{0}$.
     \textsc{T-App} gives $\Gamma \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast} = (\subst{\varphi}{P}{\psi})^\ast$. \qedhere
 \end{itemize}
 \end{proof}
-
-\paragraph{From terms to proofs.}
-A normal term is a universe, a $\Pi$, a $\lambda$, or a \emph{neutral} term $x\;n_1 \cdots n_k$ with $k \ge 0$,
-whose head $x$ is a variable and whose arguments $n_i$ are normal.
-If $\Gamma$ represents $(\Theta; \Delta)$, the head of a well-typed neutral term is in $\dom(\Gamma)$ by generation,
-so it is either a proposition variable or a hypothesis.
-
-\begin{lemma}[Read-back]
-\label{lem:readback}
-Let $\Gamma$ represent $(\Theta; \Delta)$, let $n$ be a normal term, and let $\Gamma \vdash n : T$.
-\begin{enumerate}[label=(\roman*)]
-  \item If $T \conv \varphi^\ast$ and $\FV(\varphi) \subseteq \Theta$, then $\Theta; \Delta \vdash \varphi$.
-  \item If $T \conv \Sort{0}$, then $n = \psi^\ast$ for some $\psi$ with no $\forall$ and $\FV(\psi) \subseteq \Theta$.
-  \item If $n$ is neutral with a proposition variable as its head, then $n$ has no arguments and $T \conv \Sort{0}$.
-  \item If $n$ is neutral with a hypothesis as its head, then $T \conv \chi^\ast$ and $\Theta; \Delta \vdash \chi$ for some $\chi$ with $\FV(\chi) \subseteq \Theta$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-By induction on $n$, proving all four parts at once for all $\Theta$, $\Delta$, $\Gamma$, and $T$.
-We treat (iii) and (iv) first, since (i) and (ii) use them for neutral terms.
-
-\emph{Parts (iii) and (iv).}
-If $n = x$ has no arguments, generation gives $(x : A) \in \Gamma$ and $T \conv A$.
-For a proposition variable, $A = \Sort{0}$.
-For a hypothesis, $A = \chi^\ast$ with $\chi \in \Delta$, and the hypothesis rule gives $\Theta; \Delta \vdash \chi$.
-
-Otherwise $n = m\;a$, where $m$ is neutral with the same head and one argument fewer.
-Generation gives $\Gamma \vdash m : \tPi{y}{A}{B}$, $\Gamma \vdash a : A$, and $T \conv \subst{B}{y}{a}$.
-If the head is a proposition variable, the induction hypothesis (iii) for $m$ gives $\tPi{y}{A}{B} \conv \Sort{0}$, which confluence rules out.
-So the head is a hypothesis, and part (iii) holds.
-The induction hypothesis (iv) for $m$ gives $\tPi{y}{A}{B} \conv \chi^\ast$ with $\Theta; \Delta \vdash \chi$.
-Since $\chi^\ast$ is a $\Pi$, $\chi$ is an implication or a universal formula.
-\begin{itemize}
-  \item If $\chi = \chi_1 \to \chi_2$, confluence gives $A \conv \chi_1^\ast$ and $B \conv \chi_2^\ast$.
-    The induction hypothesis (i) for $a$ gives $\Theta; \Delta \vdash \chi_1$, and $\to$-elim gives $\Theta; \Delta \vdash \chi_2$.
-    Since $y \notin \FV(\chi_2^\ast)$, $T \conv \subst{B}{y}{a} \conv \chi_2^\ast$.
-  \item If $\chi = \forall P.\,\chi_1$, confluence gives $A \conv \Sort{0}$ and $B \conv \subst{\chi_1^\ast}{P}{y}$.
-    The induction hypothesis (ii) for $a$ gives $a = \psi^\ast$ with $\psi$ free of $\forall$ and $\FV(\psi) \subseteq \Theta$,
-    so $\forall$-elim gives $\Theta; \Delta \vdash \subst{\chi_1}{P}{\psi}$.
-    By the substitution property, $T \conv \subst{\chi_1^\ast}{P}{\psi^\ast} = (\subst{\chi_1}{P}{\psi})^\ast$.
-\end{itemize}
-
-\emph{Part (ii).}
-If $n = \Sort{u}$ or $n$ is a $\lambda$, generation makes $T$ convertible to a universe $\Sort{(u+1)}$ or to a $\Pi$, neither of which is $\Sort{0}$.
-If $n = \tPi{x}{A}{B}$, generation gives $\Gamma \vdash A : \Sort{u}$ and $\Gamma, x : A \vdash B : \Sort{v}$ with $\Sort{0} \conv \Sort{(\max(u, v))}$, so $u = v = 0$.
-The induction hypothesis (ii) for $A$ gives $A = \psi_1^\ast$.
-Then $\Gamma, x : \psi_1^\ast$ is well formed by context validity and represents $(\Theta; \Delta, \psi_1)$,
-so the induction hypothesis (ii) for $B$ in that context gives $B = \psi_2^\ast$ with $\FV(\psi_2) \subseteq \Theta$.
-In particular $x \notin \FV(B)$, so $n = \psi_1^\ast \to \psi_2^\ast = (\psi_1 \to \psi_2)^\ast$.
-If $n$ is neutral with a proposition variable $P$ as its head, part (iii) gives $n = P = P^\ast$.
-If $n$ is neutral with a hypothesis as its head, part (iv) gives $\Sort{0} \conv \chi^\ast$, which confluence rules out.
-
-\emph{Part (i).}
-If $n = \Sort{u}$ or $n$ is a $\Pi$, generation makes $T$ convertible to a universe, but $\varphi^\ast$ is not one.
-If $n$ is neutral with a proposition variable as its head, part (iii) gives $\varphi^\ast \conv \Sort{0}$, which is impossible for the same reason.
-If $n$ is neutral with a hypothesis as its head, part (iv) gives $\chi^\ast \conv \varphi^\ast$ with $\Theta; \Delta \vdash \chi$.
-Both are normal, so they are $\alpha$-equivalent, and injectivity gives $\chi \alphaeq \varphi$.
-
-The remaining case is $n = \tLam{x}{A}{s}$.
-Generation gives $\Gamma, x : A \vdash s : B$ and $\varphi^\ast \conv \tPi{x}{A}{B}$, so $\varphi$ is an implication or a universal formula.
-The annotation $A$ is normal because $n$ is.
-\begin{itemize}
-  \item If $\varphi = \varphi_1 \to \varphi_2$, then $A \conv \varphi_1^\ast$, so $A = \varphi_1^\ast$ since both are normal, and $B \conv \varphi_2^\ast$.
-    The context $\Gamma, x : \varphi_1^\ast$ is well formed and represents $(\Theta; \Delta, \varphi_1)$.
-    The induction hypothesis (i) for $s$ gives $\Theta; \Delta, \varphi_1 \vdash \varphi_2$, and $\to$-intro gives $\Theta; \Delta \vdash \varphi$.
-  \item If $\varphi = \forall P.\,\varphi_1$, then $A = \Sort{0}$ and $B \conv \subst{\varphi_1^\ast}{P}{x}$.
-    Since $\Gamma, x : \Sort{0}$ is well formed, $x \notin \dom(\Gamma)$, so $x \notin \Theta$ and the context represents $(\Theta, x; \Delta)$.
-    The induction hypothesis (i) for $s$ gives $\Theta, x; \Delta \vdash \subst{\varphi_1}{P}{x}$,
-    and $\forall$-intro gives $\Theta; \Delta \vdash \forall x.\,\subst{\varphi_1}{P}{x}$, which is $\alpha$-equivalent to $\varphi$. \qedhere
-\end{itemize}
-\end{proof}
-
-\begin{proof}[Proof of Theorem~\ref{thm:pat-precise}]
-The forward direction is Lemma~\ref{lem:decorate}.
-For the converse, let $\Gamma \vdash t : \varphi^\ast$.
-By strong normalization, $t$ reduces to a normal term $n$, and by subject reduction, $\Gamma \vdash n : \varphi^\ast$.
-Lemma~\ref{lem:readback}(i) with $T = \varphi^\ast$ gives $\Theta; \Delta \vdash \varphi$.
-\end{proof}
-
-%\bibliographystyle{ACM-Reference-Format}
-%\bibliography{ref}
 
 \end{document}
 

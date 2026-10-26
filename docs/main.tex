@@ -466,7 +466,10 @@ A practical kernel also caps the number of reduction steps, so that a bug cannot
 
 \paragraph{Contexts and judgments.}
 A \emph{context} $\Gamma$ is an ordered list of assumptions $x_1 : A_1, \ldots, x_n : A_n$.
-The order matters: $A_i$ may mention $x_1, \ldots, x_{i-1}$, as in $P : \Sort{0}, h : P$.
+It records the type of each variable in scope, and we write $\dom(\Gamma)$ for the set $\{x_1, \ldots, x_n\}$.
+Since \textsc{C-Ext} below forbids repeated names, $\Gamma$ can be used like a dictionary from names to types,
+and \textsc{T-Var} is simply a lookup.
+Unlike a plain dictionary, however, the order matters: $A_i$ may mention $x_1, \ldots, x_{i-1}$, as in $P : \Sort{0}, h : P$.
 We use two judgments:
 \begin{itemize}
   \item $\ctxok{\Gamma}$: the context $\Gamma$ is well formed.

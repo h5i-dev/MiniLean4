@@ -479,10 +479,11 @@ Appendix~\ref{app:alpha} gives the full proof.
 \section{Reduction and Conversion}
 \label{sec:conversion}
 
-Applying a $\lambda$-abstraction computes by substitution:
+Applying a $\lambda$-abstraction to an argument is computed by substituting the argument for the bound variable:
 \[
 (\tLam{x}{A}{t})\;s \;\betared\; \subst{t}{x}{s}.
 \]
+This step is called \emph{$\beta$-reduction}.
 A subterm of the form $(\tLam{x}{A}{t})\;s$ is called a \emph{$\beta$-redex}, and we also allow this step anywhere inside a term.
 A term with no $\beta$-redex is in \emph{normal form}.
 

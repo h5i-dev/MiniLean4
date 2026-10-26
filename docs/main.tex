@@ -289,89 +289,6 @@ and verifying a proof means type-checking that term}.
 The kernel implements these typing rules rather than reasoning about
 truth directly.
 
-\section{Propositions as Types}
-
-\label{sec:curry-howard}
-
-
-
-A theorem prover has to decide whether a proof is correct. A proof written in English cannot be checked by a computer, 
-
-and the Curry--Howard correspondence is exactly the concept that connects logic with programming:
-
-\emph{propositions are types, and proofs are programs}.
-
-A proposition $A$ is true if we can construct a term $t$ of type $A$, written $t : A$.
-
-
-
-For example, consider the proposition $A \to B$ (``$A$ implies $B$'').
-
-To prove it, we assume $A$ and construct a proof of $B$.
-
-This is exactly a function that takes a value of type $A$ and returns a value of type $B$.
-
-Thus, logical implication corresponds to a function type. Here are three examples, where $\lambda x.\,e$ denotes a 
-
-function taking $x$ and returning $e$:
-
-
-
-\[
-\begin{array}{rcll}
-P \to P
-&:& \lambda p.\,p
-& \text{Return the assumption.}\\[4pt]
-A \to B \to A
-&:& \lambda a.\,\lambda b.\,a
-& \text{Ignore the second argument.}\\[4pt]
-(A \to B) \to (B \to C) \to A \to C
-&:& \lambda f.\,\lambda g.\,\lambda a.\,g(f(a))
-& \text{Compose two functions.}
-\end{array}
-\]
-
-
-
-The same idea extends to universal quantification.
-
-To prove ``for every $x : A$, $B(x)$ holds'', we construct a function
-
-that takes any $x : A$ and returns a proof of $B(x)$. Unlike an ordinary function type $A \to B$, the return type $B(x)$
-
-may depend on the input $x$. This is called a \emph{dependent function type},
-
-written
-
-\[
-\Pi(x : A).\,B(x).
-\]
-
-For example, ``every proposition implies itself'' is expressed as
-
-\[
-\tPi{P}{\Sort{0}}{P \to P},
-\]
-
-where $\Sort{0}$ is the type of propositions. Its proof is simply
-
-\[
-\tLam{P}{\Sort{0}}{\tLam{p}{P}{p}}.
-\]
-
-
-
-This gives us the central idea behind a theorem prover:
-
-\emph{proving a theorem means constructing a term of the required type,
- and verifying a proof means type-checking that term}.
-
-The kernel implements these typing rules rather than reasoning about
-
-truth directly.
-
-
-
 \section{Syntax}
 \label{sec:syntax}
 
@@ -389,11 +306,9 @@ Here, $u$ is a natural number and $x$ is a variable name.
     \item $t\;s$: Function application.
 \end{itemize}
 
-When $B$ does not depend on $x$, we write $A \to B$ instead of
+\noindent When $B$ does not depend on $x$, we write $A \to B$ instead of
 $\tPi{x}{A}{B}$. Thus, ordinary function types are special cases
-of dependent function types.
-
-For example, the proposition ``every proposition implies itself''
+of dependent function types. For example, the proposition ``every proposition implies itself''
 and its proof are represented as
 \[
 \underbrace{\tLam{P}{\Sort{0}}{\tLam{p}{P}{p}}}_{\text{proof}}
@@ -403,21 +318,6 @@ and its proof are represented as
 Notice that types and expressions share the same grammar.
 There is no separate syntax for types: whether a term is a valid
 type is determined by the type checker.
-
-\paragraph{Implementation.}
-We represent these five constructors directly as a Rust enum:
-\begin{lstlisting}[language=Rust, numbers=none]
-#[derive(Clone, Debug, PartialEq, Eq)]
-enum Term {
-    Sort(u64),
-    Var(String),
-    Pi(String, Box<Term>, Box<Term>),
-    Lam(String, Box<Term>, Box<Term>),
-    App(Box<Term>, Box<Term>),
-}
-\end{lstlisting}
-We use \texttt{Box} for recursive subterms so that
-\texttt{Term} has a finite size.
 
 \section{Free Variables and Substitution}
 

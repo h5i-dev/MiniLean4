@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 17:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 17:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1605,12 +1605,19 @@ Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 734.
  [7.7]
 
-LaTeX Font Warning: Command \Small invalid in math mode on input line 803.
+LaTeX Font Warning: Command \Small invalid in math mode on input line 805.
 
-[8.8] [9.9]
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [8.8]
+
+LaTeX Font Warning: Command \Small invalid in math mode on input line 877.
+
+[9.9] [10.10]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 8.0pt on input line 902.
- [10.10] [11.11]
+(Font)              scaled to size 8.0pt on input line 961.
+ [11.11] [12.12]
 
 Class acmart Warning: Some images may lack descriptions.
 
@@ -1619,23 +1626,23 @@ File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 )
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/se-utf8.def
 File: se-utf8.def 2019/11/29 v1.12 stringenc: UTF-8
-) [12.12]
+) [13.13]
 (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 7DD57B69E9310F113B6CD619699F9052;3167.
+(rerunfilecheck)             Checksum: 1BF177FBF3DF170E4290312ABA3D105E;3167.
  ) 
 Here is how much of TeX's memory you used:
- 38196 strings out of 474222
- 694694 string characters out of 5748733
+ 38240 strings out of 474222
+ 695713 string characters out of 5748733
  1950975 words of memory out of 5000000
- 58817 multiletter control sequences out of 15000+600000
- 877684 words of font info for 606 fonts, out of 8000000 for 9000
+ 58822 multiletter control sequences out of 15000+600000
+ 883469 words of font info for 626 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 90i,28n,131p,7883b,867s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,28n,131p,7883b,891s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI.pfb><
 /usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI5.pfb></u
 sr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI7.pfb></usr
@@ -1650,10 +1657,10 @@ f-dist/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
 /newtx/txsym.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsys.
 pfb>
-Output written on main.pdf (12 pages, 541298 bytes).
+Output written on main.pdf (13 pages, 545636 bytes).
 PDF statistics:
- 348 PDF objects out of 1000 (max. 8388607)
- 295 compressed objects within 3 object streams
- 79 named destinations out of 1000 (max. 500000)
- 172213 words of extra memory for PDF output out of 184870 (max. 10000000)
+ 366 PDF objects out of 1000 (max. 8388607)
+ 311 compressed objects within 4 object streams
+ 87 named destinations out of 1000 (max. 500000)
+ 176309 words of extra memory for PDF output out of 184870 (max. 10000000)
 

@@ -796,6 +796,8 @@ Some remarks on Algorithm~\ref{alg:infer}:
 \section{Worked Examples}
 \label{sec:examples}
 
+This section runs Algorithm~\ref{alg:infer} on three terms and relates each run to the typing rules of Figure~\ref{fig:typing}.
+
 \paragraph{The identity proof.}
 Let $\Gamma_1 = P : \Sort{0}$ and $\Gamma_2 = \Gamma_1, h : P$.
 Omitting the well-formedness premises $\ctxok{\Gamma}$, the derivation of the opening example is
@@ -809,22 +811,78 @@ Omitting the well-formedness premises $\ctxok{\Gamma}$, the derivation of the op
      {\Gamma_1 \vdash \tLam{h}{P}{h} : P \to P}}
   {\cdot \vdash \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}} : \tPi{P}{\Sort{0}}{P \to P}}
 \]
-Algorithm~\ref{alg:infer} produces the type $\tPi{P}{\Sort{0}}{\tPi{h}{P}{P}}$.
-It is $\alpha$-equivalent to the stated type, because $P \to P$ abbreviates $\tPi{\_}{P}{P}$ and the names $h$ and $\_$ do not occur in the body.
+The algorithm builds the same derivation from the bottom up.
+$\textsc{Infer}(\cdot, \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}})$ makes the following calls:
+\begin{enumerate}[nosep, label=\arabic*.]
+  \item $\textsc{InferSort}(\cdot, \Sort{0})$: \textsc{Infer} returns $\Sort{1}$, so the annotation is a type. \hfill (\textsc{T-Sort})
+  \item $\textsc{Freshen}$ leaves $P$ unchanged, since the context is empty.
+  \item $\textsc{Infer}(\Gamma_1, \tLam{h}{P}{h})$, which makes three calls of its own:
+  \begin{enumerate}[nosep, label=(\alph*)]
+    \item $\textsc{InferSort}(\Gamma_1, P)$: \textsc{Infer} looks up $P$ and returns $\Sort{0}$. \hfill (\textsc{T-Var})
+    \item $\textsc{Freshen}$ leaves $h$ unchanged.
+    \item $\textsc{Infer}(\Gamma_2, h)$ looks up $h$ and returns $P$. \hfill (\textsc{T-Var})
+  \end{enumerate}
+  It returns $\tPi{h}{P}{P}$. \hfill (inner \textsc{T-Lam})
+\end{enumerate}
+The outer call returns $\tPi{P}{\Sort{0}}{\tPi{h}{P}{P}}$. \hfill (outer \textsc{T-Lam})
 
-A wrong proof is rejected.
-For $\tLam{P}{\Sort{0}}{\tLam{h}{P}{P}}$, the body $P$ has type $\Sort{0}$, not $P$, so \textsc{Check} reports a type mismatch.
+\noindent Each call that returns a type corresponds to one node of the tree, and no call uses conversion.
+The result is $\alpha$-equivalent to the stated type, because $P \to P$ abbreviates $\tPi{\_}{P}{P}$ and neither $h$ nor $\_$ occurs in the body.
 
-\paragraph{Using a theorem.}
-Let $\mathit{id} = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$ and $\Gamma = Q : \Sort{0}$.
-By \textsc{T-App},
+\paragraph{A wrong proof.}
+Suppose a user claims that $t = \tLam{P}{\Sort{0}}{\tLam{h}{P}{P}}$ proves $\tPi{P}{\Sort{0}}{P \to P}$.
+The kernel calls $\textsc{Check}(\cdot, t, \tPi{P}{\Sort{0}}{P \to P})$, which first calls \textsc{Infer}.
+The calls are the same as above, except that the last one, $\textsc{Infer}(\Gamma_2, P)$, returns $\Sort{0}$.
+So \textsc{Infer} succeeds with
 \[
-\inferrule*[right=T-App]
-  {\Gamma \vdash \mathit{id} : \tPi{P}{\Sort{0}}{P \to P} \\ \Gamma \vdash Q : \Sort{0}}
-  {\Gamma \vdash \mathit{id}\;Q : \subst{(P \to P)}{P}{Q}}
+\textsc{Infer}(\cdot, t) = \tPi{P}{\Sort{0}}{\tPi{h}{P}{\Sort{0}}}.
 \]
-and $\subst{(P \to P)}{P}{Q} = Q \to Q$.
-Applying a proof of a universal statement to a particular proposition yields a proof about that proposition, and substitution computes what is being proved.
+The term $t$ is well typed; it is just not a proof of the claimed proposition.
+\textsc{Check} then compares the two types, which are already normal, using the rules of Figure~\ref{fig:alpha}:
+\[
+\begin{array}{l@{\qquad}l}
+\cdot\,;\cdot \vdash \tPi{P}{\Sort{0}}{\tPi{h}{P}{\Sort{0}}} \alphaeq \tPi{P}{\Sort{0}}{\tPi{\_}{P}{P}} & \text{by $\alpha$-Pi, needs} \\
+\quad \cdot\,;\cdot \vdash \Sort{0} \alphaeq \Sort{0} & \text{holds by $\alpha$-Sort} \\
+\quad P; P \vdash \tPi{h}{P}{\Sort{0}} \alphaeq \tPi{\_}{P}{P} & \text{by $\alpha$-Pi, needs} \\
+\quad\quad P; P \vdash P \alphaeq P & \text{holds by $\alpha$-Bound (index $0$)} \\
+\quad\quad P, h; P, \_ \vdash \Sort{0} \alphaeq P & \text{no rule applies}
+\end{array}
+\]
+so \textsc{Check} reports a type mismatch.
+The error is found only because the user stated the proposition to be proved.
+A kernel that only ran \textsc{Infer} would accept $t$ and silently assign it a different type.
+
+\paragraph{Conversion.}
+Recall $\mathit{Id} = \tLam{X}{\Sort{0}}{X}$ from \S\ref{sec:conversion}.
+Our system has no definitions, so $\mathit{Id}\;P$ below is shorthand for the term $(\tLam{X}{\Sort{0}}{X})\;P$.
+Consider checking
+\[
+t = \tLam{P}{\Sort{0}}{\tLam{h}{\mathit{Id}\;P}{h}}
+\quad\text{against}\quad
+\tPi{P}{\Sort{0}}{P \to P}.
+\]
+\textsc{Infer} first checks that the annotation $\mathit{Id}\;P$ is a type.
+$\textsc{InferSort}(\Gamma_1, \mathit{Id}\;P)$ reaches the application case of \textsc{Infer}:
+the function $\tLam{X}{\Sort{0}}{X}$ has type $\tPi{X}{\Sort{0}}{\Sort{0}}$, the argument $P$ passes $\textsc{Check}(\Gamma_1, P, \Sort{0})$,
+and the result is $\subst{\Sort{0}}{X}{P} = \Sort{0}$.
+The body $h$ then has type $\mathit{Id}\;P$, so
+\[
+\textsc{Infer}(\cdot, t) = \tPi{P}{\Sort{0}}{\tPi{h}{\mathit{Id}\;P}{\mathit{Id}\;P}}.
+\]
+This is not $\alpha$-equivalent to $\tPi{P}{\Sort{0}}{P \to P}$.
+But \textsc{Check} normalizes both sides before comparing them, and $\mathit{Id}\;P \betared P$,
+so the inferred type becomes $\tPi{P}{\Sort{0}}{\tPi{h}{P}{P}}$ and the comparison succeeds as in the first example.
+In the typing rules, this step is an application of \textsc{T-Conv} at the root of the derivation:
+\[
+\footnotesize
+\inferrule*[right=T-Conv]
+  {\cdot \vdash t : \tPi{P}{\Sort{0}}{\mathit{Id}\;P \to \mathit{Id}\;P} \\
+   \cdot \vdash \tPi{P}{\Sort{0}}{P \to P} : \Sort{1} \\
+   \tPi{P}{\Sort{0}}{\mathit{Id}\;P \to \mathit{Id}\;P} \conv \tPi{P}{\Sort{0}}{P \to P}}
+  {\cdot \vdash t : \tPi{P}{\Sort{0}}{P \to P}}
+\]
+The algorithm never decides where to apply \textsc{T-Conv}.
+As described in \S\ref{sec:algorithm}, conversion is hidden in the calls to \textsc{Normalize}, which run only where two types are compared.
 
 \paragraph{An exercise.}
 Prove $\tPi{P}{\Sort{0}}{\tPi{Q}{\Sort{0}}{P \to Q \to P}}$.
@@ -833,6 +891,7 @@ One answer is
 \tLam{P}{\Sort{0}}{\tLam{Q}{\Sort{0}}{\tLam{p}{P}{\tLam{q}{Q}{p}}}}.
 \]
 The proof never uses $q$; this system allows hypotheses to go unused.
+Running \textsc{Infer} on it by hand, as in the first example, is a good check of one's understanding of the algorithm.
 
 \section{A Pitfall: Variable Capture in Contexts}
 \label{sec:capture}

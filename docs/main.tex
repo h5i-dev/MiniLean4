@@ -313,7 +313,7 @@ and its proof are represented as
 \[
 \underbrace{\tLam{P}{\Sort{0}}{\tLam{p}{P}{p}}}_{\text{proof}}
 \quad : \quad
-\underbrace{\tPi{P}{\Sort{0}}{P \to P}}_{\text{proposition}}.
+\underbrace{\tPi{P}{\Sort{0}}{P \to P}}_{\text{proposition = type of proof}}.
 \]
 Notice that types and expressions share the same grammar.
 There is no separate syntax for types: whether a term is a valid
@@ -341,13 +341,10 @@ in the annotation $A$.
 
 The typing rule for application (\S\ref{sec:typing}) needs to replace a variable with 
 a term. We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences 
-of $x$ in $t$ with $s$. The only subtle case is a binder. Consider
+of $x$ in $t$ with $s$. 
 
-\[
-\subst{(\tLam{y}{A}{x})}{x}{y}.
-\]
-
-The body says ``ignore the argument and return the outer $x$''. Replacing $x$ by $y$ 
+The only subtle case is a binder. Consider $\subst{(\tLam{y}{A}{x})}{x}{y}$. The body 
+says ``ignore the argument and return the outer $x$''. Replacing $x$ by $y$ 
 naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: 
 the free $y$ has been \emph{captured} by the binder. Substitution must avoid this 
 by renaming the binder first.

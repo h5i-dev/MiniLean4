@@ -360,7 +360,7 @@ For $\square \in \{\Pi, \lambda\}$:
 \subst{\Sort{u}}{x}{s} &= \Sort{u} \\
 \subst{(t_1\;t_2)}{x}{s} &= \subst{t_1}{x}{s}\;\;\subst{t_2}{x}{s} \\
 \subst{(\square(x{:}A).\,B)}{x}{s} &= \square(x{:}\subst{A}{x}{s}).\,B
-  && \text{($x$ is shadowed)} \\
+  && \text{(we say that $x$ is shadowed)} \\
 \subst{(\square(y{:}A).\,B)}{x}{s} &= \square(y{:}\subst{A}{x}{s}).\,\subst{B}{x}{s}
   && (y \neq x,\; y \notin \FV(s)) \\
 \subst{(\square(y{:}A).\,B)}{x}{s} &= \square(z{:}\subst{A}{x}{s}).\,\subst{(\subst{B}{y}{z})}{x}{s}
@@ -378,14 +378,9 @@ For $\square \in \{\Pi, \lambda\}$:
 
 
 
-The names of bound variables carry no meaning.
-
-$\tLam{x}{A}{x}$ and $\tLam{y}{A}{y}$ are the same function, and
-
-$\tPi{P}{\Sort{0}}{P \to P}$ and $\tPi{Q}{\Sort{0}}{Q \to Q}$ are the same proposition.
-
-Terms that differ only in the names of bound variables are called \emph{$\alpha$-equivalent}.
-
+The names of bound variables carry no meaning. For example, $\tLam{x}{A}{x}$ and $\tLam{y}{A}{y}$ are the same function, and 
+$\tPi{P}{\Sort{0}}{P \to P}$ and $\tPi{Q}{\Sort{0}}{Q \to Q}$ are the same proposition. Terms that differ only in the names 
+of bound variables are called \emph{$\alpha$-equivalent}.
 
 
 \begin{definition}[$\alpha$-equivalence]
@@ -399,21 +394,12 @@ $\alphaeq$ is the smallest congruence on terms that contains, for $\square \in \
 
 \end{definition}
 
-
-
-This definition is easy to state but not directly executable, since it does not say which names to choose.
-
-An implementation instead walks both terms in lockstep and remembers, for each side, the list of binders passed so far.
-
-A bound variable is then identified by \emph{which} binder it refers to, not by its name.
-
-We write $E_1; E_2 \vdash s \alphaeq t$, where $E_1$ and $E_2$ are lists of names.
-
-Let $\mathit{idx}(E, x)$ be the position of the last occurrence of $x$ in $E$, counted from the right starting at $0$, or undefined if $x \notin E$.
-
-Taking the \emph{last} occurrence handles shadowing: in $\tLam{x}{A}{\tLam{x}{B}{x}}$ the body refers to the inner $x$.
-
-
+This definition is easy to state but not directly executable, since it does not say which names to choose. An implementation 
+instead walks both terms in lockstep and remembers, for each side, the list of binders passed so far. A bound variable is 
+then identified by \emph{which} binder it refers to, not by its name. We write $E_1; E_2 \vdash s \alphaeq t$, where $E_1$ 
+and $E_2$ are lists of names. Let $\mathit{idx}(E, x)$ be the position of the last occurrence of $x$ in $E$, counted from 
+the right starting at $0$, or undefined if $x \notin E$. Taking the \emph{last} occurrence handles shadowing: 
+in $\tLam{x}{A}{\tLam{x}{B}{x}}$ the body refers to the inner $x$.
 
 \begin{figure}[ht]
 

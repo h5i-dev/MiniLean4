@@ -601,12 +601,14 @@ by \textsc{T-Pi}, $(\forall Q.\,\chi)^\ast = \tPi{Q}{\Sort{0}}{\chi^\ast}$ lives
 We return to this restriction in \S\ref{sec:hierarchy}.
 
 \begin{theorem}[Propositions as types]
+\label{thm:pat}
 $\Delta \vdash \varphi$ is provable if and only if $\Delta^\ast \vdash t : \varphi^\ast$ for some term $t$.
 \end{theorem}
 
 \noindent From left to right, the figure turns each step of a proof into a step of a typing derivation, so every proof becomes a term.
 From right to left, strong normalization (\S\ref{sec:properties}) lets us assume $t$ is in normal form,
 and a normal term of type $\varphi^\ast$ is built only from variables, $\lambda$, and applications to terms or to types $\psi^\ast$, so it can be read back as a proof.
+Appendix~\ref{app:pat} states the theorem precisely and gives the full proof.
 
 The theorem is what makes a type checker a proof checker.
 In particular, define $\bot = \forall P.\,P$ (``everything holds'').
@@ -683,11 +685,10 @@ Let $\mathit{id} = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$, a proof of $\forall P.\,
 Logic lets us instantiate this theorem with itself to get $(\forall P.\,P \to P) \to (\forall P.\,P \to P)$, but the corresponding application is ill typed:
 \[
 \mathit{id} : \tPi{P}{\Sort{0}}{P \to P}
-\qquad\text{and}\qquad
+\qquad\text{but}\qquad
 \tPi{P}{\Sort{0}}{P \to P} : \Sort{1},
-\quad\text{so}\quad
-\mathit{id}\;(\tPi{P}{\Sort{0}}{P \to P}) \text{ is rejected by \textsc{T-App}.}
 \]
+so \textsc{T-App}, which requires an argument of type $\Sort{0}$, rejects $\mathit{id}\;(\tPi{P}{\Sort{0}}{P \to P})$.
 Higher levels are what make up for this.
 The same proof can be written at $\Sort{1}$, as $\tLam{P}{\Sort{1}}{\tLam{h}{P}{h}}$, and that version does accept $\tPi{P}{\Sort{0}}{P \to P}$.
 Each level holds the level beneath it, and in practice a few levels suffice; higher levels appear when one quantifies over large collections, such as the category of all small categories.
@@ -904,6 +905,205 @@ the only variable available is $P$ itself, whose type is $\Sort{0}$, not $P$.
 \bibitem{hurkens1995simplification} A. J. C. Hurkens. A simplification of Girard's paradox. \emph{TLCA}, 1995.
 \bibitem{moura2021lean4} L. de Moura and S. Ullrich. The Lean 4 theorem prover and programming language. \emph{CADE}, 2021.
 \end{thebibliography}
+
+\appendix
+
+\section{Proof of Theorem~\ref{thm:pat}}
+\label{app:pat}
+
+\paragraph{The precise statement.}
+Theorem~\ref{thm:pat} leaves implicit which proposition variables are in scope.
+For the proof we make them explicit and write $\Theta; \Delta \vdash \varphi$, where $\Theta$ is a list of distinct proposition variables
+and every proposition variable free in $\Delta$ or $\varphi$ belongs to $\Theta$.
+The rules of Figure~\ref{fig:logic} then read
+\begin{mathpar}
+\inferrule{\varphi \in \Delta}{\Theta; \Delta \vdash \varphi}
+\and
+\inferrule{\Theta; \Delta, \varphi \vdash \psi}{\Theta; \Delta \vdash \varphi \to \psi}
+\and
+\inferrule{\Theta; \Delta \vdash \varphi \to \psi \\ \Theta; \Delta \vdash \varphi}{\Theta; \Delta \vdash \psi}
+\and
+\inferrule{\Theta, P; \Delta \vdash \varphi \\ P \notin \Theta}{\Theta; \Delta \vdash \forall P.\,\varphi}
+\and
+\inferrule{\Theta; \Delta \vdash \forall P.\,\varphi \\ \psi \text{ has no } \forall \\ \FV(\psi) \subseteq \Theta}{\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}}
+\end{mathpar}
+The side condition $P \notin \FV(\Delta)$ of Figure~\ref{fig:logic} is now implied by $P \notin \Theta$.
+Formulas are taken up to $\alpha$-equivalence, and $\varphi^\ast \to \psi^\ast$ stands for $\tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x$ fresh.
+
+The context $\Delta^\ast$ of \S\ref{sec:logic} lists the proposition variables first and the hypotheses after them.
+The proof has to extend contexts on the right, so it is convenient to allow any order.
+
+\begin{definition}[Representation]
+A context $\Gamma$ \emph{represents} $(\Theta; \Delta)$ if $\ctxok{\Gamma}$ and $\Gamma$ consists of
+one assumption $P : \Sort{0}$ for each $P \in \Theta$ and one assumption $h : \chi^\ast$ for each $\chi \in \Delta$, in some order.
+\end{definition}
+
+\begin{theorem}[Theorem~\ref{thm:pat}, precise form]
+\label{thm:pat-precise}
+If $\Gamma$ represents $(\Theta; \Delta)$, then
+$\Theta; \Delta \vdash \varphi$ if and only if $\Gamma \vdash t : \varphi^\ast$ for some term $t$.
+\end{theorem}
+
+\noindent The context $\Delta^\ast$ represents $(\Theta; \Delta)$ when $\Theta$ lists the free proposition variables;
+it is well formed by Lemma~\ref{lem:formula-type} below and \textsc{C-Ext}.
+So Theorem~\ref{thm:pat} is the special case $\Gamma = \Delta^\ast$.
+
+\paragraph{Facts about the type system.}
+Besides subject reduction and strong normalization (\S\ref{sec:properties}), the proof uses the following standard properties of Pure Type Systems~\cite{barendregt1992lambda}.
+
+\begin{lemma}
+\label{lem:pts}
+\leavevmode
+\begin{enumerate}[label=(\alph*)]
+  \item \emph{Context validity.} If $\Gamma \vdash t : T$, then $\ctxok{\Gamma}$.
+  \item \emph{Generation.} If $\Gamma \vdash t : T$, then, depending on the shape of $t$:
+    \begin{itemize}
+      \item if $t = x$, then $(x : A) \in \Gamma$ and $T \conv A$;
+      \item if $t = \Sort{u}$, then $T \conv \Sort{(u+1)}$;
+      \item if $t = \tPi{x}{A}{B}$, then $\Gamma \vdash A : \Sort{u}$, $\Gamma, x : A \vdash B : \Sort{v}$, and $T \conv \Sort{(\max(u, v))}$;
+      \item if $t = \tLam{x}{A}{s}$, then $\Gamma, x : A \vdash s : B$ and $T \conv \tPi{x}{A}{B}$ for some $B$;
+      \item if $t = f\;a$, then $\Gamma \vdash f : \tPi{x}{A}{B}$, $\Gamma \vdash a : A$, and $T \conv \subst{B}{x}{a}$ for some $A$ and $B$.
+    \end{itemize}
+  \item \emph{Confluence.} If $s \conv t$, then $s$ and $t$ reduce to a common term.
+    Consequently, two normal terms are convertible only if they are $\alpha$-equivalent;
+    $\tPi{x}{A}{B} \conv \tPi{x}{A'}{B'}$ implies $A \conv A'$ and $B \conv B'$;
+    and no two of a variable, a universe, and a $\Pi$ are convertible.
+  \item \emph{Substitution.} If $A \conv B$, then $\subst{A}{x}{a} \conv \subst{B}{x}{a}$.
+\end{enumerate}
+\end{lemma}
+
+\paragraph{Facts about the translation.}
+The following are routine inductions on formulas.
+Every $\varphi^\ast$ is a normal term, and it is a variable or a $\Pi$, never a universe.
+Translation commutes with substitution: $(\subst{\varphi}{P}{\psi})^\ast = \subst{\varphi^\ast}{P}{\psi^\ast}$.
+Translation is injective: if $\varphi^\ast \alphaeq \psi^\ast$, then $\varphi \alphaeq \psi$,
+because $(\forall P.\,\chi)^\ast$ has domain $\Sort{0}$ while the domain of $(\chi_1 \to \chi_2)^\ast$ is $\chi_1^\ast$, which is not a universe.
+
+\begin{lemma}[Formulas are types]
+\label{lem:formula-type}
+If $\ctxok{\Gamma}$ and $(P : \Sort{0}) \in \Gamma$ for every $P \in \FV(\varphi)$,
+then $\Gamma \vdash \varphi^\ast : \Sort{u}$ for some $u$, and $u = 0$ when $\varphi$ has no $\forall$.
+\end{lemma}
+
+\begin{proof}
+By induction on $\varphi$.
+For $P$, use \textsc{T-Var}.
+For $\varphi \to \psi$, the induction hypothesis gives $\Gamma \vdash \varphi^\ast : \Sort{u}$,
+so $\Gamma, x : \varphi^\ast$ is well formed by \textsc{C-Ext} for a fresh $x$.
+The induction hypothesis for $\psi$ in that context gives $\Sort{v}$, and \textsc{T-Pi} gives $\Sort{(\max(u, v))}$.
+For $\forall Q.\,\chi$, rename $Q$ so that $Q \notin \dom(\Gamma)$.
+\textsc{T-Sort} gives $\Gamma \vdash \Sort{0} : \Sort{1}$, so $\Gamma, Q : \Sort{0}$ is well formed,
+and \textsc{T-Pi} with the induction hypothesis for $\chi$ gives $\Sort{(\max(1, v))}$.
+\end{proof}
+
+\paragraph{From proofs to terms.}
+
+\begin{lemma}
+\label{lem:decorate}
+If $\Theta; \Delta \vdash \varphi$ and $\Gamma$ represents $(\Theta; \Delta)$, then $\Gamma \vdash t : \varphi^\ast$ for some $t$.
+\end{lemma}
+
+\begin{proof}
+By induction on the derivation of $\Theta; \Delta \vdash \varphi$, for all $\Gamma$ at once.
+Each case builds the typing derivation shown in the right column of Figure~\ref{fig:logic}.
+\begin{itemize}
+  \item \emph{Hypothesis.} $\Gamma$ contains $h : \varphi^\ast$, so $\Gamma \vdash h : \varphi^\ast$ by \textsc{T-Var}.
+  \item \emph{$\to$-intro.} By Lemma~\ref{lem:formula-type}, $\Gamma \vdash \varphi^\ast : \Sort{u}$.
+    For a fresh $h$, the context $\Gamma, h : \varphi^\ast$ is well formed and represents $(\Theta; \Delta, \varphi)$.
+    The induction hypothesis gives $\Gamma, h : \varphi^\ast \vdash t : \psi^\ast$,
+    and \textsc{T-Lam} gives $\Gamma \vdash \tLam{h}{\varphi^\ast}{t} : \tPi{h}{\varphi^\ast}{\psi^\ast}$.
+    This type is $\varphi^\ast \to \psi^\ast$, since the free variables of $\psi^\ast$ are proposition variables and $h$ is not one of them.
+  \item \emph{$\to$-elim.} The induction hypotheses give $\Gamma \vdash f : \tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x \notin \FV(\psi^\ast)$ and $\Gamma \vdash a : \varphi^\ast$.
+    \textsc{T-App} gives $\Gamma \vdash f\;a : \subst{\psi^\ast}{x}{a} = \psi^\ast$.
+  \item \emph{$\forall$-intro.} Renaming $P$ if necessary, assume $P \notin \dom(\Gamma)$;
+    a routine induction shows that renaming a variable of $\Theta$ to a fresh one preserves derivations.
+    By \textsc{T-Sort} and \textsc{C-Ext}, $\Gamma, P : \Sort{0}$ is well formed, and it represents $(\Theta, P; \Delta)$.
+    The induction hypothesis gives $\Gamma, P : \Sort{0} \vdash t : \varphi^\ast$,
+    and \textsc{T-Lam} gives $\Gamma \vdash \tLam{P}{\Sort{0}}{t} : \tPi{P}{\Sort{0}}{\varphi^\ast}$.
+  \item \emph{$\forall$-elim.} The induction hypothesis gives $\Gamma \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast}$.
+    Since $\psi$ has no $\forall$, Lemma~\ref{lem:formula-type} gives $\Gamma \vdash \psi^\ast : \Sort{0}$.
+    \textsc{T-App} gives $\Gamma \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast} = (\subst{\varphi}{P}{\psi})^\ast$. \qedhere
+\end{itemize}
+\end{proof}
+
+\paragraph{From terms to proofs.}
+A normal term is a universe, a $\Pi$, a $\lambda$, or a \emph{neutral} term $x\;n_1 \cdots n_k$ with $k \ge 0$,
+whose head $x$ is a variable and whose arguments $n_i$ are normal.
+If $\Gamma$ represents $(\Theta; \Delta)$, the head of a well-typed neutral term is in $\dom(\Gamma)$ by generation,
+so it is either a proposition variable or a hypothesis.
+
+\begin{lemma}[Read-back]
+\label{lem:readback}
+Let $\Gamma$ represent $(\Theta; \Delta)$, let $n$ be a normal term, and let $\Gamma \vdash n : T$.
+\begin{enumerate}[label=(\roman*)]
+  \item If $T \conv \varphi^\ast$ and $\FV(\varphi) \subseteq \Theta$, then $\Theta; \Delta \vdash \varphi$.
+  \item If $T \conv \Sort{0}$, then $n = \psi^\ast$ for some $\psi$ with no $\forall$ and $\FV(\psi) \subseteq \Theta$.
+  \item If $n$ is neutral with a proposition variable as its head, then $n$ has no arguments and $T \conv \Sort{0}$.
+  \item If $n$ is neutral with a hypothesis as its head, then $T \conv \chi^\ast$ and $\Theta; \Delta \vdash \chi$ for some $\chi$ with $\FV(\chi) \subseteq \Theta$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+By induction on $n$, proving all four parts at once for all $\Theta$, $\Delta$, $\Gamma$, and $T$.
+We treat (iii) and (iv) first, since (i) and (ii) use them for neutral terms.
+
+\emph{Parts (iii) and (iv).}
+If $n = x$ has no arguments, generation gives $(x : A) \in \Gamma$ and $T \conv A$.
+For a proposition variable, $A = \Sort{0}$.
+For a hypothesis, $A = \chi^\ast$ with $\chi \in \Delta$, and the hypothesis rule gives $\Theta; \Delta \vdash \chi$.
+
+Otherwise $n = m\;a$, where $m$ is neutral with the same head and one argument fewer.
+Generation gives $\Gamma \vdash m : \tPi{y}{A}{B}$, $\Gamma \vdash a : A$, and $T \conv \subst{B}{y}{a}$.
+If the head is a proposition variable, the induction hypothesis (iii) for $m$ gives $\tPi{y}{A}{B} \conv \Sort{0}$, which confluence rules out.
+So the head is a hypothesis, and part (iii) holds.
+The induction hypothesis (iv) for $m$ gives $\tPi{y}{A}{B} \conv \chi^\ast$ with $\Theta; \Delta \vdash \chi$.
+Since $\chi^\ast$ is a $\Pi$, $\chi$ is an implication or a universal formula.
+\begin{itemize}
+  \item If $\chi = \chi_1 \to \chi_2$, confluence gives $A \conv \chi_1^\ast$ and $B \conv \chi_2^\ast$.
+    The induction hypothesis (i) for $a$ gives $\Theta; \Delta \vdash \chi_1$, and $\to$-elim gives $\Theta; \Delta \vdash \chi_2$.
+    Since $y \notin \FV(\chi_2^\ast)$, $T \conv \subst{B}{y}{a} \conv \chi_2^\ast$.
+  \item If $\chi = \forall P.\,\chi_1$, confluence gives $A \conv \Sort{0}$ and $B \conv \subst{\chi_1^\ast}{P}{y}$.
+    The induction hypothesis (ii) for $a$ gives $a = \psi^\ast$ with $\psi$ free of $\forall$ and $\FV(\psi) \subseteq \Theta$,
+    so $\forall$-elim gives $\Theta; \Delta \vdash \subst{\chi_1}{P}{\psi}$.
+    By the substitution property, $T \conv \subst{\chi_1^\ast}{P}{\psi^\ast} = (\subst{\chi_1}{P}{\psi})^\ast$.
+\end{itemize}
+
+\emph{Part (ii).}
+If $n = \Sort{u}$ or $n$ is a $\lambda$, generation makes $T$ convertible to a universe $\Sort{(u+1)}$ or to a $\Pi$, neither of which is $\Sort{0}$.
+If $n = \tPi{x}{A}{B}$, generation gives $\Gamma \vdash A : \Sort{u}$ and $\Gamma, x : A \vdash B : \Sort{v}$ with $\Sort{0} \conv \Sort{(\max(u, v))}$, so $u = v = 0$.
+The induction hypothesis (ii) for $A$ gives $A = \psi_1^\ast$.
+Then $\Gamma, x : \psi_1^\ast$ is well formed by context validity and represents $(\Theta; \Delta, \psi_1)$,
+so the induction hypothesis (ii) for $B$ in that context gives $B = \psi_2^\ast$ with $\FV(\psi_2) \subseteq \Theta$.
+In particular $x \notin \FV(B)$, so $n = \psi_1^\ast \to \psi_2^\ast = (\psi_1 \to \psi_2)^\ast$.
+If $n$ is neutral with a proposition variable $P$ as its head, part (iii) gives $n = P = P^\ast$.
+If $n$ is neutral with a hypothesis as its head, part (iv) gives $\Sort{0} \conv \chi^\ast$, which confluence rules out.
+
+\emph{Part (i).}
+If $n = \Sort{u}$ or $n$ is a $\Pi$, generation makes $T$ convertible to a universe, but $\varphi^\ast$ is not one.
+If $n$ is neutral with a proposition variable as its head, part (iii) gives $\varphi^\ast \conv \Sort{0}$, which is impossible for the same reason.
+If $n$ is neutral with a hypothesis as its head, part (iv) gives $\chi^\ast \conv \varphi^\ast$ with $\Theta; \Delta \vdash \chi$.
+Both are normal, so they are $\alpha$-equivalent, and injectivity gives $\chi \alphaeq \varphi$.
+
+The remaining case is $n = \tLam{x}{A}{s}$.
+Generation gives $\Gamma, x : A \vdash s : B$ and $\varphi^\ast \conv \tPi{x}{A}{B}$, so $\varphi$ is an implication or a universal formula.
+The annotation $A$ is normal because $n$ is.
+\begin{itemize}
+  \item If $\varphi = \varphi_1 \to \varphi_2$, then $A \conv \varphi_1^\ast$, so $A = \varphi_1^\ast$ since both are normal, and $B \conv \varphi_2^\ast$.
+    The context $\Gamma, x : \varphi_1^\ast$ is well formed and represents $(\Theta; \Delta, \varphi_1)$.
+    The induction hypothesis (i) for $s$ gives $\Theta; \Delta, \varphi_1 \vdash \varphi_2$, and $\to$-intro gives $\Theta; \Delta \vdash \varphi$.
+  \item If $\varphi = \forall P.\,\varphi_1$, then $A = \Sort{0}$ and $B \conv \subst{\varphi_1^\ast}{P}{x}$.
+    Since $\Gamma, x : \Sort{0}$ is well formed, $x \notin \dom(\Gamma)$, so $x \notin \Theta$ and the context represents $(\Theta, x; \Delta)$.
+    The induction hypothesis (i) for $s$ gives $\Theta, x; \Delta \vdash \subst{\varphi_1}{P}{x}$,
+    and $\forall$-intro gives $\Theta; \Delta \vdash \forall x.\,\subst{\varphi_1}{P}{x}$, which is $\alpha$-equivalent to $\varphi$. \qedhere
+\end{itemize}
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:pat-precise}]
+The forward direction is Lemma~\ref{lem:decorate}.
+For the converse, let $\Gamma \vdash t : \varphi^\ast$.
+By strong normalization, $t$ reduces to a normal term $n$, and by subject reduction, $\Gamma \vdash n : \varphi^\ast$.
+Lemma~\ref{lem:readback}(i) with $T = \varphi^\ast$ gives $\Theta; \Delta \vdash \varphi$.
+\end{proof}
 
 %\bibliographystyle{ACM-Reference-Format}
 %\bibliography{ref}

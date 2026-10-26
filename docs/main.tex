@@ -1062,14 +1062,26 @@ Terms gain \emph{constants} $c$:
 \[
 t, A, B ::= \cdots \mid c
 \]
-A \emph{signature} $\Sigma$ lists each constant with its type, and some constants also with a body; those are \emph{definitions}.
-Two rules use the signature:
+A \emph{signature} $\Sigma$ lists the constants.
+Each entry either declares a constant with its type, written $c : C$, or also gives it a body, written $c : C \mathrel{:=} t$; the latter are \emph{definitions}.
+For example, $\Nat : \Sort{1}$ below is a declaration, and $\add$ in \S\ref{sec:nat} is a definition.
+Before an entry is added, its type is checked to be a type in the empty context, and its body, if any, is checked against that type, as Lean does for each \texttt{def}.
+
+The signature is used in two ways.
+First, a constant has the type the signature gives it:
 \[
 \inferrule{\ctxok{\Gamma} \\ (c : C) \in \Sigma}{\Gamma \vdash c : C}\rulename{T-Const}
-\qquad\qquad
-c \deltared t \quad \text{if } (c : C \mathrel{:=} t) \in \Sigma.
 \]
-Before a constant is added, its type is checked to be a type in the empty context, and its body, if any, is checked against that type, as Lean does for each \texttt{def}.
+where $(c : C) \in \Sigma$ covers both declarations and definitions.
+Second, a definition can be \emph{unfolded}: the constant is replaced by its body.
+This computation step is called \emph{$\delta$-reduction}:
+\[
+c \deltared t \qquad \text{if } (c : C \mathrel{:=} t) \in \Sigma.
+\]
+For example, $\add\;2\;1 \deltared (\tLam{m}{\Nat}{\tLam{n}{\Nat}{\cdots}})\;2\;1$, after which $\beta$-reduction continues.
+A declared constant without a body, such as $\Nat$ or $\zero$, never $\delta$-reduces.
+Like $\beta$, the step may be applied to any subterm.
+
 Constants are not variables: they are never bound, so $\FV(c) = \emptyset$ and substitution leaves them unchanged.
 Reduction now consists of $\beta$, $\delta$, and the $\iota$-rules introduced below, and conversion (\S\ref{sec:conversion}) is taken with respect to all three.
 

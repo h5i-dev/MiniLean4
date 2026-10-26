@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 16:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 16:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1257,56 +1257,14 @@ Package hyperref Info: Option `pdfdisplaydoctitle' set `true' on input line 203
 .
 
 Include comment 'screenonly' Excluding comment 'printonly'
-Include comment 'anonsuppress' (./main.aux
-
-LaTeX Warning: Label `sec:syntax' multiply defined.
-
-
-LaTeX Warning: Label `sec:subst' multiply defined.
-
-
-LaTeX Warning: Label `sec:alpha' multiply defined.
-
-
-LaTeX Warning: Label `fig:alpha' multiply defined.
-
-
-LaTeX Warning: Label `sec:conversion' multiply defined.
-
-
-LaTeX Warning: Label `sec:universes' multiply defined.
-
-
-LaTeX Warning: Label `tab:universes' multiply defined.
-
-
-LaTeX Warning: Label `sec:typing' multiply defined.
-
-
-LaTeX Warning: Label `fig:typing' multiply defined.
-
-
-LaTeX Warning: Label `sec:algorithm' multiply defined.
-
-
-LaTeX Warning: Label `alg:infer' multiply defined.
-
-
-LaTeX Warning: Label `sec:examples' multiply defined.
-
-
-LaTeX Warning: Label `sec:capture' multiply defined.
-
-
-LaTeX Warning: Label `sec:properties' multiply defined.
-
-)
+Include comment 'anonsuppress' (./main.aux)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/nxlmi/m/it on input line 203.
 LaTeX Font Info:    Trying to load font information for OML+nxlmi on input line
  203.
- (/usr/share/texlive/texmf-dist/tex/latex/newtx/omlnxlmi.fd
+
+(/usr/share/texlive/texmf-dist/tex/latex/newtx/omlnxlmi.fd
 File: omlnxlmi.fd 2013/11/19 Fontinst v1.933 font definitions for OML/nxlmi.
 )
 LaTeX Font Info:    ... okay on input line 203.
@@ -1633,59 +1591,8 @@ LaTeX Font Warning: Command \Small invalid in math mode on input line 855.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
 (Font)              scaled to size 9.0pt on input line 862.
 [6.6] [7.7] [8.8]
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 10
-74.
- (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd
-File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
-)
-LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 1074.
-Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `zi4' (encoding: T1).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
-
-
-LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 1075.
-
-LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.0pt on input line 1075.
-LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
-(Font)              scaled to size 10.0pt on input line 1076.
-[9.9{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-4.enc}]
-
-Class acmart Warning: A possible image without description on input line 1170.
-
-[10.10]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1204.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 1204.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                \kern 2.77695pt
-(hyperref)                removed on input line 1204.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1204.
-
-[11.11]
-
-Class acmart Warning: A possible image without description on input line 1304.
-
-[12.12] [13.13]
-
-LaTeX Font Warning: Command \Small invalid in math mode on input line 1421.
-
-[14.14] [15.15]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 8.0pt on input line 1522.
+(Font)              scaled to size 8.0pt on input line 1029.
 
 
 Class acmart Warning: Some images may lack descriptions.
@@ -1695,50 +1602,41 @@ File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 )
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/se-utf8.def
 File: se-utf8.def 2019/11/29 v1.12 stringenc: UTF-8
-) [16.16]
+) [9.9]
 (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
-
-
-LaTeX Font Warning: Some font shapes were not available, defaults substituted.
-
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 861BFED99BFAA443E73332EE4E773B79;3654.
+(rerunfilecheck)             Checksum: C97A7F35B40D6456F5BEDA08496D68BF;1973.
  ) 
 Here is how much of TeX's memory you used:
- 39574 strings out of 474222
- 710649 string characters out of 5748733
- 1994975 words of memory out of 5000000
- 60176 multiletter control sequences out of 15000+600000
- 876044 words of font info for 595 fonts, out of 8000000 for 9000
+ 38033 strings out of 474222
+ 691084 string characters out of 5748733
+ 1951975 words of memory out of 5000000
+ 58793 multiletter control sequences out of 15000+600000
+ 862947 words of font info for 530 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 90i,28n,131p,7883b,3237s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4
-b.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata
--zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMath
-MI.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI5
-.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI7.p
-fb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathRM.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/public/libertine/LinBiolinumT.pfb></
-usr/share/texlive/texmf-dist/fonts/type1/public/libertine/LinBiolinumTB.pfb></u
-sr/share/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineT.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTB.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTI.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/newtx/txexas.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type
-1/public/newtx/txsym.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newt
-x/txsys.pfb>
-Output written on main.pdf (16 pages, 570264 bytes).
+ 90i,28n,131p,7883b,669s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI5.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI7.pfb></usr
+/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathRM.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/public/libertine/LinBiolinumT.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/libertine/LinBiolinumTB.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineT.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTB.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTI.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/newtx/txexas.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/newtx/txsym.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsys.
+pfb>
+Output written on main.pdf (9 pages, 507553 bytes).
 PDF statistics:
- 404 PDF objects out of 1000 (max. 8388607)
- 344 compressed objects within 4 object streams
- 108 named destinations out of 1000 (max. 500000)
- 175317 words of extra memory for PDF output out of 184870 (max. 10000000)
+ 259 PDF objects out of 1000 (max. 8388607)
+ 209 compressed objects within 3 object streams
+ 54 named destinations out of 1000 (max. 500000)
+ 170117 words of extra memory for PDF output out of 184870 (max. 10000000)
 

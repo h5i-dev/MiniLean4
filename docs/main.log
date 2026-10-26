@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 17:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  26 OCT 2026 17:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1569,22 +1569,69 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 542.
 
-[4.4{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_tlukpt.enc}{/
-usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_nh77jq.enc}]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 618.
+
+Underfull \vbox (badness 1400) has occurred while \output is active []
+
+ [4.4{/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_tlukpt.enc}{
+/usr/share/texlive/texmf-dist/fonts/enc/dvips/libertine/lbtn_nh77jq.enc}]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 8.0pt on input line 621.
+(Font)              scaled to size 8.0pt on input line 576.
+
+
+Class acmart Warning: A possible image without description on input line 595.
 
 [5.5]
 
-LaTeX Font Warning: Command \Small invalid in math mode on input line 687.
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 621.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\leavevmode@ifvmode' on input line 621.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                \kern 2.77695pt
+(hyperref)                removed on input line 621.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 621.
 
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
-(Font)              scaled to size 9.0pt on input line 694.
-[6.6] [7.7]
+(Font)              scaled to size 9.0pt on input line 675.
+[6.6]
+Overfull \hbox (83.03395pt too wide) detected at line 690
+[] \OT1/LinuxLibertineT-TLF/m/n/10 : \U/ntxmia/m/it/10 ^^E\LMS/ntxsy/m/n/10 ¹\O
+ML/nxlmi/m/it/10 P[][] \OT1/LinuxLibertineT-TLF/m/n/10 0\LMS/ntxsy/m/n/10 º\OML
+/nxlmi/m/it/10 : P \LMS/ntxsy/m/n/10 ! \OML/nxlmi/m/it/10 P [] \U/ntxmia/m/it/1
+0 ^^E\LMS/ntxsy/m/n/10 ¹\OML/nxlmi/m/it/10 P[][] \OT1/LinuxLibertineT-TLF/m/n/1
+0 0\LMS/ntxsy/m/n/10 º\OML/nxlmi/m/it/10 : P \LMS/ntxsy/m/n/10 ! \OML/nxlmi/m/i
+t/10 P \OT1/LinuxLibertineT-TLF/m/n/10 : [] 1\OML/nxlmi/m/it/10 ;  [] [] \LMS/n
+txsy/m/n/10 ¹\U/ntxmia/m/it/10 ^^E\LMS/ntxsy/m/n/10 ¹\OML/nxlmi/m/it/10 P[][] \
+OT1/LinuxLibertineT-TLF/m/n/10 0\LMS/ntxsy/m/n/10 º\OML/nxlmi/m/it/10 : P \LMS/
+ntxsy/m/n/10 ! \OML/nxlmi/m/it/10 P\LMS/ntxsy/m/n/10 º[]
+ []
+
+
+Overfull \hbox (15.546pt too wide) in paragraph at lines 690--694
+\T1/LinuxLibertineT-TLF/m/n/10 (-20) Higher lev-els are what make up for this. 
+The same proof can be writ-ten at $[] \OT1/LinuxLibertineT-TLF/m/n/10 (-20) 1$\
+T1/LinuxLibertineT-TLF/m/n/10 (-20) , as $\OML/nxlmi/m/it/10 ^^U\LMS/ntxsy/m/n/
+10 ¹\OML/nxlmi/m/it/10 P[][] \OT1/LinuxLibertineT-TLF/m/n/10 (-20) 1\LMS/ntxsy/
+m/n/10 º\OML/nxlmi/m/it/10 : ^^U\LMS/ntxsy/m/n/10 ¹\OML/nxlmi/m/it/10 h[]P\LMS/
+ntxsy/m/n/10 º\OML/nxlmi/m/it/10 : h$\T1/LinuxLibertineT-TLF/m/n/10 (-20) ,
+ []
+
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
+put line 733.
+[7.7]
+
+LaTeX Font Warning: Command \Small invalid in math mode on input line 802.
+
+[8.8] [9.9]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 8.0pt on input line 786.
+(Font)              scaled to size 8.0pt on input line 901.
 
 
 Class acmart Warning: Some images may lack descriptions.
@@ -1594,23 +1641,23 @@ File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 )
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/se-utf8.def
 File: se-utf8.def 2019/11/29 v1.12 stringenc: UTF-8
-) [8.8]
+) [10.10]
 (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 51836EDDEF2454B3545A04FB6FCB2B71;1973.
+(rerunfilecheck)             Checksum: 7FFC531598142031A1594067A901CA19;3010.
  ) 
 Here is how much of TeX's memory you used:
- 38087 strings out of 474222
- 692506 string characters out of 5748733
- 1949975 words of memory out of 5000000
- 58793 multiletter control sequences out of 15000+600000
- 868819 words of font info for 567 fonts, out of 8000000 for 9000
+ 38113 strings out of 474222
+ 693042 string characters out of 5748733
+ 1950975 words of memory out of 5000000
+ 58804 multiletter control sequences out of 15000+600000
+ 872943 words of font info for 574 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 90i,28n,131p,7883b,658s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,28n,131p,7883b,666s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI.pfb><
 /usr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI5.pfb></u
 sr/share/texlive/texmf-dist/fonts/type1/public/newtx/LibertineMathMI7.pfb></usr
@@ -1625,10 +1672,10 @@ f-dist/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
 /newtx/txsym.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsys.
 pfb>
-Output written on main.pdf (8 pages, 508449 bytes).
+Output written on main.pdf (10 pages, 522761 bytes).
 PDF statistics:
- 256 PDF objects out of 1000 (max. 8388607)
- 207 compressed objects within 3 object streams
- 53 named destinations out of 1000 (max. 500000)
- 170117 words of extra memory for PDF output out of 184870 (max. 10000000)
+ 295 PDF objects out of 1000 (max. 8388607)
+ 244 compressed objects within 3 object streams
+ 57 named destinations out of 1000 (max. 500000)
+ 172205 words of extra memory for PDF output out of 184870 (max. 10000000)
 

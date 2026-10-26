@@ -489,16 +489,17 @@ A term with no $\beta$-redex is in \emph{normal form}.
 
 Computation can make two different-looking types equal.
 If $\mathit{Id} = \tLam{X}{\Sort{0}}{X}$, then a proof of $\mathit{Id}\;P$ should also be a proof of $P$, since $\mathit{Id}\;P \betared P$.
-This is captured by \emph{definitional equality} (or \emph{conversion}).
+\emph{Definitional equality} (or \emph{conversion}) makes such types interchangeable by identifying terms that compute to the same result.
 
 \begin{definition}[Conversion]
 $s \conv t$ is the smallest equivalence relation that contains $\alphaeq$ and $\betared$ and is closed under all term constructors.
 \end{definition}
 
 To decide $s \conv t$, the kernel normalizes both terms and compares the results with $\alphaeq$.
-This is correct because $\beta$-reduction is confluent: different reduction orders cannot lead to different normal forms.
-It also requires every well-typed term to \emph{have} a normal form.
-That is true for the system in this section, but it is a deep theorem (strong normalization)~\cite{barendregt1992lambda}.
+This procedure relies on two facts.
+First, $\beta$-reduction is confluent: different reduction orders cannot lead to different normal forms, so $s \conv t$ holds exactly when the normal forms of $s$ and $t$ are $\alpha$-equivalent.
+Second, every well-typed term \emph{has} a normal form, so normalization terminates.
+The second fact holds for our system, but it is a deep theorem (strong normalization)~\cite{barendregt1992lambda}.
 A practical kernel also caps the number of reduction steps, so that a bug cannot make it loop forever.
 
 \section{Typing Rules}
@@ -636,10 +637,11 @@ $\inferrule{\Delta^\ast \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast} \\ \Delta^\as
 \label{fig:logic}
 \end{figure}
 
-Two details in the figure deserve comment.
-The side condition $P \notin \FV(\Delta)$ of $\forall$-intro is what lets $P : \Sort{0}$ be added after the hypotheses, since none of their types mention $P$.
-The $\forall$-elim row has the premise $\psi^\ast : \Sort{0}$, which holds for every formula $\psi$, including one that itself contains $\forall$.
-That is a consequence of how \textsc{T-Pi} assigns universes, and \S\ref{sec:hierarchy} explains why it is designed that way.
+In the $\forall$-intro row, the side condition $P \notin \FV(\Delta)$ guarantees that no hypothesis mentions $P$,
+so the typing rule may add $P : \Sort{0}$ after the hypotheses.
+In the $\forall$-elim row, the premise $\psi^\ast : \Sort{0}$ holds for every formula $\psi$, even one that contains $\forall$,
+because \textsc{T-Pi} places every translated formula in $\Sort{0}$ (\S\ref{sec:hierarchy}).
+Hence $\forall$-elim may instantiate $P$ with any formula, as in the logic.
 
 \begin{theorem}[Proofs are terms]
 \label{thm:pat}
@@ -657,8 +659,8 @@ The type theory should agree, that is, no closed term should have type
 \[
 \bot^\ast = \tPi{P}{\Sort{0}}{P}.
 \]
-This matters, because a closed $t : \bot^\ast$ would prove every proposition: $t\;C : C$ for every $C : \Sort{0}$.
-This property is called \emph{consistency}, and a design for universes is acceptable only if it keeps the system consistent.
+A closed term $t : \bot^\ast$ would prove every proposition, since $t\;C : C$ for every $C : \Sort{0}$.
+A system in which no closed term has type $\bot^\ast$ is called \emph{consistent}, and a design for universes is acceptable only if the system remains consistent.
 
 One might hope for the full converse of Theorem~\ref{thm:pat}: every term of type $\varphi^\ast$ comes from a proof of $\varphi$.
 That is a stronger property, called conservativity, and it is harder to establish here,
@@ -677,8 +679,8 @@ P : \Sort{0} \vdash \tLam{h}{P}{h} : P \to P
 \]
 The left judgment proves $P \to P$ for one fixed $P$.
 The right one is a single closed term that proves it for every $P$, and it can be applied later to any particular proposition.
-There are two natural answers to the question of what type $\Sort{0}$ has.
-The first is ``itself''.
+\S\ref{sec:typetype} shows that the simplest answer, that $\Sort{0}$ is its own type, makes the system inconsistent.
+\S\ref{sec:hierarchy} then presents Lean's answer, a hierarchy of universes.
 
 \subsection{Type Is Not a Type}
 \label{sec:typetype}
@@ -691,7 +693,7 @@ Suppose we replace all universes by a single universe $\mathsf{Type}$ that conta
 \]
 Translate $\forall P.\,\varphi$ as $\tPi{P}{\mathsf{Type}}{\varphi^\ast}$.
 Then $P$ ranges over a collection that contains $\mathsf{Type}$ itself and every type built from it.
-This is the type-theoretic analogue of the set of all sets, and Russell's paradox can be replayed.
+Such a collection is the type-theoretic analogue of the set of all sets, and Russell's paradox can be replayed in it.
 Girard showed that the system then has a closed term
 \[
 \vdash t_{\mathrm{G}} : \tPi{P}{\mathsf{Type}}{P},
@@ -714,8 +716,8 @@ The second answer is that $\Sort{0}$ lives in a larger universe, which lives in 
 \Sort{0} : \Sort{1} : \Sort{2} : \cdots.
 \]
 No universe contains itself.
-It remains to decide where a $\Pi$ type lives.
-\textsc{T-Pi} answers with the function $\imax$ used by Lean:
+A $\Pi$ type takes an argument from one universe and returns a type in another, so \textsc{T-Pi} must also say which universe the $\Pi$ type itself belongs to.
+Lean's answer uses the function $\imax$:
 \[
 \inferrule{\Gamma \vdash A : \Sort{u} \\ \Gamma, x : A \vdash B : \Sort{v}}{\Gamma \vdash \tPi{x}{A}{B} : \Sort{\imax(u, v)}}\rulename{T-Pi}
 \qquad
@@ -725,13 +727,14 @@ It remains to decide where a $\Pi$ type lives.
 \max(u, v) & \text{otherwise.}
 \end{cases}
 \]
-The two cases behave differently.
+The case split in $\imax$ makes a $\Pi$ type impredicative when its body is a proposition, and predicative otherwise.
 
 \paragraph{Propositions are impredicative.}
 If the body $B$ is a proposition ($v = 0$), the whole $\Pi$ is a proposition, whatever it quantifies over.
 In particular $(\forall P.\,\varphi)^\ast = \tPi{P}{\Sort{0}}{\varphi^\ast}$ is in $\Sort{0}$, although it quantifies over all of $\Sort{0}$.
 A universe that contains types quantifying over itself is called \emph{impredicative}.
-This is what makes $\forall$-elim unrestricted: a universal statement can be instantiated with any proposition, even itself.
+Because every translated formula lies in $\Sort{0}$, the premise $\psi^\ast : \Sort{0}$ of $\forall$-elim always holds,
+so a universal statement can be instantiated with any proposition, even with itself.
 For example, with $\mathit{id} = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$,
 \[
 \mathit{id} : \tPi{P}{\Sort{0}}{P \to P}
@@ -848,7 +851,7 @@ Conversion is used only where two types must be compared: in \textsc{Check}, and
 \end{algorithmic}
 \end{algorithm}
 
-Some remarks on Algorithm~\ref{alg:infer}:
+Algorithm~\ref{alg:infer} has the following properties.
 \begin{itemize}
   \item Each case corresponds to exactly one rule of Figure~\ref{fig:typing}, so the algorithm is \emph{syntax-directed}.
     Finding a proof may be hard, but checking a given proof is mechanical.
@@ -1237,7 +1240,7 @@ If $T$ normalizes to a $\Pi$ type, the tactic moves its argument into the contex
 \hole{m} \mathrel{:=} \tLam{x}{A}{\hole{1}}.
 \]
 The assignment has the right type by \textsc{T-Lam}.
-The name $x$ must not be in $\dom(\Gamma)$; otherwise the tactic must rename, for the reason given in \S\ref{sec:capture}.
+The name $x$ must not be in $\dom(\Gamma)$; otherwise the new assumption would shadow an existing one, which makes the kernel unsound (\S\ref{sec:capture}), so the tactic must rename it.
 
 \paragraph{\texttt{exact t}.}
 The tactic closes the goal with a given term:
@@ -1270,7 +1273,8 @@ The tactic replaces the goal by a definitionally equal one:
 \]
 provided $T'$ is a type and $T' \conv T$.
 It adds nothing to the term; it only changes how the goal is displayed, and \textsc{T-Conv} justifies it.
-This matters for tactics such as \texttt{rw} below, which look for subterms syntactically.
+\texttt{change} is needed because \texttt{rw} (below) finds subterms only up to $\alpha$-equivalence:
+a subterm that appears only after computation must first be exposed with \texttt{change}, as in the example of \S\ref{sec:zero-add-tactics}.
 
 \paragraph{\texttt{rfl}.}
 If $T$ normalizes to $\Eq{u}\;A\;a\;b$ with $a \conv b$, the tactic closes the goal:
@@ -1280,7 +1284,7 @@ If $T$ normalizes to $\Eq{u}\;A\;a\;b$ with $a \conv b$, the tactic closes the g
 \hole{m} \mathrel{:=} \refl{u}\;A\;a.
 \]
 The assignment has type $\Eq{u}\;A\;a\;a$, which is convertible to the goal.
-This is the definitional equality of \S\ref{sec:eq} put to use.
+So \texttt{rfl} proves exactly the equations that hold by definitional equality (\S\ref{sec:eq}).
 
 \subsection{Induction}
 
@@ -1297,7 +1301,7 @@ The tactic \texttt{induction n} abstracts $n$ in the goal to form the motive, an
 \]
 With the motive $M = \tLam{z}{\Nat}{\subst{T}{n}{z}}$, the type of $\NatRec{u}\;M$ asks for $M\;\zero$ and $\tPi{k}{\Nat}{M\;k \to M\;(\tsucc\;k)}$, and the result has type $M\;n$.
 These are convertible to the types of the two goals and to $T$, by $\beta$.
-Three details need care.
+The construction is correct only if the names are fresh, the level $u$ is right, and no other hypothesis mentions $n$:
 \begin{itemize}
   \item The motive binds a fresh name $z$, not $n$: since $n$ is already in $\Gamma$, writing $\tLam{n}{\Nat}{T}$ would shadow it, which is the pitfall of \S\ref{sec:capture}.
     Likewise $k$ and $\mathit{ih}$ must be fresh.
@@ -1339,6 +1343,7 @@ Step~2 fails, and Lean reports the same situation as ``motive is not type correc
 Without step~2, the tactic would produce a term that the kernel rejects.
 
 \subsection{Example: $0 + n = n$ with Tactics}
+\label{sec:zero-add-tactics}
 
 In our system the proof of \S\ref{sec:zero-add} becomes the script
 \begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
@@ -1360,7 +1365,7 @@ The proof state evolves as follows.
   \item \texttt{rfl} closes the first goal with $\hole{2} \mathrel{:=} \refl{1}\;\Nat\;(0 + 0)$, since $0 + 0 \conv 0$.
   \item In the second goal, $0 + k$ does not occur syntactically, so \texttt{rw [ih]} would find nothing.
     \texttt{change} first exposes it, using $0 + \tsucc\;k \conv \tsucc\;(0 + k)$: it assigns $\hole{3} \mathrel{:=} \hole{4}$ with the goal $\hole{4} : \tsucc\;(0 + k) = \tsucc\;k$.
-    In Lean, the lemma \texttt{Nat.add\_succ} plays this role.
+    In Lean, rewriting with the lemma \texttt{Nat.add\_succ}, which states $n + \tsucc\;m = \tsucc\;(n + m)$, produces the same goal.
   \item \texttt{rw [ih]} abstracts $0 + k$ to get $C = (\tsucc\;x = \tsucc\;k)$.
     With $T = (\tsucc\;(0 + k) = \tsucc\;k)$ for the current goal, it assigns
     \[
@@ -1400,91 +1405,6 @@ All of this lives on the untrusted side: Lean's kernel, like ours, only ever see
 \end{thebibliography}
 
 \appendix
-
-\section{Proof of Theorem~\ref{thm:pat}}
-\label{app:pat}
-
-\paragraph{The precise statement.}
-Theorem~\ref{thm:pat} leaves implicit which proposition variables are in scope.
-For the proof we make them explicit and write $\Theta; \Delta \vdash \varphi$, where $\Theta$ is a list of distinct proposition variables
-and every proposition variable free in $\Delta$ or $\varphi$ belongs to $\Theta$.
-The rules of Figure~\ref{fig:logic} then read
-\begin{mathpar}
-\inferrule{\varphi \in \Delta}{\Theta; \Delta \vdash \varphi}
-\and
-\inferrule{\Theta; \Delta, \varphi \vdash \psi}{\Theta; \Delta \vdash \varphi \to \psi}
-\and
-\inferrule{\Theta; \Delta \vdash \varphi \to \psi \\ \Theta; \Delta \vdash \varphi}{\Theta; \Delta \vdash \psi}
-\and
-\inferrule{\Theta, P; \Delta \vdash \varphi \\ P \notin \Theta}{\Theta; \Delta \vdash \forall P.\,\varphi}
-\and
-\inferrule{\Theta; \Delta \vdash \forall P.\,\varphi \\ \FV(\psi) \subseteq \Theta}{\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}}
-\end{mathpar}
-The side condition $P \notin \FV(\Delta)$ of Figure~\ref{fig:logic} is now implied by $P \notin \Theta$.
-Formulas are taken up to $\alpha$-equivalence, and $\varphi^\ast \to \psi^\ast$ stands for $\tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x$ fresh.
-
-The context $\Delta^\ast$ of \S\ref{sec:logic} lists the proposition variables first and the hypotheses after them.
-The proof has to extend contexts on the right, so it is convenient to allow any order.
-
-\begin{definition}[Representation]
-A context $\Gamma$ \emph{represents} $(\Theta; \Delta)$ if $\ctxok{\Gamma}$ and $\Gamma$ consists of
-one assumption $P : \Sort{0}$ for each $P \in \Theta$ and one assumption $h : \chi^\ast$ for each $\chi \in \Delta$, in some order.
-\end{definition}
-
-\begin{theorem}[Theorem~\ref{thm:pat}, precise form]
-\label{thm:pat-precise}
-If $\Theta; \Delta \vdash \varphi$ and $\Gamma$ represents $(\Theta; \Delta)$, then $\Gamma \vdash t : \varphi^\ast$ for some term $t$.
-\end{theorem}
-
-\noindent The context $\Delta^\ast$ represents $(\Theta; \Delta)$ when $\Theta$ lists the free proposition variables;
-it is well formed by Lemma~\ref{lem:formula-type} below and \textsc{C-Ext}.
-So Theorem~\ref{thm:pat} is the special case $\Gamma = \Delta^\ast$.
-
-\paragraph{Facts about the translation.}
-Translation commutes with substitution: $(\subst{\varphi}{P}{\psi})^\ast = \subst{\varphi^\ast}{P}{\psi^\ast}$.
-This is a routine induction on $\varphi$.
-
-\begin{lemma}[Formulas are propositions]
-\label{lem:formula-type}
-If $\ctxok{\Gamma}$ and $(P : \Sort{0}) \in \Gamma$ for every $P \in \FV(\varphi)$, then $\Gamma \vdash \varphi^\ast : \Sort{0}$.
-\end{lemma}
-
-\begin{proof}
-By induction on $\varphi$.
-For $P$, use \textsc{T-Var}.
-For $\varphi \to \psi$, the induction hypothesis gives $\Gamma \vdash \varphi^\ast : \Sort{0}$,
-so $\Gamma, x : \varphi^\ast$ is well formed by \textsc{C-Ext} for a fresh $x$.
-The induction hypothesis for $\psi$ in that context gives $\Sort{0}$, and \textsc{T-Pi} gives $\Sort{\imax(0, 0)} = \Sort{0}$.
-For $\forall Q.\,\chi$, rename $Q$ so that $Q \notin \dom(\Gamma)$.
-\textsc{T-Sort} gives $\Gamma \vdash \Sort{0} : \Sort{1}$, so $\Gamma, Q : \Sort{0}$ is well formed,
-and \textsc{T-Pi} with the induction hypothesis for $\chi$ gives $\Sort{\imax(1, 0)} = \Sort{0}$.
-\end{proof}
-
-\noindent The last case is where impredicativity is used. With $\max$ in place of $\imax$, $(\forall Q.\,\chi)^\ast$ would live in $\Sort{1}$,
-and the $\forall$-elim case below would hold only for formulas $\psi$ without $\forall$.
-
-\begin{proof}[Proof of Theorem~\ref{thm:pat-precise}]
-By induction on the derivation of $\Theta; \Delta \vdash \varphi$, for all $\Gamma$ at once.
-Each case builds the typing derivation shown in the right column of Figure~\ref{fig:logic}.
-\begin{itemize}
-  \item \emph{Hypothesis.} $\Gamma$ contains $h : \varphi^\ast$, so $\Gamma \vdash h : \varphi^\ast$ by \textsc{T-Var}.
-  \item \emph{$\to$-intro.} By Lemma~\ref{lem:formula-type}, $\Gamma \vdash \varphi^\ast : \Sort{0}$.
-    For a fresh $h$, the context $\Gamma, h : \varphi^\ast$ is well formed and represents $(\Theta; \Delta, \varphi)$.
-    The induction hypothesis gives $\Gamma, h : \varphi^\ast \vdash t : \psi^\ast$,
-    and \textsc{T-Lam} gives $\Gamma \vdash \tLam{h}{\varphi^\ast}{t} : \tPi{h}{\varphi^\ast}{\psi^\ast}$.
-    This type is $\varphi^\ast \to \psi^\ast$, since the free variables of $\psi^\ast$ are proposition variables and $h$ is not one of them.
-  \item \emph{$\to$-elim.} The induction hypotheses give $\Gamma \vdash f : \tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x \notin \FV(\psi^\ast)$ and $\Gamma \vdash a : \varphi^\ast$.
-    \textsc{T-App} gives $\Gamma \vdash f\;a : \subst{\psi^\ast}{x}{a} = \psi^\ast$.
-  \item \emph{$\forall$-intro.} Renaming $P$ if necessary, assume $P \notin \dom(\Gamma)$;
-    a routine induction shows that renaming a variable of $\Theta$ to a fresh one preserves derivations.
-    By \textsc{T-Sort} and \textsc{C-Ext}, $\Gamma, P : \Sort{0}$ is well formed, and it represents $(\Theta, P; \Delta)$.
-    The induction hypothesis gives $\Gamma, P : \Sort{0} \vdash t : \varphi^\ast$,
-    and \textsc{T-Lam} gives $\Gamma \vdash \tLam{P}{\Sort{0}}{t} : \tPi{P}{\Sort{0}}{\varphi^\ast}$.
-  \item \emph{$\forall$-elim.} The induction hypothesis gives $\Gamma \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast}$,
-    and Lemma~\ref{lem:formula-type} gives $\Gamma \vdash \psi^\ast : \Sort{0}$.
-    \textsc{T-App} gives $\Gamma \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast} = (\subst{\varphi}{P}{\psi})^\ast$. \qedhere
-\end{itemize}
-\end{proof}
 
 \section{Proof of Theorem~\ref{thm:alpha}}
 \label{app:alpha}
@@ -1621,6 +1541,91 @@ For the converse, we use induction on the size of $s$, for all $t$ and $E$.
 \begin{proof}[Proof of Theorem~\ref{thm:alpha}]
 If $s \alphaeq t$, then $\db{s}{\cdot} = \db{t}{\cdot}$ by Lemma~\ref{lem:alpha-def}, and $\cdot\,;\cdot \vdash s \alphaeq t$ by Lemma~\ref{lem:alpha-alg}.
 Conversely, if $\cdot\,;\cdot \vdash s \alphaeq t$, then $\db{s}{\cdot} = \db{t}{\cdot}$ by Lemma~\ref{lem:alpha-alg}, and $s \alphaeq t$ by Lemma~\ref{lem:alpha-def}.
+\end{proof}
+
+\section{Proof of Theorem~\ref{thm:pat}}
+\label{app:pat}
+
+\paragraph{The precise statement.}
+Theorem~\ref{thm:pat} leaves implicit which proposition variables are in scope.
+For the proof we make them explicit and write $\Theta; \Delta \vdash \varphi$, where $\Theta$ is a list of distinct proposition variables
+and every proposition variable free in $\Delta$ or $\varphi$ belongs to $\Theta$.
+The rules of Figure~\ref{fig:logic} then read
+\begin{mathpar}
+\inferrule{\varphi \in \Delta}{\Theta; \Delta \vdash \varphi}
+\and
+\inferrule{\Theta; \Delta, \varphi \vdash \psi}{\Theta; \Delta \vdash \varphi \to \psi}
+\and
+\inferrule{\Theta; \Delta \vdash \varphi \to \psi \\ \Theta; \Delta \vdash \varphi}{\Theta; \Delta \vdash \psi}
+\and
+\inferrule{\Theta, P; \Delta \vdash \varphi \\ P \notin \Theta}{\Theta; \Delta \vdash \forall P.\,\varphi}
+\and
+\inferrule{\Theta; \Delta \vdash \forall P.\,\varphi \\ \FV(\psi) \subseteq \Theta}{\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}}
+\end{mathpar}
+The side condition $P \notin \FV(\Delta)$ of Figure~\ref{fig:logic} is now implied by $P \notin \Theta$.
+Formulas are taken up to $\alpha$-equivalence, and $\varphi^\ast \to \psi^\ast$ stands for $\tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x$ fresh.
+
+The context $\Delta^\ast$ of \S\ref{sec:logic} lists the proposition variables first and the hypotheses after them.
+The proof has to extend contexts on the right, so it is convenient to allow any order.
+
+\begin{definition}[Representation]
+A context $\Gamma$ \emph{represents} $(\Theta; \Delta)$ if $\ctxok{\Gamma}$ and $\Gamma$ consists of
+one assumption $P : \Sort{0}$ for each $P \in \Theta$ and one assumption $h : \chi^\ast$ for each $\chi \in \Delta$, in some order.
+\end{definition}
+
+\begin{theorem}[Theorem~\ref{thm:pat}, precise form]
+\label{thm:pat-precise}
+If $\Theta; \Delta \vdash \varphi$ and $\Gamma$ represents $(\Theta; \Delta)$, then $\Gamma \vdash t : \varphi^\ast$ for some term $t$.
+\end{theorem}
+
+\noindent The context $\Delta^\ast$ represents $(\Theta; \Delta)$ when $\Theta$ lists the free proposition variables;
+it is well formed by Lemma~\ref{lem:formula-type} below and \textsc{C-Ext}.
+So Theorem~\ref{thm:pat} is the special case $\Gamma = \Delta^\ast$.
+
+\paragraph{Facts about the translation.}
+Translation commutes with substitution: $(\subst{\varphi}{P}{\psi})^\ast = \subst{\varphi^\ast}{P}{\psi^\ast}$.
+This is a routine induction on $\varphi$.
+
+\begin{lemma}[Formulas are propositions]
+\label{lem:formula-type}
+If $\ctxok{\Gamma}$ and $(P : \Sort{0}) \in \Gamma$ for every $P \in \FV(\varphi)$, then $\Gamma \vdash \varphi^\ast : \Sort{0}$.
+\end{lemma}
+
+\begin{proof}
+By induction on $\varphi$.
+For $P$, use \textsc{T-Var}.
+For $\varphi \to \psi$, the induction hypothesis gives $\Gamma \vdash \varphi^\ast : \Sort{0}$,
+so $\Gamma, x : \varphi^\ast$ is well formed by \textsc{C-Ext} for a fresh $x$.
+The induction hypothesis for $\psi$ in that context gives $\Sort{0}$, and \textsc{T-Pi} gives $\Sort{\imax(0, 0)} = \Sort{0}$.
+For $\forall Q.\,\chi$, rename $Q$ so that $Q \notin \dom(\Gamma)$.
+\textsc{T-Sort} gives $\Gamma \vdash \Sort{0} : \Sort{1}$, so $\Gamma, Q : \Sort{0}$ is well formed,
+and \textsc{T-Pi} with the induction hypothesis for $\chi$ gives $\Sort{\imax(1, 0)} = \Sort{0}$.
+\end{proof}
+
+\noindent The last case is where impredicativity is used. With $\max$ in place of $\imax$, $(\forall Q.\,\chi)^\ast$ would live in $\Sort{1}$,
+and the $\forall$-elim case below would hold only for formulas $\psi$ without $\forall$.
+
+\begin{proof}[Proof of Theorem~\ref{thm:pat-precise}]
+By induction on the derivation of $\Theta; \Delta \vdash \varphi$, for all $\Gamma$ at once.
+Each case builds the typing derivation shown in the right column of Figure~\ref{fig:logic}.
+\begin{itemize}
+  \item \emph{Hypothesis.} $\Gamma$ contains $h : \varphi^\ast$, so $\Gamma \vdash h : \varphi^\ast$ by \textsc{T-Var}.
+  \item \emph{$\to$-intro.} By Lemma~\ref{lem:formula-type}, $\Gamma \vdash \varphi^\ast : \Sort{0}$.
+    For a fresh $h$, the context $\Gamma, h : \varphi^\ast$ is well formed and represents $(\Theta; \Delta, \varphi)$.
+    The induction hypothesis gives $\Gamma, h : \varphi^\ast \vdash t : \psi^\ast$,
+    and \textsc{T-Lam} gives $\Gamma \vdash \tLam{h}{\varphi^\ast}{t} : \tPi{h}{\varphi^\ast}{\psi^\ast}$.
+    This type is $\varphi^\ast \to \psi^\ast$, since the free variables of $\psi^\ast$ are proposition variables and $h$ is not one of them.
+  \item \emph{$\to$-elim.} The induction hypotheses give $\Gamma \vdash f : \tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x \notin \FV(\psi^\ast)$ and $\Gamma \vdash a : \varphi^\ast$.
+    \textsc{T-App} gives $\Gamma \vdash f\;a : \subst{\psi^\ast}{x}{a} = \psi^\ast$.
+  \item \emph{$\forall$-intro.} Renaming $P$ if necessary, assume $P \notin \dom(\Gamma)$;
+    a routine induction shows that renaming a variable of $\Theta$ to a fresh one preserves derivations.
+    By \textsc{T-Sort} and \textsc{C-Ext}, $\Gamma, P : \Sort{0}$ is well formed, and it represents $(\Theta, P; \Delta)$.
+    The induction hypothesis gives $\Gamma, P : \Sort{0} \vdash t : \varphi^\ast$,
+    and \textsc{T-Lam} gives $\Gamma \vdash \tLam{P}{\Sort{0}}{t} : \tPi{P}{\Sort{0}}{\varphi^\ast}$.
+  \item \emph{$\forall$-elim.} The induction hypothesis gives $\Gamma \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast}$,
+    and Lemma~\ref{lem:formula-type} gives $\Gamma \vdash \psi^\ast : \Sort{0}$.
+    \textsc{T-App} gives $\Gamma \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast} = (\subst{\varphi}{P}{\psi})^\ast$. \qedhere
+\end{itemize}
 \end{proof}
 
 \end{document}

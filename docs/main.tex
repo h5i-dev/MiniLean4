@@ -501,7 +501,7 @@ First, $\beta$-reduction is confluent: different reduction orders cannot lead to
 Second, every well-typed term \emph{has} a normal form, so normalization terminates.
 The second fact holds for our system, but it is a deep theorem (strong normalization)~\cite{barendregt1992lambda}.
 A practical kernel also caps the number of reduction steps, so that a bug cannot make it loop forever.
-Algorithm~\ref{alg:normalize} in \S\ref{sec:iota-data} gives \textsc{Normalize} in full; for the system so far, only its $\beta$ case is needed.
+Algorithm~\ref{alg:infer} in \S\ref{sec:algorithm} includes \textsc{Normalize} as pseudocode.
 
 \section{Typing Rules}
 \label{sec:typing}
@@ -808,7 +808,7 @@ Conversion is used only where two types must be compared: in \textsc{Check}, and
 
 \begin{algorithm}[ht]
 \footnotesize
-\caption{Type inference and checking.}
+\caption{Type inference, checking, and normalization.}
 \label{alg:infer}
 \begin{algorithmic}[1]
 \Function{Infer}{$\Gamma, t$}
@@ -854,6 +854,24 @@ Conversion is used only where two types must be compared: in \textsc{Check}, and
   \Else\ \Return $(x, b)$
   \EndIf
 \EndFunction
+\Statex
+\Function{Whnf}{$t$}
+  \Loop
+    \State write $t$ as a spine $h\;a_1 \cdots a_n$
+    \If{$h = \tLam{x}{A}{b}$ and $n \ge 1$} \Comment{$\beta$}
+      \State $t \gets (\subst{b}{x}{a_1})\;a_2 \cdots a_n$
+    \Else\ \Return $t$
+    \EndIf
+  \EndLoop
+\EndFunction
+\Statex
+\Function{Normalize}{$t$}
+  \State $t \gets \Call{Whnf}{t}$
+  \If{$t = \tPi{x}{A}{B}$} \Return $\tPi{x}{\Call{Normalize}{A}}{\Call{Normalize}{B}}$
+  \ElsIf{$t = \tLam{x}{A}{b}$} \Return $\tLam{x}{\Call{Normalize}{A}}{\Call{Normalize}{b}}$
+  \Else\ write $t$ as a spine $h\;a_1 \cdots a_n$ and \Return $h\;\Call{Normalize}{a_1} \cdots \Call{Normalize}{a_n}$
+  \EndIf
+\EndFunction
 \end{algorithmic}
 \end{algorithm}
 
@@ -869,6 +887,15 @@ Algorithm~\ref{alg:infer} has the following properties.
     A caller that starts from a non-empty context must check that context separately.
   \item Termination depends on \textsc{Normalize} terminating, which holds for well-typed terms by strong normalization (\S\ref{sec:conversion}).
 \end{itemize}
+
+The last two functions of Algorithm~\ref{alg:infer} define \textsc{Normalize}.
+It is built from \textsc{Whnf}, which reduces only the head of a term until no rule applies there, giving its \emph{weak head normal form}.
+A term is viewed as a \emph{spine} $h\;a_1 \cdots a_n$: a head $h$ that is not an application, applied to $n \ge 0$ arguments.
+In the system so far the only reduction is $\beta$, so \textsc{Whnf} has a single case; \S\ref{sec:iota-data} adds two more.
+
+\noindent \textsc{Whnf} alone is enough when a caller only needs the outermost shape of a type, such as a $\Pi$ in the application case of \textsc{Infer}.
+Practical kernels use \textsc{Whnf} there and compare types lazily instead of normalizing them fully; Algorithm~\ref{alg:infer} normalizes fully for simplicity.
+Termination of the loop for well-typed terms is strong normalization.
 
 \section{Worked Examples}
 \label{sec:examples}
@@ -1232,14 +1259,12 @@ The $\mathit{rhs}$ takes the arguments before the major premise, then the fields
 For example, $\NatRec{u}\;M\;z\;s\;(\tsucc\;n)$ selects the second rule and becomes
 $(\lambda M\,z\,s\,n.\; s\;n\;(\NatRec{u}\;M\;z\;s\;n))\;M\;z\;s\;n$, which $\beta$-reduces to the right-hand side of the second equation in Figure~\ref{fig:nat-eq}.
 
-Algorithm~\ref{alg:normalize} defines \textsc{Normalize}, which Algorithm~\ref{alg:infer} has used without definition.
-It is built from \textsc{Whnf}, which reduces only the head of a term until no rule applies there, giving its \emph{weak head normal form}.
-A term is viewed as a \emph{spine} $h\;a_1 \cdots a_n$: a head $h$ that is not an application, applied to $n \ge 0$ arguments.
+Algorithm~\ref{alg:whnf-iota} extends \textsc{Whnf} of Algorithm~\ref{alg:infer} with two cases, one for $\delta$ and one for $\iota$; \textsc{Normalize} is unchanged.
 
 \begin{algorithm}[ht]
 \footnotesize
-\caption{Normalization by $\beta$, $\delta$, and $\iota$.}
-\label{alg:normalize}
+\caption{\textsc{Whnf} with $\delta$ and $\iota$. Lines 6--12 are new; the rest is as in Algorithm~\ref{alg:infer}.}
+\label{alg:whnf-iota}
 \begin{algorithmic}[1]
 \Function{Whnf}{$t$}
   \Loop
@@ -1258,27 +1283,16 @@ A term is viewed as a \emph{spine} $h\;a_1 \cdots a_n$: a head $h$ that is not a
     \EndIf
   \EndLoop
 \EndFunction
-\Statex
-\Function{Normalize}{$t$}
-  \State $t \gets \Call{Whnf}{t}$
-  \If{$t = \tPi{x}{A}{B}$} \Return $\tPi{x}{\Call{Normalize}{A}}{\Call{Normalize}{B}}$
-  \ElsIf{$t = \tLam{x}{A}{b}$} \Return $\tLam{x}{\Call{Normalize}{A}}{\Call{Normalize}{b}}$
-  \Else\ write $t$ as a spine $h\;a_1 \cdots a_n$ and \Return $h\;\Call{Normalize}{a_1} \cdots \Call{Normalize}{a_n}$
-  \EndIf
-\EndFunction
 \end{algorithmic}
 \end{algorithm}
 
-\noindent Algorithm~\ref{alg:normalize} has the following properties.
+\noindent The new cases have the following properties.
 \begin{itemize}
-  \item The $\iota$ case contains no reference to $\Nat$ or $\Eq{}$. It reads the major position and the rules from the signature, so adding an inductive type adds rows of data, not code.
+  \item The $\iota$ case contains no reference to $\Nat$ or $\Eq{}$. It reads the major position and the rules from the signature.
+    These two cases are added to the kernel once; after that, each new inductive type adds rows of data, not code.
   \item The major premise is put in weak head normal form before the rules are consulted, because it may become a constructor only after computation, as in $2 + 1$ above.
     If it does not, for instance because it is a variable, the term is stuck and stays as it is; this is why $0 + n$ does not reduce.
-  \item \textsc{Whnf} alone is enough when a caller only needs to see the outermost shape of a type, such as a $\Pi$ in the application case of \textsc{Infer}.
-    Practical kernels use \textsc{Whnf} there and compare types lazily instead of normalizing them fully; Algorithm~\ref{alg:infer} normalizes fully for simplicity.
 \end{itemize}
-For the system of \S\S\ref{sec:syntax}--\ref{sec:properties}, which has no constants, only the $\beta$ case is ever used.
-Termination of the loop for well-typed terms is strong normalization.
 
 \subsection{General Inductive Types}
 
@@ -1286,7 +1300,7 @@ In Lean, a user never writes the rows above.
 When it accepts an \texttt{inductive} declaration, the kernel generates the type former, the constructors, the recursor with its type, and the rules, all from the shapes of the constructors.
 For \texttt{Nat}, it generates exactly the entries of Figure~\ref{fig:nat-eq} and the table above.
 For \texttt{Eq}, it generates the dependent recursor \texttt{Eq.rec}, from which \texttt{Eq.ndrec} is then defined.
-So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and Algorithm~\ref{alg:normalize} runs their rules.
+So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and Algorithm~\ref{alg:whnf-iota} runs their rules.
 
 The procedure must also reject some declarations.
 The declaration
@@ -1302,7 +1316,7 @@ Lean therefore requires every constructor argument to mention the type being def
 
 \subsection{Changes to the Kernel and Its Properties}
 
-\textsc{Infer} gains a case for constants, which looks up the type in $\Sigma$, and \textsc{Normalize} is Algorithm~\ref{alg:normalize}.
+\textsc{Infer} gains a case for constants, which looks up the type in $\Sigma$, and \textsc{Normalize} keeps its definition from Algorithm~\ref{alg:infer}, with \textsc{Whnf} replaced by Algorithm~\ref{alg:whnf-iota}.
 \textsc{Check} is unchanged: it still normalizes both types and compares them up to $\alpha$-equivalence.
 
 The $\iota$-rules do not overlap with each other or with $\beta$, so reduction remains confluent.
@@ -1497,7 +1511,7 @@ Both are proofs of the same proposition, and the kernel does not care which one 
 The kernel checks the final term, so tactics do not have to be correct for the system to be sound.
 A buggy tactic can fail, or it can produce an ill-typed term, which the kernel rejects; it cannot make the kernel accept a false theorem.
 The checks that tactics perform themselves, such as \textsc{Check} in \texttt{exact} or the motive check in \texttt{rw}, exist only to report errors early and clearly.
-The trusted part of the system is therefore small: Algorithm~\ref{alg:infer}, \textsc{Normalize}, and the signature of \S\ref{sec:inductive}.
+The trusted part of the system is therefore small: Algorithm~\ref{alg:infer} with the extended \textsc{Whnf} of Algorithm~\ref{alg:whnf-iota}, and the signature of \S\ref{sec:inductive}.
 
 Lean's tactic framework is far richer than the one sketched here.
 It has metavariables solved by unification, an elaborator that fills in implicit arguments and expands notation such as \texttt{0 + n},

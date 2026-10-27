@@ -472,11 +472,11 @@ as comparing positions counted from the left, and an implementation may store ea
 provided it restores the previous entry when it leaves a binder. Using positions instead of names everywhere gives the 
 \emph{de Bruijn representation}~\cite{debruijn1972nameless}, in which $\alpha$-equivalent terms are syntactically identical.
 
-The rules of Figure~\ref{fig:alpha} are a different definition from Definition~\ref{def:alpha}, so we must check that they agree.
+The rules of Fig.~\ref{fig:alpha} are a different definition from Definition~\ref{def:alpha}, so we must check that they agree.
 
 \begin{theorem}[Correctness of algorithmic $\alpha$-equivalence]
 \label{thm:alpha}
-For all terms $s$ and $t$, $s \alphaeq t$ in the sense of Definition~\ref{def:alpha} if and only if $\cdot\,;\cdot \vdash s \alphaeq t$ is derivable by the rules of Figure~\ref{fig:alpha}.
+For all terms $s$ and $t$, $s \alphaeq t$ in the sense of Definition~\ref{def:alpha} if and only if $\cdot\,;\cdot \vdash s \alphaeq t$ is derivable by the rules of Fig.~\ref{fig:alpha}.
 \end{theorem}
 
 \noindent The idea of the proof is that both sides say the same thing: $s$ and $t$ have the same de Bruijn representation.
@@ -618,7 +618,7 @@ P^\ast = P, \qquad
 (\varphi_1, \ldots, \varphi_n)^\ast = P_1 : \Sort{0}, \ldots, P_k : \Sort{0},\; h_1 : \varphi_1^\ast, \ldots, h_n : \varphi_n^\ast,
 \]
 where $P_1, \ldots, P_k$ are the proposition variables free in $\Delta$ and $h_1, \ldots, h_n$ are fresh names for the hypotheses.
-Figure~\ref{fig:logic} places each logical rule next to the typing rule it corresponds to.
+Fig.~\ref{fig:logic} places each logical rule next to the typing rule it corresponds to.
 Erasing the terms from the right column gives the left column exactly.
 
 \begin{figure}[ht]
@@ -679,7 +679,7 @@ We do not need it; consistency is enough.
 
 \subsection{What Is the Type of $\Sort{0}$?}
 
-The $\forall$ rows of Figure~\ref{fig:logic} bind $P$ with the annotation $\Sort{0}$.
+The $\forall$ rows of Fig.~\ref{fig:logic} bind $P$ with the annotation $\Sort{0}$.
 \textsc{T-Lam} and \textsc{T-Pi} require every annotation to be a type, so $\Sort{0}$ itself needs a type.
 Without one, a proposition variable could only be an assumption placed in the context from outside:
 \[
@@ -809,7 +809,7 @@ $\Sort{u} : \Sort{(u+1)}$ with $\imax$ (Lean) & any level & normalization is har
 \section{A Type Checking Algorithm}
 \label{sec:algorithm}
 
-The rules in Figure~\ref{fig:typing} define which judgments hold, but they are not yet an algorithm,
+The rules in Fig.~\ref{fig:typing} define which judgments hold, but they are not yet an algorithm,
 because \textsc{T-Conv} can be applied at any point.
 The standard solution splits type checking into two mutually recursive functions~\cite{barendregt1992lambda}:
 \textsc{Infer} computes the type of a term, and \textsc{Check} verifies a term against an expected type.
@@ -886,7 +886,7 @@ Conversion is used only where two types must be compared: in \textsc{Check}, and
 
 Algorithm~\ref{alg:infer} has the following properties.
 \begin{itemize}
-  \item Each case corresponds to exactly one rule of Figure~\ref{fig:typing}, so the algorithm is \emph{syntax-directed}.
+  \item Each case corresponds to exactly one rule of Fig.~\ref{fig:typing}, so the algorithm is \emph{syntax-directed}.
     Finding a proof may be hard, but checking a given proof is mechanical.
   \item \textsc{InferSort} implements the premises of the form $\Gamma \vdash A : \Sort{u}$.
     It is also how the kernel decides whether a term is a type at all: $A$ is a type exactly when its type normalizes to a universe.
@@ -912,7 +912,7 @@ Termination of the loop for well-typed terms is strong normalization.
 \section{Worked Examples}
 \label{sec:examples}
 
-This section runs Algorithm~\ref{alg:infer} on three terms and relates each run to the typing rules of Figure~\ref{fig:typing}.
+This section runs Algorithm~\ref{alg:infer} on three terms and relates each run to the typing rules of Fig.~\ref{fig:typing}.
 
 \paragraph{The identity proof.}
 Let $\Gamma_1 = P : \Sort{0}$ and $\Gamma_2 = \Gamma_1, h : P$.
@@ -954,7 +954,7 @@ So \textsc{Infer} succeeds with
 \textsc{Infer}(\cdot, t) = \tPi{P}{\Sort{0}}{\tPi{h}{P}{\Sort{0}}}.
 \]
 The term $t$ is well typed; it is just not a proof of the claimed proposition.
-\textsc{Check} then compares the two types, which are already normal, using the rules of Figure~\ref{fig:alpha}:
+\textsc{Check} then compares the two types, which are already normal, using the rules of Fig.~\ref{fig:alpha}:
 \[
 \begin{array}{l@{\qquad}l}
 \cdot\,;\cdot \vdash \tPi{P}{\Sort{0}}{\tPi{h}{P}{\Sort{0}}} \alphaeq \tPi{P}{\Sort{0}}{\tPi{\_}{P}{P}} & \text{by $\alpha$-Pi, needs} \\
@@ -1128,7 +1128,7 @@ Reduction now consists of $\beta$, $\delta$, and the $\iota$-rules introduced be
 \subsection{Natural Numbers}
 \label{sec:nat}
 
-Figure~\ref{fig:nat-eq} lists the constants for $\Nat$ and $\Eq{}$ and their $\iota$-rules.
+Fig.~\ref{fig:nat-eq} lists the constants for $\Nat$ and $\Eq{}$ and their $\iota$-rules.
 The recursor $\NatRec{u}$ takes a \emph{motive} $M$, which says what is to be built for each $n$,
 a value $z$ for $\zero$, and a step $s$ that turns a value for $n$ into a value for $\tsucc\;n$.
 The $\iota$-rules say that recursion unfolds along the constructors.
@@ -1244,7 +1244,7 @@ Writing such terms by hand is tedious, and finding the right motive is the hard 
 \subsection{Computation Rules as Data}
 \label{sec:iota-data}
 
-Figure~\ref{fig:nat-eq} writes each $\iota$-rule as a separate equation, which suggests that every new inductive type needs new reduction code in the kernel.
+Fig.~\ref{fig:nat-eq} writes each $\iota$-rule as a separate equation, which suggests that every new inductive type needs new reduction code in the kernel.
 It does not.
 A kernel stores the $\iota$-rules as data in the signature, next to the recursor, and a single piece of code applies them for every inductive type.
 
@@ -1269,7 +1269,7 @@ $\EqRec{u,v}$ & 6th & $\refl{u}$ & 2 & 0 & $\lambda A\,a\,M\,m\,b.\; m$ \\
 \end{center}
 The $\mathit{rhs}$ takes the arguments before the major premise, then the fields of the constructor.
 For example, $\NatRec{u}\;M\;z\;s\;(\tsucc\;n)$ selects the second rule and becomes
-$(\lambda M\,z\,s\,n.\; s\;n\;(\NatRec{u}\;M\;z\;s\;n))\;M\;z\;s\;n$, which $\beta$-reduces to the right-hand side of the second equation in Figure~\ref{fig:nat-eq}.
+$(\lambda M\,z\,s\,n.\; s\;n\;(\NatRec{u}\;M\;z\;s\;n))\;M\;z\;s\;n$, which $\beta$-reduces to the right-hand side of the second equation in Fig.~\ref{fig:nat-eq}.
 
 Algorithm~\ref{alg:whnf-iota} extends \textsc{Whnf} of Algorithm~\ref{alg:infer} with two cases, one for $\delta$ and one for $\iota$; \textsc{Normalize} is unchanged.
 
@@ -1310,7 +1310,7 @@ Algorithm~\ref{alg:whnf-iota} extends \textsc{Whnf} of Algorithm~\ref{alg:infer}
 
 In Lean, a user never writes the rows above.
 When it accepts an \texttt{inductive} declaration, the kernel generates the type former, the constructors, the recursor with its type, and the rules, all from the shapes of the constructors.
-For \texttt{Nat}, it generates exactly the entries of Figure~\ref{fig:nat-eq} and the table above.
+For \texttt{Nat}, it generates exactly the entries of Fig.~\ref{fig:nat-eq} and the table above.
 For \texttt{Eq}, it generates the dependent recursor \texttt{Eq.rec}, from which \texttt{Eq.ndrec} is then defined.
 So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and Algorithm~\ref{alg:whnf-iota} runs their rules.
 
@@ -1578,7 +1578,7 @@ For all $E_1$, $E_2$, $s$, and $t$: $E_1; E_2 \vdash s \alphaeq t$ is derivable 
 
 \begin{proof}
 By induction on $s$, for all $t$, $E_1$, and $E_2$.
-For each shape of $s$, exactly one rule of Figure~\ref{fig:alpha} can conclude the judgment, and its premises match the equations for $\db{\cdot}{}$.
+For each shape of $s$, exactly one rule of Fig.~\ref{fig:alpha} can conclude the judgment, and its premises match the equations for $\db{\cdot}{}$.
 \begin{itemize}
   \item If $s = \Sort{u}$, both sides hold exactly when $t = \Sort{u}$, by $\alpha$-Sort.
   \item If $s = x$, the nameless forms can be equal only if $t$ is a variable $y$.
@@ -1689,7 +1689,7 @@ Conversely, if $\cdot\,;\cdot \vdash s \alphaeq t$, then $\db{s}{\cdot} = \db{t}
 Theorem~\ref{thm:pat} leaves implicit which proposition variables are in scope.
 For the proof we make them explicit and write $\Theta; \Delta \vdash \varphi$, where $\Theta$ is a list of distinct proposition variables
 and every proposition variable free in $\Delta$ or $\varphi$ belongs to $\Theta$.
-The rules of Figure~\ref{fig:logic} then read
+The rules of Fig.~\ref{fig:logic} then read
 \begin{mathpar}
 \inferrule{\varphi \in \Delta}{\Theta; \Delta \vdash \varphi}
 \and
@@ -1701,7 +1701,7 @@ The rules of Figure~\ref{fig:logic} then read
 \and
 \inferrule{\Theta; \Delta \vdash \forall P.\,\varphi \\ \FV(\psi) \subseteq \Theta}{\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}}
 \end{mathpar}
-The side condition $P \notin \FV(\Delta)$ of Figure~\ref{fig:logic} is now implied by $P \notin \Theta$.
+The side condition $P \notin \FV(\Delta)$ of Fig.~\ref{fig:logic} is now implied by $P \notin \Theta$.
 Formulas are taken up to $\alpha$-equivalence, and $\varphi^\ast \to \psi^\ast$ stands for $\tPi{x}{\varphi^\ast}{\psi^\ast}$ with $x$ fresh.
 
 The context $\Delta^\ast$ of \S\ref{sec:logic} lists the proposition variables first and the hypotheses after them.
@@ -1746,7 +1746,7 @@ and the $\forall$-elim case below would hold only for formulas $\psi$ without $\
 
 \begin{proof}[Proof of Theorem~\ref{thm:pat-precise}]
 By induction on the derivation of $\Theta; \Delta \vdash \varphi$, for all $\Gamma$ at once.
-Each case builds the typing derivation shown in the right column of Figure~\ref{fig:logic}.
+Each case builds the typing derivation shown in the right column of Fig.~\ref{fig:logic}.
 \begin{itemize}
   \item \emph{Hypothesis.} $\Gamma$ contains $h : \varphi^\ast$, so $\Gamma \vdash h : \varphi^\ast$ by \textsc{T-Var}.
   \item \emph{$\to$-intro.} By Lemma~\ref{lem:formula-type}, $\Gamma \vdash \varphi^\ast : \Sort{0}$.

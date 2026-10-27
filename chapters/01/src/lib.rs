@@ -37,17 +37,20 @@ pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
             if let Ok(_) = infer_sort(gamma, a) {
                 let (x_p, s_p) = fresh_from_context(gamma, x, s);
                 let mut new_gamma = gamma.clone();
-                new_gamma.push((x.clone(), *a.clone()));
-                let b = infer(&new_gamma, &s_p);
-                return Ok(Term::Pi(x.clone(), a.clone(), Box::new(b.unwrap())));
+                new_gamma.push((x_p.clone(), *a.clone()));
+                if let Ok(b) = infer(&new_gamma, &s_p) {
+                    return Ok(Term::Pi(x_p.clone(), a.clone(), Box::new(b)));
+                }
             }
             Err(())
         },
         Term::App(f, a) => {
-            let t = normalize(&infer(gamma, f).unwrap());
-            if let Term::Pi(x, a_cap, b) = t {
-                if check(gamma, a, &a_cap) {
-                    return Ok(substitute(&b, &x, &a));
+            if let Ok(f_p) = infer(gamma, f) {
+                let t = normalize(&f_p);
+                if let Term::Pi(x, a_cap, b) = t {
+                    if let Ok(true) = check(gamma, a, &a_cap) {
+                        return Ok(substitute(&b, &x, &a));
+                    }
                 }
             }
             Err(())
@@ -55,9 +58,22 @@ pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
     }
 }
 
-pub fn check(gamma: &Context, t:&Term, t_cap: &Term) -> bool {
-    let t_cap_p = infer(gamma, t);
-    alpha(&normalize(t_cap), &normalize(&t_cap_p.unwrap()), gamma, gamma)
+pub fn check(gamma: &Context, t:&Term, t_cap: &Term) -> Result<bool, ()> {
+    if let Ok(t_cap_p) = infer(gamma, t) {
+        Ok(alpha(&normalize(t_cap), &normalize(&t_cap_p), gamma, gamma))
+    } else {
+        Err(())
+    }
+}
+
+pub fn get_pos_in_context(gamma: &Context, var_name: &String) -> Option<usize> {
+    for (i, (s, _, )) in gamma.into_iter().rev().enumerate() {
+        if s == var_name {
+            return Some(i);
+        }
+    }
+    
+    None
 }
 
 pub fn alpha(a: &Term, b: &Term, gamma_a: &Context, gamma_b: &Context) -> bool {
@@ -72,11 +88,16 @@ pub fn alpha(a: &Term, b: &Term, gamma_a: &Context, gamma_b: &Context) -> bool {
                 _ => false
             }
         },
-        (Term::Pi(x, a_1, b_1), Term::Pi(y, a_2, b_2)) => {
-            alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-Pi
-        },
-        (Term::Lam(x, a_1, a_2), Term::Lam(y, b_1, b_2)) => {
-            alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-Lam
+        (Term::Pi(x, a_1, b_1), Term::Pi(y, a_2, b_2)) 
+        | (Term::Lam(x, a_1, b_1), Term::Lam(y, a_2, b_2)) => {
+            if !alpha(a_1, a_2, gamma_a, gamma_b) {
+                return false;
+            }
+            let mut gamma_a_prime = gamma_a.clone();
+            let mut gamma_b_prime = gamma_b.clone();
+            gamma_a_prime.push((x.clone(), Term::Sort(0)));
+            gamma_b_prime.push((y.clone(), Term::Sort(0)));
+            alpha(b_1, b_2, &gamma_a_prime, &gamma_b_prime) // alpha-Pi
         },
         (Term::App(a_1, b_1), Term::App(a_2, b_2)) => {
             alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-App
@@ -232,14 +253,4 @@ pub fn normalize(t: &Term) -> Term {
         Term::App(f, a) => Term::App(Box::new(normalize(&f)), Box::new(normalize(&a))),
         other => other, // Sort, Var
     }
-}
-
-pub fn get_pos_in_context(gamma: &Context, var_name: &String) -> Option<usize> {
-    for (i, (s, _, )) in gamma.into_iter().rev().enumerate() {
-        if s == var_name {
-            return Some(i);
-        }
-    }
-    
-    None
 }

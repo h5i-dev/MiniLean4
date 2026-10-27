@@ -1,19 +1,4 @@
-/*
-(x : A) ∈ Γ（most recently added one）
-───────────────────────────────────── Var
-Γ ⊢ x : A
-
-───────────────────────── Sort
-Γ ⊢ Sort u : Sort (u+1)
-
-Γ ⊢ A : Sort u     Γ, x:A ⊢ B : Sort v
-────────────────────────────────────── Pi
-Γ ⊢ Π(x:A). B : Sort (max u v)
-
-Γ ⊢ A : Sort u     Γ, x:A ⊢ t : B
-────────────────────────────────── Lam
-Γ ⊢ λ(x:A). t : Π(x:A). B
-*/
+use std::collections::HashSet;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Term {
@@ -55,13 +40,13 @@ pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
             }
             Err(())
         },
-        Term::App(_, _) => todo!()
+        Term::App(f, a) => todo!()
     }
 }
 
 pub fn infer_sort(gamma: &Context, t: &Term) -> Result<u64, ()> {
     match infer(gamma, t) {
-        Ok(s) => match s {
+        Ok(s) => match normalize(&s) {
             Term::Sort(u) => Ok(u),
             _ => Err(())
         },
@@ -69,10 +54,10 @@ pub fn infer_sort(gamma: &Context, t: &Term) -> Result<u64, ()> {
     }
 }
 
-pub fn fv(t: &Term) -> std::collections::HashSet<String> {
+pub fn fv(t: &Term) -> HashSet<String> {
     match t {
-        Term::Sort(_) => std::collections::HashSet::new(),
-        Term::Var(x) => vec![x.clone()].into_iter().collect::<std::collections::HashSet<String>>(),
+        Term::Sort(_) => HashSet::new(),
+        Term::Var(x) => vec![x.clone()].into_iter().collect::<HashSet<String>>(),
         Term::App(t_1, t_2) => {
             let mut fv_1 = fv(t_1);
             fv_1.extend(fv(t_2));

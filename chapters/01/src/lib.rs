@@ -184,7 +184,27 @@ pub fn whnf(t: &Term) -> Term {
     }
 }
 
-
+pub fn normalize(t: &Term) -> Term {
+    let t_whnf = whnf(t);
+    if let Term::Pi(x, a, b) = t_whnf {
+        Term::Pi(x, Box::new(normalize(&a)), Box::new(normalize(&b)))
+    } else {
+        if let Term::Lam(x, a, b) = t_whnf {
+            Term::Lam(x, Box::new(normalize(&a)), Box::new(normalize(&b)))
+        } else {
+            match t {
+                Term::App(f, a) => {
+                    let f = normalize(f);                      
+                    match f {
+                        Term::Lam(x, _, body) => normalize(&substitute(&body, &x, a)), 
+                        _ => Term::App(Box::new(f), a.clone()),                  
+                    }
+                }
+                _ => t.clone(),
+            }
+        }
+    }
+}
 
 pub fn get_pos_in_context(gamma: &Context, var_name: &String) -> Option<usize> {
     for (i, (s, _, )) in gamma.into_iter().rev().enumerate() {

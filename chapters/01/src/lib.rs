@@ -125,7 +125,7 @@ pub fn substitute (t: &Term, x: &String, s: &Term) -> Term {
                 Term::Pi(
                     x.clone(), 
                     Box::new(substitute(a, x, s)), 
-                    Box::new(substitute(b, x, s))
+                    b.clone()
                 )
             } else {
                 if !fv(s).contains(y) {
@@ -149,7 +149,7 @@ pub fn substitute (t: &Term, x: &String, s: &Term) -> Term {
                 Term::Lam(
                     x.clone(), 
                     Box::new(substitute(a, x, s)), 
-                    Box::new(substitute(b, x, s))
+                    b.clone()
                 )
             } else {
                 if !fv(s).contains(y) {
@@ -185,24 +185,11 @@ pub fn whnf(t: &Term) -> Term {
 }
 
 pub fn normalize(t: &Term) -> Term {
-    let t_whnf = whnf(t);
-    if let Term::Pi(x, a, b) = t_whnf {
-        Term::Pi(x, Box::new(normalize(&a)), Box::new(normalize(&b)))
-    } else {
-        if let Term::Lam(x, a, b) = t_whnf {
-            Term::Lam(x, Box::new(normalize(&a)), Box::new(normalize(&b)))
-        } else {
-            match t {
-                Term::App(f, a) => {
-                    let f = normalize(f);                      
-                    match f {
-                        Term::Lam(x, _, body) => normalize(&substitute(&body, &x, a)), 
-                        _ => Term::App(Box::new(f), a.clone()),                  
-                    }
-                }
-                _ => t.clone(),
-            }
-        }
+    match whnf(t) {
+        Term::Pi(x, a, b) => Term::Pi(x, Box::new(normalize(&a)), Box::new(normalize(&b))),
+        Term::Lam(x, a, b) => Term::Lam(x, Box::new(normalize(&a)), Box::new(normalize(&b))),
+        Term::App(f, a) => Term::App(Box::new(normalize(&f)), Box::new(normalize(&a))),
+        other => other, // Sort, Var
     }
 }
 

@@ -310,6 +310,9 @@ We begin with a small dependent type theory consisting of five kinds of terms:
 t, A, B ::= \Sort{u} \mid x \mid \tPi{x}{A}{B} \mid \tLam{x}{A}{t} \mid t\;s
 \]
 Here, $u$ is a natural number and $x$ is a variable name.
+Throughout, $s, t, a, b, f, A, B, C, T$ (possibly with subscripts or primes) stand for terms,
+$x, y, z$ and the other names bound by $\Pi$ or $\lambda$ stand for variable names, and $u, v$ stand for universe levels.
+Accordingly, the set $\FV(t)$ of free variables of a term $t$, defined in \S\ref{sec:subst}, is a set of names.
 
 \begin{itemize}
     \item $\Sort{u}$: A universe containing types.
@@ -331,6 +334,12 @@ and its proof are represented as
 Notice that types and expressions share the same grammar.
 There is no separate syntax for types: whether a term is a valid
 type is determined by the type checker.
+
+Application associates to the left and arrows associate to the right: $f\;a\;b$ means $(f\;a)\;b$, and
+$A \to B \to C$ means $A \to (B \to C)$. A function of two arguments is thus a function that takes the first
+argument and returns a function expecting the second; this encoding is called \emph{currying}. For example,
+$\tLam{a}{A}{\tLam{b}{B}{a}}$ has type $A \to B \to A$, and applied to $x : A$ and $y : B$ it is written
+$(\tLam{a}{A}{\tLam{b}{B}{a}})\;x\;y$, that is, $((\tLam{a}{A}{\tLam{b}{B}{a}})\;x)\;y$.
 
 \section{Free Variables and Substitution}
 \label{sec:subst}
@@ -891,6 +900,9 @@ Algorithm~\ref{alg:infer} has the following properties.
 The last two functions of Algorithm~\ref{alg:infer} define \textsc{Normalize}.
 It is built from \textsc{Whnf}, which reduces only the head of a term until no rule applies there, giving its \emph{weak head normal form}.
 A term is viewed as a \emph{spine} $h\;a_1 \cdots a_n$: a head $h$ that is not an application, applied to $n \ge 0$ arguments.
+Since application associates to the left (\S\ref{sec:syntax}), $f\;a\;b\;c$ is the nested term $((f\;a)\;b)\;c$;
+following the function side of each application down to $f$ gives the head, and the arguments met on the way, read from the inside out, are $a, b, c$.
+Every term has exactly one such decomposition; a term that is not an application is a spine with $n = 0$.
 In the system so far the only reduction is $\beta$, so \textsc{Whnf} has a single case; \S\ref{sec:iota-data} adds two more.
 
 \noindent \textsc{Whnf} alone is enough when a caller only needs the outermost shape of a type, such as a $\Pi$ in the application case of \textsc{Infer}.

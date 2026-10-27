@@ -16,7 +16,7 @@
 */
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-enum Term {
+pub enum Term {
     Sort(u64),
     Var(String),
     Pi(String, Box<Term>, Box<Term>),
@@ -24,7 +24,7 @@ enum Term {
     App(Box<Term>, Box<Term>)
 }
 
-type Context = Vec<(String, Term)>;
+pub type Context = Vec<(String, Term)>;
 
 pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
     match t {
@@ -146,21 +146,21 @@ pub fn substitute (t: &Term, x: &String, s: &Term) -> Term {
         },
         Term::Lam(y, a, b) => {
             if y == x {
-                Term::Pi(
+                Term::Lam(
                     x.clone(), 
                     Box::new(substitute(a, x, s)), 
                     Box::new(substitute(b, x, s))
                 )
             } else {
                 if !fv(s).contains(y) {
-                    Term::Pi(
+                    Term::Lam(
                         y.clone(), 
                         Box::new(substitute(a, x, s)), 
                         Box::new(substitute(b, x, s))
                     )
                 } else {
                     let z = fresh(s, b, x, y);
-                    Term::Pi(
+                    Term::Lam(
                         z.clone(), 
                         Box::new(substitute(a, x, s)), 
                         Box::new(substitute(&substitute(b, y, &Term::Var(z)), x, s)), 
@@ -171,11 +171,16 @@ pub fn substitute (t: &Term, x: &String, s: &Term) -> Term {
     }
 }
 
-pub fn whfn(t: &mut Term) {
-    while true {
-        if let Term::App(t_1, t_2) = t {
+pub fn whnf(t: &Term) -> Term {
+    match t {
+        Term::App(f, a) => {
+            let f = whnf(f);                      // 関数側（spine の左）を先に whnf
+            match f {
+                Term::Lam(x, _, body) => whnf(&substitute(&body, &x, a)), // β して続ける
+                _ => Term::App(Box::new(f), a.clone()),                    // 先頭が λ でなければ止まる
+            }
         }
-        
+        _ => t.clone(), // Sort, Var, Pi, Lam はそのまま（weak なので中に入らない）
     }
 }
 

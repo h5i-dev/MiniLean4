@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  27 OCT 2026 19:10
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.5.10)  27 OCT 2026 19:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1596,48 +1596,47 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 [6.6] [7.7]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
-(Font)              scaled to size 9.0pt on input line 770.
- [8.8]
+(Font)              scaled to size 9.0pt on input line 777.
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 822.
+put line 829.
+ [8.8]
 
-
-LaTeX Font Warning: Command \Small invalid in math mode on input line 923.
+LaTeX Font Warning: Command \Small invalid in math mode on input line 930.
 
 [9.9] [10.10]
 
-LaTeX Font Warning: Command \Small invalid in math mode on input line 995.
+LaTeX Font Warning: Command \Small invalid in math mode on input line 1002.
 
 [11.11] [12.12]
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 10
-88.
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 11
+04.
  (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 1088.
+(Font)              scaled to size 10.0pt on input line 1104.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `zi4' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 8.0pt on input line 1088.
-
-
-Class acmart Warning: A possible image without description on input line 1165.
+(Font)              scaled to size 8.0pt on input line 1104.
 
 [13.13{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-4.enc}]
+
+Class acmart Warning: A possible image without description on input line 1181.
+
 [14.14]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1223.
+(hyperref)                removing `math shift' on input line 1239.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1223.
+(hyperref)                removing `math shift' on input line 1239.
 
-
-Overfull \hbox (15.67485pt too wide) in paragraph at lines 1272--1275
+[15.15]
+Overfull \hbox (15.67485pt too wide) in paragraph at lines 1288--1291
 [][] \OML/nxlmi/m/it/10 M z s \LMS/ntxsy/m/n/10 น[] \OML/nxlmi/m/it/10 n\LMS/nt
 xsy/m/n/10 บ$ \T1/LinuxLibertineT-TLF/m/n/10 (-20) se-lects the sec-ond rule an
 d be-comes $\LMS/ntxsy/m/n/10 น\OML/nxlmi/m/it/10 ^^UM z s n: s n \LMS/ntxsy/m/
@@ -1645,20 +1644,20 @@ n/10 น[][] \OML/nxlmi/m/it/10 M z s n\LMS/ntxsy/m/n/10 บบ \OML/nxlmi/m/it/10 M
 z s n$\T1/LinuxLibertineT-TLF/m/n/10 (-20) ,
  []
 
-[15.15]
+[16.16]
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 7.3pt on input line 1326.
+(Font)              scaled to size 7.3pt on input line 1342.
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 5.5pt on input line 1326.
- [16.16]
+(Font)              scaled to size 5.5pt on input line 1342.
+
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 1377.
+(Font)              using `T1/zi4/m/n' instead on input line 1393.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.0pt on input line 1387.
+(Font)              scaled to size 10.0pt on input line 1403.
 [17.17]
-Overfull \hbox (15.19101pt too wide) in paragraph at lines 1442--1447
+Overfull \hbox (15.19101pt too wide) in paragraph at lines 1458--1463
 \T1/LinuxLibertineT-TLF/m/n/10 (-20) With the mo-tive $\OML/nxlmi/m/it/10 M \U/
 ntxmia/m/it/10 = \OML/nxlmi/m/it/10 ^^U\LMS/ntxsy/m/n/10 น\OML/nxlmi/m/it/10 z[
 ][]\LMS/ntxsy/m/n/10 บ\OML/nxlmi/m/it/10 : T\LMS/ntxsy/m/n/10 ป\OML/nxlmi/m/it/
@@ -1672,16 +1671,29 @@ TLF/m/n/10 (-20) and $\U/ntxmia/m/it/10 ^^E\LMS/ntxsy/m/n/10 น\OML/nxlmi/m/it/1
 [18.18]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1486.
+(hyperref)                removing `math shift' on input line 1502.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1486.
+(hyperref)                removing `math shift' on input line 1502.
 
 [19.19]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 8.0pt on input line 1537.
+(Font)              scaled to size 8.0pt on input line 1553.
  [20.20] [21.21] [22.22]
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 6.2pt on input line 1797.
+
+Overfull \hbox (31.13751pt too wide) detected at line 1811
+[]
+ []
+
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 9.0pt on input line 1812.
+
+Class acmart Warning: A possible image without description on input line 1814.
+
+[23.23] [24.24]
 
 Class acmart Warning: Some images may lack descriptions.
 
@@ -1690,7 +1702,7 @@ File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 )
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/se-utf8.def
 File: se-utf8.def 2019/11/29 v1.12 stringenc: UTF-8
-) [23.23]
+) [25.25]
 (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
@@ -1701,14 +1713,14 @@ L3 programming layer <2024-01-22>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: C92F4329B043C3577A21D80B9774440C;6597.
+(rerunfilecheck)             Checksum: C1F952DE45019EF90753187989EFAE4D;6895.
  ) 
 Here is how much of TeX's memory you used:
- 38826 strings out of 474222
- 703208 string characters out of 5748733
- 1991975 words of memory out of 5000000
- 59243 multiletter control sequences out of 15000+600000
- 899868 words of font info for 690 fonts, out of 8000000 for 9000
+ 38867 strings out of 474222
+ 703898 string characters out of 5748733
+ 1987975 words of memory out of 5000000
+ 59255 multiletter control sequences out of 15000+600000
+ 901788 words of font info for 701 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
  90i,28n,131p,7883b,1221s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4
@@ -1721,16 +1733,17 @@ share/texlive/texmf-dist/fonts/type1/public/libertine/LinBiolinumTB.pfb></usr/s
 hare/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineT.pfb></usr/sh
 are/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTB.pfb></usr/sh
 are/texlive/texmf-dist/fonts/type1/public/libertine/LinLibertineTI.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/public/newtx/NewTXMI7.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/public/newtx/txexas.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfon
-ts/txsyc.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsym.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsys.pfb>
-Output written on main.pdf (23 pages, 634390 bytes).
+are/texlive/texmf-dist/fonts/type1/public/newtx/NewTXMI.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/public/newtx/NewTXMI7.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/newtx/txexas.pfb></usr/share/texlive/texmf-dist/fonts/type
+1/public/newtx/txexs.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newt
+x/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/txsyc.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/txsym.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/newtx/txsys.pfb>
+Output written on main.pdf (25 pages, 659104 bytes).
 PDF statistics:
- 617 PDF objects out of 1000 (max. 8388607)
- 543 compressed objects within 6 object streams
- 154 named destinations out of 1000 (max. 500000)
- 184629 words of extra memory for PDF output out of 184870 (max. 10000000)
+ 669 PDF objects out of 1000 (max. 8388607)
+ 591 compressed objects within 6 object streams
+ 168 named destinations out of 1000 (max. 500000)
+ 185669 words of extra memory for PDF output out of 221844 (max. 10000000)
 

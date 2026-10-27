@@ -681,16 +681,20 @@ We do not need it; consistency is enough.
 
 \subsection{What Is the Type of $\Sort{0}$?}
 
-The $\forall$ rows of Fig.~\ref{fig:logic} bind $P$ with the annotation $\Sort{0}$.
-\textsc{T-Lam} and \textsc{T-Pi} require every annotation to be a type, so $\Sort{0}$ itself needs a type.
-Without one, a proposition variable could only be an assumption placed in the context from outside:
+A proposition variable appears in the type theory as an assumption $P : \Sort{0}$.
+It can occur in two places: in a context, as in the left judgment below, or bound by $\lambda$ or $\Pi$, as in the right one:
 \[
 P : \Sort{0} \vdash \tLam{h}{P}{h} : P \to P
 \qquad\text{versus}\qquad
 \vdash \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}} : \tPi{P}{\Sort{0}}{P \to P}.
 \]
-The left judgment proves $P \to P$ for one fixed $P$.
-The right one is a single closed term that proves it for every $P$, and it can be applied later to any particular proposition.
+The left judgment proves $P \to P$ for one fixed $P$ supplied from outside.
+The right one is a single closed term that proves it for every $P$, and it can be applied later to any particular proposition;
+this is what the $\forall$ rows of Fig.~\ref{fig:logic} need.
+
+Both forms require $\Sort{0}$ to be a type.
+\textsc{C-Ext}, which adds $P : \Sort{0}$ to a context, and \textsc{T-Lam} and \textsc{T-Pi}, which bind $P : \Sort{0}$, all have the premise $\Gamma \vdash A : \Sort{u}$ for the type $A$ of the new variable.
+With $A = \Sort{0}$, this premise reads $\Gamma \vdash \Sort{0} : \Sort{u}$ for some $u$: the universe of propositions must itself have a type.
 \S\ref{sec:typetype} shows that the simplest answer, that $\Sort{0}$ is its own type, makes the system inconsistent.
 \S\ref{sec:hierarchy} then presents Lean's answer, a hierarchy of universes.
 
@@ -706,22 +710,25 @@ Suppose we replace all universes by a single universe $\mathsf{Type}$ that conta
 Translate $\forall P.\,\varphi$ as $\tPi{P}{\mathsf{Type}}{\varphi^\ast}$.
 Then $P$ ranges over a collection that contains $\mathsf{Type}$ itself and every type built from it.
 Such a collection is the type-theoretic analogue of the set of all sets, and naive set theory shows that such collections lead to contradictions.
-The best-known example is \emph{Russell's paradox}.
-Let $R = \{\, x \mid x \notin x \,\}$ be the set of all sets that are not members of themselves.
-If $R \in R$, then $R$ fails the condition, so $R \notin R$; if $R \notin R$, then $R$ satisfies the condition, so $R \in R$.
-Either way we reach a contradiction, and the culprit is a collection that may contain itself.
+The best-known example is \emph{Russell's paradox}:
+for $R = \{\, x \mid x \notin x \,\}$, both $R \in R$ and $R \notin R$ lead to a contradiction.
 Type theory has no membership test like $x \notin x$, so Russell's argument does not carry over word for word.
-Girard instead adapted a related paradox about the collection of all well-orderings, due to Burali-Forti, and showed that the system has a closed term
+Girard instead adapted a related paradox about the collection of all well-orderings, due to Burali-Forti~\cite{girard1972interpretation},
+and Hurkens simplified the resulting term~\cite{hurkens1995simplification}.
+The result is a closed term $t_{\mathrm{H}}$ with
 \[
-\vdash t_{\mathrm{G}} : \tPi{P}{\mathsf{Type}}{P},
+\vdash t_{\mathrm{H}} : \tPi{P}{\mathsf{Type}}{P},
 \]
-and Hurkens later found a short one~\cite{girard1972interpretation,hurkens1995simplification}.
-So the system is inconsistent: $\bot$ has no proof, yet $\bot^\ast$ has a term, and a kernel built on these rules accepts a proof of every statement.
+so the system is inconsistent: $\bot$ has no proof, yet $\bot^\ast$ has a term, and a kernel built on these rules accepts a proof of every statement.
+The essential ingredient is a type $U$ that quantifies over all of $\mathsf{Type}$ while being a member of $\mathsf{Type}$,
+which lets $U$ contain a copy of its own double power set, something no set can do.
+Appendix~\ref{app:hurkens} gives $t_{\mathrm{H}}$ in full and explains how it works.
+
 
 The damage reaches the algorithm as well.
-Subject reduction still holds, so if $t_{\mathrm{G}}$ had a normal form, it would be a normal closed term of type $\tPi{P}{\mathsf{Type}}{P}$.
-The argument at the end of \S\ref{sec:properties} shows that no such normal term exists.
-Hence $t_{\mathrm{G}}$ has no normal form, strong normalization fails, and \textsc{Normalize} in Algorithm~\ref{alg:infer} can run forever.
+Subject reduction still holds, so if $t_{\mathrm{H}}$ had a normal form, it would be a normal closed term of type $\tPi{p}{\mathsf{Type}}{p}$.
+The part of the proof of Theorem~\ref{thm:consistency} (Appendix~\ref{app:consistency}) that analyses normal terms does not use strong normalization and carries over to $\mathsf{Type} : \mathsf{Type}$; it shows that no such normal term exists.
+Hence $t_{\mathrm{H}}$ has no normal form, strong normalization fails, and \textsc{Normalize} in Algorithm~\ref{alg:infer} runs forever on it.
 
 \subsection{A Hierarchy with an Impredicative Bottom}
 \label{sec:hierarchy}
@@ -1072,11 +1079,20 @@ If $\Gamma \vdash t : A$, then every sequence of $\beta$-reductions starting fro
 
 Together these give the two guarantees we want from a kernel.
 \emph{Decidability}: Algorithm~\ref{alg:infer} terminates on every input, so whether a proof is correct can always be determined.
-\emph{Consistency}: there is no closed term of type $\tPi{P}{\Sort{0}}{P}$.
-By strong normalization and subject reduction, such a term would have a normal form of the same type.
-That normal form must be $\tLam{P}{\Sort{0}}{s}$ with $P : \Sort{0} \vdash s : P$ and $s$ normal.
+\emph{Consistency}: no closed term proves False.
+
+\begin{theorem}[Consistency]
+\label{thm:consistency}
+There is no closed term $t$ with $\cdot \vdash t : \tPi{P}{\Sort{0}}{P}$.
+\end{theorem}
+
+\noindent By strong normalization and subject reduction, such a term would have a normal form of the same type.
+A closed normal term whose type is a $\Pi$ must be a $\lambda$:
+it cannot be a variable or start with one, since no variable is in scope, and universes and $\Pi$ types have a universe as their type.
+So the normal form is $\tLam{P}{\Sort{0}}{s}$ with $P : \Sort{0} \vdash s : P$ and $s$ normal.
 A normal term is a universe, a $\Pi$, a $\lambda$, or a variable applied to arguments, and none of these can have type $P$ in that context:
 the only variable available is $P$ itself, whose type is $\Sort{0}$, not $P$.
+Appendix~\ref{app:consistency} gives the full proof, including the facts about typing and conversion that this argument uses.
 
 \section{Inductive Types: Natural Numbers and Equality}
 \label{sec:inductive}
@@ -1768,6 +1784,150 @@ Each case builds the typing derivation shown in the right column of Fig.~\ref{fi
     \textsc{T-App} gives $\Gamma \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast} = (\subst{\varphi}{P}{\psi})^\ast$. \qedhere
 \end{itemize}
 \end{proof}
+
+\section{Hurkens' Paradox}
+\label{app:hurkens}
+
+This appendix gives the term $t_{\mathrm{H}}$ of \S\ref{sec:typetype} in full (Fig.~\ref{fig:hurkens}) and explains how it works.
+We checked it with the kernel of \texttt{chapters/01}, with \textsc{T-Sort} changed to $\mathsf{Type} : \mathsf{Type}$:
+\textsc{Infer} returns exactly $\tPi{p}{\mathsf{Type}}{p}$ for $t_{\mathrm{H}}$, while the unchanged kernel rejects the term.
+
+\begin{figure}[ht]
+\footnotesize
+\[
+\begin{array}{r@{\;}c@{\;}l}
+\bot &=& \tPi{p}{\mathsf{Type}}{p}, \qquad \neg\varphi = \varphi \to \bot, \qquad \wp S = S \to \mathsf{Type} \\[4pt]
+U &=& \tPi{X}{\mathsf{Type}}{((\wp\wp X \to X) \to \wp\wp X)} \\[4pt]
+\tau &=& \tLam{t}{\wp\wp U}{\tLam{X}{\mathsf{Type}}{\tLam{f}{\wp\wp X \to X}{\tLam{p}{\wp X}{t\;(\tLam{x}{U}{p\;(f\;(x\;X\;f))})}}}} \\[4pt]
+\sigma &=& \tLam{s}{U}{s\;U\;\tau} \\[4pt]
+\Delta &=& \tLam{y}{U}{\neg\,(\tPi{p}{\wp U}{\sigma\;y\;p \to p\;(\tau\;(\sigma\;y))})} \\[4pt]
+\Omega &=& \tau\;(\tLam{p}{\wp U}{\tPi{x}{U}{\sigma\;x\;p \to p\;x}}) \\[10pt]
+t_{\mathrm{H}} &=& (\lambda (h_0 : \tPi{p}{\wp U}{(\tPi{x}{U}{\sigma\;x\;p \to p\;x}) \to p\;\Omega}).\; \\
+&& \qquad h_0\;\Delta\;(\tLam{x}{U}{\tLam{h_2}{\sigma\;x\;\Delta}{\tLam{h_3}{\tPi{p}{\wp U}{\sigma\;x\;p \to p\;(\tau\;(\sigma\;x))}}{
+     h_3\;\Delta\;h_2\;(\tLam{p}{\wp U}{h_3\;(\tLam{y}{U}{p\;(\tau\;(\sigma\;y))})})}}}) \\
+&& \qquad\phantom{h_0\;\Delta\;}(\tLam{p}{\wp U}{h_0\;(\tLam{y}{U}{p\;(\tau\;(\sigma\;y))})})) \\
+&& (\tLam{p}{\wp U}{\tLam{h_1}{\tPi{x}{U}{\sigma\;x\;p \to p\;x}}{h_1\;\Omega\;(\tLam{x}{U}{h_1\;(\tau\;(\sigma\;x))})}})
+\end{array}
+\]
+\caption{Hurkens' paradox in a system with $\mathsf{Type} : \mathsf{Type}$. The first six lines are abbreviations, expanded in place; $t_{\mathrm{H}}$ has type $\bot$.}
+\label{fig:hurkens}
+\end{figure}
+
+\paragraph{How the term works.}
+Read $\wp S = S \to \mathsf{Type}$ as the type of predicates on $S$, that is, of ``subsets'' of $S$.
+The type $U$ is built to contain a copy of its own double power set $\wp\wp U$:
+$\tau : \wp\wp U \to U$ packs a family of subsets of $U$ into one element of $U$, and $\sigma : U \to \wp\wp U$ unpacks it, with
+\[
+\sigma\;(\tau\;t)\;p \;\conv\; t\;(\tLam{x}{U}{p\;(\tau\;(\sigma\;x))})
+\]
+by $\beta$-reduction alone.
+In set theory no set contains a copy of its power set (Cantor's theorem), let alone of its double power set.
+$U$ can, because it quantifies over all of $\mathsf{Type}$ while being a member of $\mathsf{Type}$.
+
+With $\sigma$ we can imitate an ordering on $U$.
+Read $\sigma\;x\;p$ as ``$p$ holds for every element below $x$'',
+call $p$ \emph{inductive} if $\tPi{x}{U}{\sigma\;x\;p \to p\;x}$, and call $x$ \emph{well-founded} if every inductive $p$ holds of $x$.
+The element $\Omega$ plays the role of ``the collection of all well-founded elements'', like the set of all ordinals in Burali-Forti's paradox.
+The three arguments in $t_{\mathrm{H}}$ then say the following.
+\begin{itemize}
+  \item The last line proves that $\Omega$ is well-founded. Its type is the type of $h_0$.
+  \item $h_0\;\Delta\;(\cdots)$ proves that the predicate $\Delta$, ``$y$ is not below itself'', is inductive, and applies the well-foundedness of $\Omega$ to it:
+    $\Omega$ is not below itself. (Strictly, $\Delta\;y$ speaks of $\tau\;(\sigma\;y)$, which behaves like $y$.)
+  \item The argument $\tLam{p}{\wp U}{h_0\;(\cdots)}$ proves, using the equation above, that $\Omega$ is below itself.
+\end{itemize}
+Applying the second to the third yields a term of type $\bot$.
+$\mathsf{Type} : \mathsf{Type}$ is used in one place: $\sigma$ applies $s : U$ to $U$ itself, which requires $U : \mathsf{Type}$ although $U$ quantifies over $\mathsf{Type}$.
+In the hierarchy of \S\ref{sec:hierarchy}, $U$ lives in a higher universe than the one it quantifies over, so this application is ill typed.
+
+\section{Proof of Theorem~\ref{thm:consistency}}
+\label{app:consistency}
+
+The proof concerns the system of \S\S\ref{sec:syntax}--\ref{sec:properties}, without the constants of \S\ref{sec:inductive}.
+It combines strong normalization with an analysis of the shapes of normal terms.
+
+\paragraph{Facts about the type system.}
+Besides subject reduction and strong normalization (\S\ref{sec:properties}), the proof uses the following standard properties of Pure Type Systems~\cite{barendregt1992lambda}.
+Subject reduction extends from one step to any number of steps by induction on the number of steps.
+
+\begin{lemma}
+\label{lem:pts}
+\leavevmode
+\begin{enumerate}[label=(\alph*)]
+  \item \emph{Generation.} If $\Gamma \vdash t : T$, then, depending on the shape of $t$:
+    \begin{itemize}
+      \item if $t = x$, then $(x : A) \in \Gamma$ and $T \conv A$ for some $A$;
+      \item if $t = \Sort{u}$, then $T \conv \Sort{(u+1)}$;
+      \item if $t = \tPi{x}{A}{B}$, then $T \conv \Sort{w}$ for some $w$;
+      \item if $t = \tLam{x}{A}{s}$, then $\Gamma, x : A \vdash s : B$ and $T \conv \tPi{x}{A}{B}$ for some $B$;
+      \item if $t = f\;a$, then $\Gamma \vdash f : \tPi{x}{A}{B}$ and $\Gamma \vdash a : A$ for some $x$, $A$, and $B$.
+    \end{itemize}
+  \item \emph{Confluence.} If $s \conv t$, then $s$ and $t$ reduce to a common term. Consequently:
+    $\tPi{x}{A}{B} \conv \tPi{y}{A'}{B'}$ implies $A \conv A'$ and $\subst{B}{x}{z} \conv \subst{B'}{y}{z}$ for a fresh $z$;
+    and no two of a variable, a universe, and a $\Pi$ are convertible.
+  \item \emph{Substitution.} If $s \conv t$, then $\subst{s}{z}{a} \conv \subst{t}{z}{a}$.
+\end{enumerate}
+\end{lemma}
+
+\noindent The consequences in (b) hold because a variable and a universe do not reduce at all, a $\Pi$ reduces only to a $\Pi$,
+and two terms with a common reduct must therefore have the same outermost shape.
+
+\paragraph{Shapes of normal terms.}
+Recall from \S\ref{sec:algorithm} that every term is a spine $h\;a_1 \cdots a_n$ whose head $h$ is not an application.
+
+\begin{lemma}[Normal forms]
+\label{lem:normal-shape}
+Let $n$ be a normal term with $\Gamma \vdash n : T$.
+Then $n$ is a universe, a $\Pi$, a $\lambda$, or a \emph{neutral} term $x\;a_1 \cdots a_k$ with $k \ge 0$ whose head $x$ is a variable in $\dom(\Gamma)$.
+Moreover, if $k \ge 1$, then $\Gamma \vdash x : C$ for some $C$ that is convertible to a $\Pi$.
+\end{lemma}
+
+\begin{proof}
+Write $n = h\;a_1 \cdots a_k$.
+If $k = 0$, then $n = h$ is a universe, a $\Pi$, a $\lambda$, or a variable, and a variable is in $\dom(\Gamma)$ by generation.
+
+Let $k \ge 1$.
+Applying the generation lemma for application $k$ times, from the outside in, shows that every prefix $h\;a_1 \cdots a_i$ is typable,
+and in particular $\Gamma \vdash h : \tPi{y}{A}{B}$ for some $y$, $A$, and $B$, from the innermost application $h\;a_1$.
+The head $h$ is not a $\lambda$, since $h\;a_1$ would then be a $\beta$-redex inside the normal term $n$.
+It is not a universe or a $\Pi$ either: by generation, its type would be convertible to a universe, and by confluence a universe is not convertible to $\tPi{y}{A}{B}$.
+So $h$ is a variable $x$, which is in $\dom(\Gamma)$ by generation, and $\Gamma \vdash x : \tPi{y}{A}{B}$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:consistency}]
+Suppose that $\cdot \vdash t : \tPi{P}{\Sort{0}}{P}$.
+By strong normalization, $t$ reduces to a normal term $n$, and by subject reduction, $\cdot \vdash n : \tPi{P}{\Sort{0}}{P}$.
+We show that no such $n$ exists, using Lemma~\ref{lem:normal-shape} twice.
+
+\emph{The normal form is a $\lambda$.}
+By Lemma~\ref{lem:normal-shape}, $n$ is a universe, a $\Pi$, a $\lambda$, or a neutral term.
+\begin{itemize}
+  \item It is not neutral, because its head would be a variable in the empty context.
+  \item It is not a universe or a $\Pi$, because generation would make $\tPi{P}{\Sort{0}}{P}$ convertible to a universe, which confluence rules out.
+\end{itemize}
+So $n = \tLam{x}{A}{s}$.
+By generation, $x : A \vdash s : B$ and $\tPi{P}{\Sort{0}}{P} \conv \tPi{x}{A}{B}$ for some $B$.
+By confluence, $A \conv \Sort{0}$ and $\subst{P}{P}{z} \conv \subst{B}{x}{z}$ for a fresh $z$, that is, $z \conv \subst{B}{x}{z}$.
+Substituting $x$ for $z$ on both sides, which preserves convertibility by (c), gives $x \conv B$.
+The body $s$ is normal, because it is a subterm of $n$.
+In short, $x : A \vdash s : B$ with $A \conv \Sort{0}$ and $B \conv x$.
+
+\emph{The body cannot exist.}
+Let $\Gamma = x : A$. By Lemma~\ref{lem:normal-shape}, $s$ is a universe, a $\Pi$, a $\lambda$, or a neutral term.
+\begin{itemize}
+  \item If $s$ is a universe or a $\Pi$, generation makes $B$ convertible to a universe; if $s$ is a $\lambda$, it makes $B$ convertible to a $\Pi$.
+    But $B \conv x$, and by confluence a variable is convertible to neither.
+  \item If $s$ is neutral, its head is a variable in $\dom(\Gamma) = \{x\}$, so $s = x\;a_1 \cdots a_k$.
+    If $k = 0$, then $s = x$, and generation gives $B \conv A$. Then $x \conv B \conv A \conv \Sort{0}$, but a variable is not convertible to a universe.
+    If $k \ge 1$, Lemma~\ref{lem:normal-shape} gives $\Gamma \vdash x : C$ with $C$ convertible to a $\Pi$, and generation gives $C \conv A \conv \Sort{0}$.
+    Then a $\Pi$ is convertible to a universe, which confluence rules out.
+\end{itemize}
+Every case leads to a contradiction, so no closed term has type $\tPi{P}{\Sort{0}}{P}$.
+\end{proof}
+
+\noindent In words: the only variable available is $x$, whose type is $\Sort{0}$.
+It can neither be returned, since $\Sort{0}$ is not $x$, nor be applied to anything, since $\Sort{0}$ is not a function type.
+Every other normal term has a universe or a $\Pi$ as its type.
+The argument relies on strong normalization to reduce the question to normal terms; that step is where all the difficulty lies.
 
 \end{document}
 

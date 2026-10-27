@@ -617,8 +617,10 @@ P^\ast = P, \qquad
 \[
 (\varphi_1, \ldots, \varphi_n)^\ast = P_1 : \Sort{0}, \ldots, P_k : \Sort{0},\; h_1 : \varphi_1^\ast, \ldots, h_n : \varphi_n^\ast,
 \]
-where $P_1, \ldots, P_k$ are the proposition variables free in $\Delta$ and $h_1, \ldots, h_n$ are fresh names for the hypotheses.
-Fig.~\ref{fig:logic} places each logical rule next to the typing rule it corresponds to.
+where $P_1, \ldots, P_k$ are the proposition variables free in $\Delta$ or in the conclusion $\varphi$ of the judgment $\Delta \vdash \varphi$ being translated,
+and $h_1, \ldots, h_n$ are fresh names for the hypotheses.
+The conclusion must be included because a proposition variable may occur only there, as $P$ does in $\cdot \vdash P \to P$.
+Fig.~\ref{fig:logic} places each logical rule next to the typing rule it corresponds to; in each row, $\Delta^\ast$ is the context for the conclusion of the rule.
 Erasing the terms from the right column gives the left column exactly.
 
 \begin{figure}[ht]

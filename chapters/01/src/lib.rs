@@ -24,23 +24,64 @@ pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
         },
         Term::Pi(x, a, b) => {
             if let Ok(u) = infer_sort(gamma, a) {
+                let (x_p, b_p) = fresh_from_context(gamma, x, b);
                 let mut new_gamma = gamma.clone();
-                new_gamma.push((x.clone(), *a.clone()));
-                if let Ok(v) = infer_sort(gamma, b) {
+                new_gamma.push((x_p.clone(), *a.clone()));
+                if let Ok(v) = infer_sort(&new_gamma, &b_p) {
                     return Ok(Term::Sort(std::cmp::max(u, v)));
                 }
             }
             Err(())
         },
-        Term::Lam(x, a, b) => {
+        Term::Lam(x, a, s) => {
             if let Ok(_) = infer_sort(gamma, a) {
+                let (x_p, s_p) = fresh_from_context(gamma, x, s);
                 let mut new_gamma = gamma.clone();
                 new_gamma.push((x.clone(), *a.clone()));
-                return Ok(Term::Pi(x.clone(), a.clone(), b.clone()));
+                let b = infer(&new_gamma, &s_p);
+                return Ok(Term::Pi(x.clone(), a.clone(), Box::new(b.unwrap())));
             }
             Err(())
         },
-        Term::App(f, a) => todo!()
+        Term::App(f, a) => {
+            let t = normalize(&infer(gamma, f).unwrap());
+            if let Term::Pi(x, a_cap, b) = t {
+                if check(gamma, a, &a_cap) {
+                    return Ok(substitute(&b, &x, &a));
+                }
+            }
+            Err(())
+        }
+    }
+}
+
+pub fn check(gamma: &Context, t:&Term, t_cap: &Term) -> bool {
+    let t_cap_p = infer(gamma, t);
+    alpha(&normalize(t_cap), &normalize(&t_cap_p.unwrap()), gamma, gamma)
+}
+
+pub fn alpha(a: &Term, b: &Term, gamma_a: &Context, gamma_b: &Context) -> bool {
+    match (a, b) {
+        (Term::Sort(u), Term::Sort(v)) => u == v, // alpha-Sort
+        (Term::Var(x), Term::Var(y)) => {
+            let i = get_pos_in_context(gamma_a, x);
+            let j = get_pos_in_context(gamma_b, y);
+            match (i, j) {
+                (Some(i), Some(j)) => i == j, // alpha-Bound
+                (None, None) => x == y,                     // alpha-Free
+                _ => false
+            }
+        },
+        (Term::Pi(x, a_1, b_1), Term::Pi(y, a_2, b_2)) => {
+            alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-Pi
+        },
+        (Term::Lam(x, a_1, a_2), Term::Lam(y, b_1, b_2)) => {
+            alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-Lam
+        },
+        (Term::App(a_1, b_1), Term::App(a_2, b_2)) => {
+            alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-App
+        }
+        _ => false
     }
 }
 
@@ -87,6 +128,21 @@ pub fn fresh(s: &Term, b: &Term, x: &String, y: &String) -> String {
         z = z + "'";
     }
     z
+}
+
+pub fn fresh_from_context(gamma: &Context, x: &String, b: &Term) -> (String, Term) {
+    let mut var_name_set: HashSet<String> = gamma.into_iter().map(|(n, _)| n.clone()).collect();
+    if var_name_set.contains(x) {
+        var_name_set.extend(fv(b));
+        let mut x_p = x.clone();
+        while var_name_set.contains(&x_p) {
+            x_p = x_p + "'";
+        }
+
+        (x_p.clone(), substitute(b, x, &Term::Var(x_p)))
+    } else {
+        (x.clone(), b.clone())
+    }
 }
 
 pub fn substitute (t: &Term, x: &String, s: &Term) -> Term {
@@ -186,32 +242,4 @@ pub fn get_pos_in_context(gamma: &Context, var_name: &String) -> Option<usize> {
     }
     
     None
-}
-
-pub fn alpha(a: &Term, b: &Term, gamma_a: &Context, gamma_b: &Context) -> bool {
-    match (a, b) {
-        (Term::Sort(u), Term::Sort(v)) => u == v,
-        (Term::Var(x), Term::Var(y)) => {
-            let i = get_pos_in_context(gamma_a, x);
-            let j = get_pos_in_context(gamma_b, y);
-            match (i, j) {
-                (Some(i), Some(j)) => i == j,
-                (None, None) => x == y,
-                _ => false
-            }
-        },
-        (Term::Pi(x, a_1, b_1), Term::Pi(y, a_2, b_2)) => {
-            if !alpha(a_1, a_2, gamma_a, gamma_b) {
-                return false;
-            }
-            return alpha(b_1, b_2, gamma_a, gamma_b);
-        },
-        (Term::Lam(x, a_1, a_2), Term::Lam(y, b_1, b_2)) => {
-            if !alpha(a_1, a_2, gamma_a, gamma_b) {
-                return false;
-            }
-            return alpha(b_1, b_2, gamma_a, gamma_b);
-        },
-        _ => false
-    }
 }

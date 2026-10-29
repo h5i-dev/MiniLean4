@@ -113,6 +113,7 @@
 \newcommand{\Eq}[1]{\mathsf{Eq}_{#1}}
 \newcommand{\refl}[1]{\mathsf{refl}_{#1}}
 \newcommand{\EqRec}[1]{\mathsf{Eq.ndrec}_{#1}}
+\newcommand{\EqRecDep}[1]{\mathsf{Eq.rec}_{#1}}
 \newcommand{\iotared}{\to_{\iota}}
 \newcommand{\deltared}{\to_{\delta}}
 \newcommand{\hole}[1]{?_{#1}}
@@ -1111,7 +1112,7 @@ inductive Eq {A : Sort u} : A -> A -> Prop where
 \end{lstlisting}
 make the kernel add a type, its constructors, and a \emph{recursor} that eliminates it, together with computation rules for the recursor.
 A general kernel derives all of these from the declaration.
-We first add the two types above by hand, which shows the ingredients, and then explain in \S\ref{sec:iota-data} how they become data that a fixed kernel processes.
+We first add the two types above by hand, which shows the ingredients, and then explain how a fixed kernel processes them as data (\S\ref{sec:iota-data}) and generates them from declarations (\S\ref{sec:inductive-decl}).
 
 \subsection{Constants and Definitions}
 \label{sec:constants}
@@ -1166,17 +1167,20 @@ $\tsucc$ & $\Nat \to \Nat$ & \texttt{Nat.succ} \\
 $\NatRec{u}$ & $\begin{array}[t]{@{}l@{}}\tPi{M}{\Nat \to \Sort{u}}{M\;\zero \to {}} \\ \quad (\tPi{n}{\Nat}{M\;n \to M\;(\tsucc\;n)}) \to \tPi{n}{\Nat}{M\;n}\end{array}$ & \texttt{Nat.rec} \\
 $\Eq{u}$ & $\tPi{A}{\Sort{u}}{A \to A \to \Sort{0}}$ & \texttt{Eq} \\
 $\refl{u}$ & $\tPi{A}{\Sort{u}}{\tPi{a}{A}{\Eq{u}\;A\;a\;a}}$ & \texttt{Eq.refl} \\
-$\EqRec{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{A \to \Sort{v}}{{}}}} \\ \quad M\;a \to \tPi{b}{A}{\Eq{u}\;A\;a\;b \to M\;b}\end{array}$ & \texttt{Eq.ndrec} \\
+$\EqRecDep{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{(\tPi{b}{A}{\Eq{u}\;A\;a\;b \to \Sort{v}})}{{}}}} \\ \quad M\;a\;(\refl{u}\;A\;a) \to \tPi{b}{A}{\tPi{h}{\Eq{u}\;A\;a\;b}{M\;b\;h}}\end{array}$ & \texttt{Eq.rec} \\
+$\EqRec{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{A \to \Sort{v}}{{}}}} \\ \quad M\;a \to \tPi{b}{A}{\Eq{u}\;A\;a\;b \to M\;b}\end{array}$ & \texttt{Eq.ndrec} (definition) \\
 \bottomrule
 \end{tabular}
 \[
 \begin{array}{r@{\;}c@{\;}l}
 \NatRec{u}\;M\;z\;s\;\zero &\iotared& z \\
 \NatRec{u}\;M\;z\;s\;(\tsucc\;n) &\iotared& s\;n\;(\NatRec{u}\;M\;z\;s\;n) \\
-\EqRec{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\iotared& m
+\EqRecDep{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\iotared& m \\
+\EqRec{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\to_{\delta\beta\iota}& m
 \end{array}
 \]
-\caption{Constants for natural numbers and equality (top) and their $\iota$-rules (bottom).}
+\caption{Constants for natural numbers and equality (top) and their $\iota$-rules (bottom).
+$\EqRec{u,v}$ is a definition built from $\EqRecDep{u,v}$ (\S\ref{sec:inductive-decl}), and its rule is derived.}
 \label{fig:nat-eq}
 \end{figure}
 
@@ -1216,10 +1220,11 @@ With $\max$, it would live in $\Sort{1}$, and statements about numbers would not
 
 For $a, b : A$, the type $\Eq{u}\;A\;a\;b$ is the proposition that $a$ and $b$ are equal; when $A$ is $\Nat$ we write it $a = b$.
 Its only constructor $\refl{u}$ proves $a = a$.
-The recursor $\EqRec{u,v}$ is Leibniz's principle: if $a = b$, then whatever holds of $a$ holds of $b$.
-It \emph{transports} $m : M\;a$ along a proof of $a = b$ to $M\;b$, and its $\iota$-rule says that transporting along $\refl{}$ does nothing.
-In a well-typed redex, $b$ and $c$ are both convertible to $a$, so the rule can ignore them.
-Lean's primitive recursor \texttt{Eq.rec} has a motive that may also depend on the proof of equality; Lean derives \texttt{Eq.ndrec} from it, and the non-dependent version is enough here.
+The recursor $\EqRecDep{u,v}$ has a motive that depends on both the right-hand side $b$ and the proof of $a = b$; \S\ref{sec:inductive-decl} explains where its type comes from.
+Most uses need only the non-dependent version $\EqRec{u,v}$, a definition built from $\EqRecDep{u,v}$.
+It is Leibniz's principle: if $a = b$, then whatever holds of $a$ holds of $b$.
+It \emph{transports} $m : M\;a$ along a proof of $a = b$ to $M\;b$, and its rule says that transporting along $\refl{}$ does nothing.
+In a well-typed redex, $b$ and $c$ are both convertible to $a$, so the rules can ignore them.
 
 In Lean, the type argument of \texttt{Eq} is \emph{implicit}, written \texttt{\{A\}} above, and the elaborator fills it in.
 Our kernel sees only fully explicit terms, so we write every argument; filling them in is the job of the layer above the kernel (\S\ref{sec:tactics}).
@@ -1281,7 +1286,7 @@ For our two recursors, the data is as follows; type annotations on $\lambda$ are
 \midrule
 $\NatRec{u}$ & 4th & $\zero$ & 0 & 0 & $\lambda M\,z\,s.\; z$ \\
 & & $\tsucc$ & 0 & 1 & $\lambda M\,z\,s\,n.\; s\;n\;(\NatRec{u}\;M\;z\;s\;n)$ \\
-$\EqRec{u,v}$ & 6th & $\refl{u}$ & 2 & 0 & $\lambda A\,a\,M\,m\,b.\; m$ \\
+$\EqRecDep{u,v}$ & 6th & $\refl{u}$ & 2 & 0 & $\lambda A\,a\,M\,m\,b.\; m$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1324,25 +1329,144 @@ Algorithm~\ref{alg:whnf-iota} extends \textsc{Whnf} of Algorithm~\ref{alg:infer}
     If it does not, for instance because it is a variable, the term is stuck and stays as it is; this is why $0 + n$ does not reduce.
 \end{itemize}
 
-\subsection{General Inductive Types}
+\subsection{Inductive Declarations}
+\label{sec:inductive-decl}
 
-In Lean, a user never writes the rows above.
-When it accepts an \texttt{inductive} declaration, the kernel generates the type former, the constructors, the recursor with its type, and the rules, all from the shapes of the constructors.
-For \texttt{Nat}, it generates exactly the entries of Fig.~\ref{fig:nat-eq} and the table above.
-For \texttt{Eq}, it generates the dependent recursor \texttt{Eq.rec}, from which \texttt{Eq.ndrec} is then defined.
-So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and Algorithm~\ref{alg:whnf-iota} runs their rules.
+In Lean, a user never writes the constants of Fig.~\ref{fig:nat-eq} or the table of \S\ref{sec:iota-data}.
+The user writes an \texttt{inductive} declaration, and the kernel checks it and generates the type, the constructors, the recursor, and the rules.
+This subsection gives that procedure for a single inductive type with parameters and indices, which covers $\Nat$, lists, and $\Eq{}$.
+Mutual and nested inductive types, which Lean also supports, are out of scope.
 
-The procedure must also reject some declarations.
-The declaration
+The procedure also answers a question that \textsc{T-Const} leaves open.
+A constant without a body is an assumption: \textsc{T-Const} would accept $c : \tPi{P}{\Sort{0}}{P}$ just as readily as $\zero : \Nat$, and with it the system would be inconsistent.
+The constants generated below are not arbitrary assumptions.
+They are instances of a fixed schema, the inductive types of the Calculus of Inductive Constructions, whose consistency is known~\cite{werner1994theorie}.
+
+\paragraph{Telescopes.}
+We write $(\vec{x} : \vec{A})$ for a sequence of bindings $(x_1 : A_1) \cdots (x_k : A_k)$ in which each $A_i$ may mention $x_1, \ldots, x_{i-1}$,
+$\tPi{\vec{x}}{\vec{A}}{B}$ for $\tPi{x_1}{A_1}{\cdots\,\tPi{x_k}{A_k}{B}}$, and $f\;\vec{x}$ for $f\;x_1 \cdots x_k$.
+The length of $\vec{x}$ is written $|\vec{x}|$.
+
+\paragraph{Declarations.}
+A declaration introduces a type former $I$ and constructors $c_1, \ldots, c_n$:
+\[
+\begin{array}{r@{\;}c@{\;}l@{\qquad}l}
+I &:& \tPi{\vec{p}}{\vec{P}}{\tPi{\vec{\imath}}{\vec{J}}{\Sort{u}}} & \\
+c_j &:& \tPi{\vec{p}}{\vec{P}}{\tPi{\vec{a}}{\vec{A}_j}{I\;\vec{p}\;\vec{t}_j}} & (j = 1, \ldots, n)
+\end{array}
+\]
+The \emph{parameters} $\vec{p}$ are shared by all constructors and appear unchanged in every result type.
+The \emph{indices} $\vec{\imath}$ may differ between constructors: the index terms $\vec{t}_j$ may mention $\vec{p}$ and the constructor's own arguments $\vec{a}$, which are called its \emph{fields}.
+For our three examples, with the leading $\Pi$ over the parameters omitted from the constructor types:
+\[
+\begin{array}{l@{\quad}l@{\quad}l@{\quad}l}
+\textbf{Type former} & \textbf{Parameters} & \textbf{Indices} & \textbf{Constructors} \\
+\Nat : \Sort{1} & \text{none} & \text{none} & \zero : \Nat, \;\; \tsucc : \Nat \to \Nat \\
+\mathsf{List} : \Sort{1} \to \Sort{1} & (A : \Sort{1}) & \text{none} & \mathsf{nil} : \mathsf{List}\;A, \\
+& & & \mathsf{cons} : A \to \mathsf{List}\;A \to \mathsf{List}\;A \\
+\Eq{u} : \tPi{A}{\Sort{u}}{A \to A \to \Sort{0}} & (A : \Sort{u})\,(a : A) & (b : A) & \refl{u} : \Eq{u}\;A\;a\;a
+\end{array}
+\]
+In $\Eq{u}\;A\;a\;b$, the left-hand side $a$ is a parameter and the right-hand side $b$ is an index.
+The constructor $\refl{u}$ has no fields, and its index term is $a$: it can only prove equations whose two sides are the same.
+This is what makes $\Eq{}$ an \emph{inductive family} rather than a single type.
+
+\paragraph{Acceptance.}
+The kernel accepts a declaration only if the following conditions hold.
+\begin{enumerate}
+  \item The type of $I$ is a type in the current signature.
+  \item With $I$ added to the signature, each constructor type is a type, and it ends in $I\;\vec{p}\;\vec{t}_j$, where $\vec{p}$ are exactly the parameters in order and $I$ does not occur in $\vec{t}_j$.
+  \item \emph{Strict positivity.} Each field type either does not mention $I$, or has the form $\tPi{\vec{y}}{\vec{B}}{I\;\vec{p}\;\vec{s}}$ where $I$ occurs neither in $\vec{B}$ nor in $\vec{s}$.
+    A field of the second form is \emph{recursive}.
+  \item \emph{Universes.} If $u \ge 1$, each field type lies in some $\Sort{w}$ with $w \le u$. If $u = 0$, there is no condition.
+\end{enumerate}
+Condition~2 lets the recursor treat the parameters uniformly.
+Condition~3 rules out declarations such as
 \begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
 inductive Bad where
   | mk : (Bad -> False) -> Bad
 \end{lstlisting}
-mentions \texttt{Bad} to the left of an arrow in the type of a constructor argument.
-Case analysis on it would let one define $f : \mathtt{Bad} \to \mathtt{False}$ by $f\;(\mathtt{mk}\;g) = g\;(\mathtt{mk}\;g)$.
+whose field mentions \texttt{Bad} to the left of an arrow.
+Case analysis on \texttt{Bad} would let one define $f : \mathtt{Bad} \to \mathtt{False}$ by $f\;(\mathtt{mk}\;g) = g\;(\mathtt{mk}\;g)$.
 Then $f\;(\mathtt{mk}\;f)$ is a closed term of type $\mathtt{False}$, and it reduces to itself, so it has no normal form.
-The self-application is the same kind of self-reference as in Russell's paradox (\S\ref{sec:typetype}).
-Lean therefore requires every constructor argument to mention the type being defined only \emph{strictly positively}, that is, never to the left of an arrow.
+Condition~4 prevents a type from containing a larger universe.
+Without it, a declaration $T : \Sort{1}$ with a constructor $\mathtt{mk} : \Sort{1} \to T$ would place a copy of all of $\Sort{1}$ inside $\Sort{1}$,
+which is the self-containment that \S\ref{sec:typetype} shows to be inconsistent.
+For $u = 0$ no condition is needed, because $\Sort{0}$ is impredicative (\S\ref{sec:hierarchy}).
+
+\paragraph{The recursor.}
+For an accepted declaration, the kernel generates a recursor $I.\mathsf{rec}_v$ for each admissible level $v$ (see below):
+\[
+I.\mathsf{rec}_v :
+\tPi{\vec{p}}{\vec{P}}{\;
+\tPi{M}{(\tPi{\vec{\imath}}{\vec{J}}{I\;\vec{p}\;\vec{\imath} \to \Sort{v}})}{\;
+\tPi{m_1}{C_1}{\cdots\,\tPi{m_n}{C_n}{\;
+\tPi{\vec{\imath}}{\vec{J}}{\tPi{x}{I\;\vec{p}\;\vec{\imath}}{M\;\vec{\imath}\;x}}}}}}.
+\]
+The motive $M$ says what is to be built for each element $x$ and its indices.
+The \emph{minor premise} $C_j$ asks for the case of constructor $c_j$: given its fields and an induction hypothesis for each recursive field, build $M$ for $c_j$ applied to those fields:
+\[
+\begin{array}{l}
+C_j = \tPi{\vec{a}}{\vec{A}_j}{\;\tPi{\vec{h}}{\vec{H}_j}{\;M\;\vec{t}_j\;(c_j\;\vec{p}\;\vec{a})}}, \\[4pt]
+H_{j,k} = \tPi{\vec{y}}{\vec{B}}{M\;\vec{s}\;(a_k\;\vec{y})}
+\quad\text{for each recursive field } a_k : \tPi{\vec{y}}{\vec{B}}{I\;\vec{p}\;\vec{s}}.
+\end{array}
+\]
+The final arguments are the indices and the element $x$ itself, the \emph{major premise}.
+
+\paragraph{The rules.}
+For each constructor, the kernel generates one $\iota$-rule, which applies the minor premise to the fields and to the induction hypotheses, computed by recursive calls:
+\[
+I.\mathsf{rec}_v\;\vec{p}\;M\;\vec{m}\;\vec{\imath}\;(c_j\;\vec{p}\,'\;\vec{a}) \;\iotared\; m_j\;\vec{a}\;\vec{h},
+\qquad
+h_k = \tLam{\vec{y}}{\vec{B}}{I.\mathsf{rec}_v\;\vec{p}\;M\;\vec{m}\;\vec{s}\;(a_k\;\vec{y})}.
+\]
+As data for Algorithm~\ref{alg:whnf-iota}, the major premise is at position $|\vec{p}| + n + |\vec{\imath}| + 2$,
+the constructor has $|\vec{p}|$ parameters and $|\vec{a}|$ fields,
+and the right-hand side is $\lambda \vec{p}\,M\,\vec{m}\,\vec{\imath}.\;\lambda \vec{a}.\; m_j\;\vec{a}\;\vec{h}$.
+In a well-typed redex, $\vec{p}\,'$ is convertible to $\vec{p}$, so the rule ignores it, as the rules of \S\ref{sec:iota-data} ignore the parameters of $\refl{}$.
+
+\paragraph{Eliminating from propositions.}
+If $u \ge 1$, the recursor is generated for every level $v$.
+If $u = 0$, so that $I$ is a proposition, the recursor is generated only for $v = 0$, unless $I$ is a \emph{subsingleton}:
+it has at most one constructor, and each field either is a proof (its type lies in $\Sort{0}$) or occurs among the index terms $\vec{t}_j$.
+The restriction keeps data from depending on which proof of a proposition was given.
+For example, $P \vee Q$ has two constructors, so a function from proofs of $P \vee Q$ into $\Nat$ could return $0$ for one and $1$ for the other.
+Lean's \texttt{Or.rec} and \texttt{Exists.rec} therefore eliminate only into $\mathsf{Prop}$,
+while \texttt{And.rec} and \texttt{Eq.rec} eliminate into every universe: \texttt{And} has one constructor whose fields are proofs, and \texttt{Eq} has one constructor with no fields.
+
+\paragraph{Examples.}
+For $\Nat$, there are no parameters or indices, and the field of $\tsucc$ is recursive with no $\vec{y}$.
+The procedure produces exactly the recursor and rules of Fig.~\ref{fig:nat-eq}, and the data in the table of \S\ref{sec:iota-data}.
+For lists, it produces
+\[
+\begin{array}{l}
+\mathsf{List.rec}_v : \tPi{A}{\Sort{1}}{\tPi{M}{\mathsf{List}\;A \to \Sort{v}}{\;M\;(\mathsf{nil}\;A) \to {}}} \\
+\qquad (\tPi{a}{A}{\tPi{\mathit{as}}{\mathsf{List}\;A}{M\;\mathit{as} \to M\;(\mathsf{cons}\;A\;a\;\mathit{as})}}) \to \tPi{x}{\mathsf{List}\;A}{M\;x} \\[6pt]
+\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;(\mathsf{nil}\;A') \;\iotared\; m_1 \\
+\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;(\mathsf{cons}\;A'\;a\;\mathit{as}) \;\iotared\; m_2\;a\;\mathit{as}\;(\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;\mathit{as})
+\end{array}
+\]
+For equality, the motive depends on the index $b$ and on the proof itself:
+\[
+\begin{array}{l}
+\EqRecDep{u,v} : \tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{(\tPi{b}{A}{\Eq{u}\;A\;a\;b \to \Sort{v}})}{{}}}} \\
+\qquad M\;a\;(\refl{u}\;A\;a) \to \tPi{b}{A}{\tPi{h}{\Eq{u}\;A\;a\;b}{M\;b\;h}} \\[6pt]
+\EqRecDep{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A'\;c) \;\iotared\; m.
+\end{array}
+\]
+$\Eq{}$ is a subsingleton, so $v$ is arbitrary.
+The non-dependent recursor of Fig.~\ref{fig:nat-eq} is a definition built from it,
+\[
+\begin{array}{l}
+\EqRec{u,v} \mathrel{:=} \tLam{A}{\Sort{u}}{\tLam{a}{A}{\tLam{M}{A \to \Sort{v}}{\tLam{m}{M\;a}{\tLam{b}{A}{\tLam{h}{\Eq{u}\;A\;a\;b}{{}}}}}}} \\
+\qquad \EqRecDep{u,v}\;A\;a\;(\tLam{b'}{A}{\tLam{\_}{\Eq{u}\;A\;a\;b'}{M\;b'}})\;m\;b\;h,
+\end{array}
+\]
+and its rule in Fig.~\ref{fig:nat-eq} follows by $\delta$, $\beta$, and the rule for $\EqRecDep{u,v}$.
+These recursor types agree with the ones Lean 4 generates for \texttt{Nat}, \texttt{List}, and \texttt{Eq}, up to the names of bound variables and implicit arguments.
+
+So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and Algorithm~\ref{alg:whnf-iota} runs their rules.
 
 \subsection{Changes to the Kernel and Its Properties}
 

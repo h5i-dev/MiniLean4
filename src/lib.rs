@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Term {
@@ -7,11 +7,28 @@ pub enum Term {
     Pi(String, Box<Term>, Box<Term>),
     Lam(String, Box<Term>, Box<Term>),
     App(Box<Term>, Box<Term>),
+    Const(String),
 }
 
-pub type Context = Vec<(String, Term)>;
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Decl { pub ty: Term, pub kind: DeclKind }
 
-pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DeclKind {
+    Axiom,
+    Def { body: Term },
+    Inductive { nparams: usize, nindices: usize, ctors: Vec<String> },
+    Ctor { nparams: usize, nfield: usize, induct: String },
+    Rec { induct: String, major_idx: usize, rules: Vec<RecRule> }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RecRule { pub ctor: String, pub nfield: usize, pub rhs: Term }
+
+pub type Context = Vec<(String, Term)>;
+pub type Env = HashMap<String, Decl>;
+
+pub fn infer(env: &Env, gamma: &Context, t: &Term) -> Result<Term, ()> {
     match t {
         Term::Sort(u) => Ok(Term::Sort(u + 1)),
         Term::Var(x) => {
@@ -23,11 +40,11 @@ pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
             Err(())
         }
         Term::Pi(x, a, b) => {
-            if let Ok(u) = infer_sort(gamma, a) {
+            if let Ok(u) = infer_sort(env, gamma, a) {
                 let (x_p, b_p) = fresh_from_context(gamma, x, b);
                 let mut new_gamma = gamma.clone();
                 new_gamma.push((x_p.clone(), *a.clone()));
-                if let Ok(v) = infer_sort(&new_gamma, &b_p) {
+                if let Ok(v) = infer_sort(env, &new_gamma, &b_p) {
                     let level = if v == 0 { 0 } else { u.max(v) };
                     return Ok(Term::Sort(level));
                 }
@@ -35,33 +52,34 @@ pub fn infer(gamma: &Context, t: &Term) -> Result<Term, ()> {
             Err(())
         }
         Term::Lam(x, a, s) => {
-            if let Ok(_) = infer_sort(gamma, a) {
+            if let Ok(_) = infer_sort(env, gamma, a) {
                 let (x_p, s_p) = fresh_from_context(gamma, x, s);
                 let mut new_gamma = gamma.clone();
                 new_gamma.push((x_p.clone(), *a.clone()));
-                if let Ok(b) = infer(&new_gamma, &s_p) {
+                if let Ok(b) = infer(env, &new_gamma, &s_p) {
                     return Ok(Term::Pi(x_p.clone(), a.clone(), Box::new(b)));
                 }
             }
             Err(())
         }
         Term::App(f, a) => {
-            if let Ok(f_p) = infer(gamma, f) {
-                let t = normalize(&f_p);
+            if let Ok(f_p) = infer(env, gamma, f) {
+                let t = normalize(env, &f_p);
                 if let Term::Pi(x, a_cap, b) = t {
-                    if let Ok(true) = check(gamma, a, &a_cap) {
+                    if let Ok(true) = check(env, gamma, a, &a_cap) {
                         return Ok(substitute(&b, &x, &a));
                     }
                 }
             }
             Err(())
         }
+        Term::Const(_) => todo!(),
     }
 }
 
-pub fn check(gamma: &Context, t: &Term, t_cap: &Term) -> Result<bool, ()> {
-    if let Ok(t_cap_p) = infer(gamma, t) {
-        Ok(alpha(&normalize(t_cap), &normalize(&t_cap_p), gamma, gamma))
+pub fn check(env: &Env, gamma: &Context, t: &Term, t_cap: &Term) -> Result<bool, ()> {
+    if let Ok(t_cap_p) = infer(env, gamma, t) {
+        Ok(alpha(&normalize(env, t_cap), &normalize(env, &t_cap_p), gamma, gamma))
     } else {
         Err(())
     }
@@ -103,13 +121,14 @@ pub fn alpha(a: &Term, b: &Term, gamma_a: &Context, gamma_b: &Context) -> bool {
         (Term::App(a_1, b_1), Term::App(a_2, b_2)) => {
             alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-App
         }
+        (Term::Const(s_1), Term::Const(s_2)) => s_1 == s_2,
         _ => false,
     }
 }
 
-pub fn infer_sort(gamma: &Context, t: &Term) -> Result<u64, ()> {
-    match infer(gamma, t) {
-        Ok(s) => match normalize(&s) {
+pub fn infer_sort(env: &Env, gamma: &Context, t: &Term) -> Result<u64, ()> {
+    match infer(env, gamma, t) {
+        Ok(s) => match normalize(env, &s) {
             Term::Sort(u) => Ok(u),
             _ => Err(()),
         },
@@ -133,6 +152,7 @@ pub fn fv(t: &Term) -> HashSet<String> {
             result.extend(body_fv);
             result
         }
+        Term::Const(_) => HashSet::new(),
     }
 }
 
@@ -216,10 +236,64 @@ pub fn substitute(t: &Term, x: &String, s: &Term) -> Term {
                 }
             }
         }
+        Term::Const(_) => t.clone(),
     }
 }
 
-pub fn whnf(t: &Term) -> Term {
+// convert `t = h a1 ... an` to `(h, [a1, ..., an])` 
+fn unfold_app(t: &Term) -> (Term, Vec<Term>) {
+    match t {
+        Term::App(f, a) => {
+            let (h, mut args) = unfold_app(f);
+            args.push(*a.clone());
+            (h, args)
+        }
+        _ => (t.clone(), vec![])
+    }
+}
+
+fn mk_app(h: &Term, args: &[Term]) -> Term {
+    let mut t = h.clone();
+    for a in args {
+        t = Term::App(Box::new(t), Box::new(a.clone()));
+    }
+    t
+}
+
+pub fn whnf(env: &Env, t: &Term) -> Term {
+    let mut t = t.clone();
+    loop {
+        let (h, args) = unfold_app(&t);
+        match &h {
+            // β: 先頭が λ で、引数が1つ以上ある
+            Term::Lam(x, _, body) if !args.is_empty() => {
+                t = mk_app(&substitute(body, x, &args[0]), &args[1..]);
+            }
+            Term::Const(c) => match env.get(c).map(|d| &d.kind) {
+                // δ: 本体を持つ定数は、本体に展開する（引数はそのまま後ろに付ける）
+                Some(DeclKind::Def { body }) => {
+                    t = mk_app(&body, &args);
+                }
+                // ι: 再帰子で、主引数まで引数がそろっている
+                Some(DeclKind::Rec { major_idx, rules, .. }) if args.len() > *major_idx => {
+                    let (k, kargs) = unfold_app(&whnf(env, &args[*major_idx]));
+                    // k がコンストラクタで、それに対応する rule があれば
+                    //   fields = kargs[nparams..]（先頭のパラメータを飛ばす）
+                    //   t = rhs に args[..major_idx] と fields を順に適用し、
+                    //       残りの引数 args[major_idx+1..] も続けて適用したもの
+                    // なければ return t（主引数が変数などで止まっている）
+                    todo!()
+                }
+                _ => return t, // Axiom, Inductive, Ctor, 引数が足りない Rec
+            },
+            _ => return t, // Var, Sort, Pi, 引数のない Lam
+        }
+    }
+}
+
+/* 
+// weak head norm form
+pub fn whnf(t: &Term) -> Term { 
     match t {
         Term::App(f, a) => {
             let f = whnf(f); // 関数側（spine の左）を先に whnf
@@ -230,13 +304,13 @@ pub fn whnf(t: &Term) -> Term {
         }
         _ => t.clone(), // Sort, Var, Pi, Lam はそのまま（weak なので中に入らない）
     }
-}
+}*/
 
-pub fn normalize(t: &Term) -> Term {
-    match whnf(t) {
-        Term::Pi(x, a, b) => Term::Pi(x, Box::new(normalize(&a)), Box::new(normalize(&b))),
-        Term::Lam(x, a, b) => Term::Lam(x, Box::new(normalize(&a)), Box::new(normalize(&b))),
-        Term::App(f, a) => Term::App(Box::new(normalize(&f)), Box::new(normalize(&a))),
+pub fn normalize(env: &Env, t: &Term) -> Term {
+    match whnf(env, t) {
+        Term::Pi(x, a, b) => Term::Pi(x, Box::new(normalize(env, &a)), Box::new(normalize(env, &b))),
+        Term::Lam(x, a, b) => Term::Lam(x, Box::new(normalize(env, &a)), Box::new(normalize(env, &b))),
+        Term::App(f, a) => Term::App(Box::new(normalize(env, &f)), Box::new(normalize(env, &a))),
         other => other, // Sort, Var
     }
 }
@@ -413,13 +487,13 @@ mod tests {
     #[test]
     fn whnf_reduces_only_head() {
         let reducible = app(lam("x", sort(0), v("x")), v("z"));
-        assert_eq!(whnf(&reducible), v("z"));
+        assert_eq!(whnf(&HashMap::new(), &reducible), v("z"));
         assert_eq!(
-            whnf(&lam("y", sort(0), reducible.clone())),
+            whnf(&HashMap::new(), &lam("y", sort(0), reducible.clone())),
             lam("y", sort(0), reducible.clone())
         );
         assert_eq!(
-            whnf(&app(v("f"), reducible.clone())),
+            whnf(&HashMap::new(), &app(v("f"), reducible.clone())),
             app(v("f"), reducible)
         );
     }
@@ -429,66 +503,66 @@ mod tests {
             app(lam("x", sort(0), lam("y", sort(0), v("x"))), v("a")),
             v("b"),
         );
-        assert_eq!(whnf(&t), v("a"));
+        assert_eq!(whnf(&HashMap::new(), &t), v("a"));
     }
     #[test]
     fn normalize_reduces_beneath_binders_and_arguments() {
         let inner = app(lam("x", sort(0), v("x")), v("a"));
         assert_eq!(
-            normalize(&lam("z", sort(0), inner.clone())),
+            normalize(&HashMap::new(), &lam("z", sort(0), inner.clone())),
             lam("z", sort(0), v("a"))
         );
-        assert_eq!(normalize(&app(v("f"), inner.clone())), app(v("f"), v("a")));
+        assert_eq!(normalize(&HashMap::new(), &app(v("f"), inner.clone())), app(v("f"), v("a")));
         assert_eq!(
-            normalize(&pi("x", inner.clone(), inner)),
+            normalize(&HashMap::new(), &pi("x", inner.clone(), inner)),
             pi("x", v("a"), v("a"))
         );
     }
     #[test]
     fn normalization_idempotent() {
         let t = lam("x", sort(0), app(lam("y", sort(0), v("y")), v("x")));
-        assert_eq!(normalize(&normalize(&t)), normalize(&t));
+        assert_eq!(normalize(&HashMap::new(), &normalize(&HashMap::new(), &t)), normalize(&HashMap::new(), &t));
     }
     #[test]
     fn infer_sort_and_variable() {
-        assert_eq!(infer(&empty(), &sort(0)), Ok(sort(1)));
-        assert_eq!(infer_sort(&empty(), &sort(0)), Ok(1));
-        assert!(infer(&empty(), &v("x")).is_err());
+        assert_eq!(infer(&HashMap::new(), &empty(), &sort(0)), Ok(sort(1)));
+        assert_eq!(infer_sort(&HashMap::new(), &empty(), &sort(0)), Ok(1));
+        assert!(infer(&HashMap::new(), &empty(), &v("x")).is_err());
         let gamma = vec![("P".into(), sort(0))];
-        assert_eq!(infer(&gamma, &v("P")), Ok(sort(0)));
-        assert!(infer_sort(&gamma, &lam("x", v("P"), v("x"))).is_err());
+        assert_eq!(infer(&HashMap::new(), &gamma, &v("P")), Ok(sort(0)));
+        assert!(infer_sort(&HashMap::new(), &gamma, &lam("x", v("P"), v("x"))).is_err());
     }
     #[test]
     fn infer_identity_proof_and_check() {
-        assert_equiv(infer(&empty(), &id_prop()).unwrap(), id_prop_type());
-        assert_eq!(check(&empty(), &id_prop(), &id_prop_type()), Ok(true));
-        assert_eq!(check(&empty(), &id_prop(), &sort(0)), Ok(false));
+        assert_equiv(infer(&HashMap::new(), &empty(), &id_prop()).unwrap(), id_prop_type());
+        assert_eq!(check(&HashMap::new(), &empty(), &id_prop(), &id_prop_type()), Ok(true));
+        assert_eq!(check(&HashMap::new(), &empty(), &id_prop(), &sort(0)), Ok(false));
     }
     #[test]
     fn infer_pi_and_lam() {
         let gamma = vec![("P".into(), sort(0))];
-        assert_eq!(infer(&gamma, &pi("x", v("P"), v("P"))), Ok(sort(0)));
+        assert_eq!(infer(&HashMap::new(), &gamma, &pi("x", v("P"), v("P"))), Ok(sort(0)));
         assert_equiv(
-            infer(&gamma, &lam("x", v("P"), v("x"))).unwrap(),
+            infer(&HashMap::new(), &gamma, &lam("x", v("P"), v("x"))).unwrap(),
             pi("x", v("P"), v("P")),
         );
-        assert_eq!(infer(&empty(), &pi("x", sort(0), sort(0))), Ok(sort(1)));
+        assert_eq!(infer(&HashMap::new(), &empty(), &pi("x", sort(0), sort(0))), Ok(sort(1)));
     }
 
     #[test]
     fn infer_application_and_reject_wrong_argument() {
         let gamma = vec![("P".into(), sort(0)), ("p".into(), v("P"))];
         let identity = lam("x", v("P"), v("x"));
-        assert_eq!(infer(&gamma, &app(identity.clone(), v("p"))), Ok(v("P")));
-        assert!(infer(&gamma, &app(identity, v("P"))).is_err());
-        assert!(infer(&gamma, &app(v("p"), v("p"))).is_err());
+        assert_eq!(infer(&HashMap::new(), &gamma, &app(identity.clone(), v("p"))), Ok(v("P")));
+        assert!(infer(&HashMap::new(), &gamma, &app(identity, v("P"))).is_err());
+        assert!(infer(&HashMap::new(), &gamma, &app(v("p"), v("p"))).is_err());
     }
 
     #[test]
     fn check_uses_beta_conversion() {
         let gamma = vec![("P".into(), sort(0)), ("p".into(), v("P"))];
         let id_type = app(lam("X", sort(0), v("X")), v("P"));
-        assert_eq!(check(&gamma, &v("p"), &id_type), Ok(true));
+        assert_eq!(check(&HashMap::new(), &gamma, &v("p"), &id_type), Ok(true));
     }
 
     #[test]
@@ -501,7 +575,7 @@ mod tests {
 
     #[test]
     fn infer_rejects_unbound_annotation() {
-        assert!(infer(&empty(), &lam("x", v("Unknown"), v("x"))).is_err());
+        assert!(infer(&HashMap::new(), &empty(), &lam("x", v("Unknown"), v("x"))).is_err());
     }
 
     // Regression tests: these express intended semantics and may fail until the kernel is fixed.
@@ -509,7 +583,7 @@ mod tests {
     fn regression_pi_impredicativity() {
         let proposition_for_all_propositions = pi("P", sort(0), v("P"));
         assert_eq!(
-            infer(&empty(), &proposition_for_all_propositions),
+            infer(&HashMap::new(), &empty(), &proposition_for_all_propositions),
             Ok(sort(0))
         );
     }
@@ -534,6 +608,6 @@ mod tests {
     fn regression_context_name_capture() {
         let t = lam("x", sort(0), lam("y", v("x"), lam("x", sort(0), v("y"))));
         let expected = pi("x", sort(0), pi("y", v("x"), pi("z", sort(0), v("x"))));
-        assert_equiv(infer(&empty(), &t).unwrap(), expected);
+        assert_equiv(infer(&HashMap::new(), &empty(), &t).unwrap(), expected);
     }
 }

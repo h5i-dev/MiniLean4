@@ -79,7 +79,7 @@ pub fn infer(env: &Env, gamma: &Context, t: &Term) -> Result<Term, ()> {
 
 pub fn check(env: &Env, gamma: &Context, t: &Term, t_cap: &Term) -> Result<bool, ()> {
     if let Ok(t_cap_p) = infer(env, gamma, t) {
-        Ok(alpha(&normalize(env, t_cap), &normalize(env, &t_cap_p), gamma, gamma))
+        Ok(alpha(&normalize(env, t_cap), &normalize(env, &t_cap_p)))
     } else {
         Err(())
     }
@@ -95,12 +95,16 @@ pub fn get_pos_in_context(gamma: &Context, var_name: &String) -> Option<usize> {
     None
 }
 
-pub fn alpha(a: &Term, b: &Term, gamma_a: &Context, gamma_b: &Context) -> bool {
+pub fn alpha(a: &Term, b: &Term) -> bool {
+    alpha_with_binders(a, b, &vec![], &vec![])
+}
+
+pub fn alpha_with_binders(a: &Term, b: &Term, e_a: &Context, e_b: &Context) -> bool {
     match (a, b) {
         (Term::Sort(u), Term::Sort(v)) => u == v, // alpha-Sort
         (Term::Var(x), Term::Var(y)) => {
-            let i = get_pos_in_context(gamma_a, x);
-            let j = get_pos_in_context(gamma_b, y);
+            let i = get_pos_in_context(e_a, x);
+            let j = get_pos_in_context(e_b, y);
             match (i, j) {
                 (Some(i), Some(j)) => i == j, // alpha-Bound
                 (None, None) => x == y,       // alpha-Free
@@ -109,17 +113,17 @@ pub fn alpha(a: &Term, b: &Term, gamma_a: &Context, gamma_b: &Context) -> bool {
         }
         (Term::Pi(x, a_1, b_1), Term::Pi(y, a_2, b_2))
         | (Term::Lam(x, a_1, b_1), Term::Lam(y, a_2, b_2)) => {
-            if !alpha(a_1, a_2, gamma_a, gamma_b) {
+            if !alpha_with_binders(a_1, a_2, e_a, e_b) {
                 return false;
             }
-            let mut gamma_a_prime = gamma_a.clone();
-            let mut gamma_b_prime = gamma_b.clone();
-            gamma_a_prime.push((x.clone(), Term::Sort(0)));
-            gamma_b_prime.push((y.clone(), Term::Sort(0)));
-            alpha(b_1, b_2, &gamma_a_prime, &gamma_b_prime) // alpha-Pi
+            let mut e_a_prime = e_a.clone();
+            let mut e_b_prime = e_b.clone();
+            e_a_prime.push((x.clone(), Term::Sort(0)));
+            e_b_prime.push((y.clone(), Term::Sort(0)));
+            alpha_with_binders(b_1, b_2, &e_a_prime, &e_b_prime) // alpha-Pi
         }
         (Term::App(a_1, b_1), Term::App(a_2, b_2)) => {
-            alpha(a_1, a_2, gamma_a, gamma_b) && alpha(b_1, b_2, gamma_a, gamma_b) // alpha-App
+            alpha_with_binders(a_1, a_2, e_a, e_b) && alpha_with_binders(b_1, b_2, e_a, e_b) // alpha-App
         }
         (Term::Const(s_1), Term::Const(s_2)) => s_1 == s_2,
         _ => false,
@@ -345,7 +349,7 @@ mod tests {
     }
 
     fn equiv(a: &Term, b: &Term) -> bool {
-        alpha(a, b, &empty(), &empty())
+        alpha_with_binders(a, b, &empty(), &empty())
     }
 
     fn assert_equiv(a: Term, b: Term) {

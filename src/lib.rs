@@ -639,4 +639,49 @@ mod tests {
         let expected = pi("x", sort(0), pi("y", v("x"), pi("z", sort(0), v("x"))));
         assert_equiv(infer(&HashMap::new(), &empty(), &t).unwrap(), expected);
     }
+
+    #[test]
+    fn substitution_no_unnecessary_renaming() {
+        let t = lam("y", sort(0), v("y"));
+        let result = substitute(&t, &"x".into(), &v("y"));
+
+        assert_eq!(result, t);
+    }
+
+    #[test]
+    fn substitution_avoids_inner_binder_capture() {
+        // [x := y] (λy. λy'. x)
+        let t = lam(
+            "y",
+            sort(0),
+            lam("y'", sort(0), v("x")),
+        );
+
+        let result = substitute(&t, &"x".into(), &v("y"));
+
+        assert_equiv(
+            result,
+            lam("z", sort(0),
+                lam("w", sort(0), v("y"))),
+        );
+    }
+
+    #[test]
+    fn substitution_preserves_shadowing() {
+        // [x := z] (λx : x. x)
+        let t = lam("x", v("x"), v("x"));
+        let result = substitute(&t, &"x".into(), &v("z"));
+
+        assert_eq!(result, lam("x", v("z"), v("x")));
+    }
+
+    #[test]
+    fn substitution_renames_only_when_needed() {
+        // [x := y] (λy. x)
+        let t = lam("y", sort(0), v("x"));
+        let result = substitute(&t, &"x".into(), &v("y"));
+
+        assert_equiv(result, lam("z", sort(0), v("y")));
+    }
+
 }

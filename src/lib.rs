@@ -140,10 +140,11 @@ pub fn infer_sort(env: &Env, gamma: &Context, t: &Term) -> Result<u64, ()> {
     }
 }
 
+/// Free varuables
 pub fn fv(t: &Term) -> HashSet<String> {
     match t {
-        Term::Sort(_) => HashSet::new(),
-        Term::Var(x) => vec![x.clone()].into_iter().collect::<HashSet<String>>(),
+        Term::Sort(_) | Term::Const(_) => HashSet::new(),
+        Term::Var(x) => HashSet::from([x.clone()]),
         Term::App(t_1, t_2) => {
             let mut fv_1 = fv(t_1);
             fv_1.extend(fv(t_2));
@@ -156,19 +157,38 @@ pub fn fv(t: &Term) -> HashSet<String> {
             result.extend(body_fv);
             result
         }
-        Term::Const(_) => HashSet::new(),
     }
 }
 
-pub fn fresh(s: &Term, b: &Term, x: &String, y: &String) -> String {
-    let mut fv_s = fv(s);
-    fv_s.extend(fv(b));
-    fv_s.extend([x.clone()].into_iter());
-    let mut z = y.clone();
-    while fv_s.contains(&z) {
-        z = z + "'";
+/// Free variables and bound variable names.
+pub fn all_names(t: &Term) -> HashSet<String> {
+    match t {
+        Term::Sort(_) | Term::Const(_) => HashSet::new(),
+        Term::Var(x) => HashSet::from([x.clone()]),
+        Term::App(f, a) => {
+            let mut names = all_names(f);
+            names.extend(all_names(a));
+            names
+        }
+        Term::Pi(x, a, b) | Term::Lam(x, a, b) => {
+            let mut names = all_names(a);
+            names.extend(all_names(b));
+            names.insert(x.clone());
+            names
+        }
     }
-    z
+}
+
+/// Choose a fresh name, avoiding both free and bound names.
+fn fresh_name(
+    preferred: &str,
+    avoid: &HashSet<String>,
+) -> String {
+    let mut name = preferred.to_string();
+    while avoid.contains(&name) {
+        name.push('\'');
+    }
+    name
 }
 
 pub fn fresh_from_context(gamma: &Context, x: &String, b: &Term) -> (String, Term) {
@@ -186,61 +206,66 @@ pub fn fresh_from_context(gamma: &Context, x: &String, b: &Term) -> (String, Ter
     }
 }
 
+/// Capture-avoiding substitution: t[x := s].
 pub fn substitute(t: &Term, x: &String, s: &Term) -> Term {
     match t {
+        Term::Sort(_) | Term::Const(_) => t.clone(),
+
         Term::Var(y) => {
-            if y == x {
-                s.clone()
-            } else {
-                Term::Var(y.clone())
-            }
+            if y == x { s.clone() } else { t.clone() }
         }
-        Term::Sort(y) => Term::Sort(*y),
-        Term::App(t_1, t_2) => Term::App(
-            Box::new(substitute(t_1, x, s)),
-            Box::new(substitute(t_2, x, s)),
+
+        Term::App(f, a) => Term::App(
+            Box::new(substitute(f, x, s)),
+            Box::new(substitute(a, x, s)),
         ),
-        Term::Pi(y, a, b) => {
-            if y == x {
-                Term::Pi(x.clone(), Box::new(substitute(a, x, s)), b.clone())
+
+        Term::Pi(y, a, b) | Term::Lam(y, a, b) => {
+            // The binder does not scope over its annotation.
+            let new_a = substitute(a, x, s);
+
+            let (new_y, new_b) = if y == x {
+                // x is shadowed in the body.
+                (y.clone(), (**b).clone())
+            } else if !fv(b).contains(x) {
+                // No occurrence to substitute in the body.
+                (y.clone(), (**b).clone())
+            } else if !fv(s).contains(y) {
+                // Substitution cannot capture any variable.
+                (y.clone(), substitute(b, x, s))
             } else {
-                if !fv(s).contains(y) {
-                    Term::Pi(
-                        y.clone(),
-                        Box::new(substitute(a, x, s)),
-                        Box::new(substitute(b, x, s)),
-                    )
-                } else {
-                    let z = fresh(s, b, x, y);
-                    Term::Pi(
-                        z.clone(),
-                        Box::new(substitute(a, x, s)),
-                        Box::new(substitute(&substitute(b, y, &Term::Var(z)), x, s)),
-                    )
-                }
+                // Rename y before substituting x.
+                let mut avoid = all_names(b);
+                avoid.extend(all_names(a));
+                avoid.extend(all_names(s));
+                avoid.insert(x.clone());
+
+                let z = fresh_name(y, &avoid);
+
+                // Rename occurrences bound by this binder.
+                let renamed = substitute(
+                    b,
+                    y,
+                    &Term::Var(z.clone()),
+                );
+
+                (z, substitute(&renamed, x, s))
+            };
+
+            match t {
+                Term::Pi(..) => Term::Pi(
+                    new_y,
+                    Box::new(new_a),
+                    Box::new(new_b),
+                ),
+                Term::Lam(..) => Term::Lam(
+                    new_y,
+                    Box::new(new_a),
+                    Box::new(new_b),
+                ),
+                _ => unreachable!(),
             }
         }
-        Term::Lam(y, a, b) => {
-            if y == x {
-                Term::Lam(x.clone(), Box::new(substitute(a, x, s)), b.clone())
-            } else {
-                if !fv(s).contains(y) {
-                    Term::Lam(
-                        y.clone(),
-                        Box::new(substitute(a, x, s)),
-                        Box::new(substitute(b, x, s)),
-                    )
-                } else {
-                    let z = fresh(s, b, x, y);
-                    Term::Lam(
-                        z.clone(),
-                        Box::new(substitute(a, x, s)),
-                        Box::new(substitute(&substitute(b, y, &Term::Var(z)), x, s)),
-                    )
-                }
-            }
-        }
-        Term::Const(_) => t.clone(),
     }
 }
 

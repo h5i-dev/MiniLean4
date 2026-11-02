@@ -1,6 +1,4 @@
-# Mini Lean 4: generic inductive declarations (educational prototype)
-
-The source uses named variables to mirror the textbook rules. Inductive declarations now enter through **both** the checked Rust `Kernel::add_inductive` API and a source-level `inductive ... where` parser. The recursor and ι-reduction are generated from constructor metadata; Nat and Eq are installed using the same API, not by recursor-name special cases.
+# Mini Lean 4
 
 ## Commands
 

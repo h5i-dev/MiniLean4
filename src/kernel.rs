@@ -635,6 +635,175 @@ impl Kernel {
     }
 }
 
+mod inductive_tests {
+
+    //
+    //! Put this file at `tests/inductive_examples.rs` in MiniLean4.
+    //! Run: cargo test --test inductive_examples -- --nocapture
+    use crate::term::lam;
+
+    use super::*;
+
+    fn nat() -> Term {
+        konst("Nat")
+    }
+    fn zero() -> Term {
+        konst("Nat.zero")
+    }
+    fn succ(n: Term) -> Term {
+        app(konst("Nat.succ"), n)
+    }
+    fn numeral(n: usize) -> Term {
+        (0..n).fold(zero(), |t, _| succ(t))
+    }
+
+    fn add_tree(k: &mut Kernel) {
+        // inductive Tree where
+        // | leaf : Tree
+        // | node : Tree -> Tree
+        // | branch : Tree -> Tree -> Tree
+        k.add_inductive(InductiveSpec {
+            name: "Tree".into(),
+            params: vec![],
+            indices: vec![],
+            sort: 1,
+            constructors: vec![
+                ConstructorSpec {
+                    name: "Tree.leaf".into(),
+                    fields: vec![],
+                    result_indices: vec![],
+                },
+                ConstructorSpec {
+                    name: "Tree.node".into(),
+                    fields: vec![("child".into(), konst("Tree"))],
+                    result_indices: vec![],
+                },
+                ConstructorSpec {
+                    name: "Tree.branch".into(),
+                    fields: vec![
+                        ("left".into(), konst("Tree")),
+                        ("right".into(), konst("Tree")),
+                    ],
+                    result_indices: vec![],
+                },
+            ],
+        })
+        .unwrap();
+    }
+
+    fn leaf() -> Term {
+        konst("Tree.leaf")
+    }
+    fn node(child: Term) -> Term {
+        app(konst("Tree.node"), child)
+    }
+    fn branch(left: Term, right: Term) -> Term {
+        apps(konst("Tree.branch"), [left, right])
+    }
+
+    fn add_list(k: &mut Kernel) {
+        // inductive List (A : Type) where
+        // | nil : List A
+        // | cons : A -> List A -> List A
+        k.add_inductive(InductiveSpec {
+            name: "List".into(),
+            params: vec![("A".into(), Term::Sort(1))],
+            indices: vec![],
+            sort: 1,
+            constructors: vec![
+                ConstructorSpec {
+                    name: "List.nil".into(),
+                    fields: vec![],
+                    result_indices: vec![],
+                },
+                ConstructorSpec {
+                    name: "List.cons".into(),
+                    fields: vec![
+                        ("head".into(), var("A")),
+                        ("tail".into(), app(konst("List"), var("A"))),
+                    ],
+                    result_indices: vec![],
+                },
+            ],
+        })
+        .unwrap();
+    }
+
+    fn list_nat() -> Term {
+        app(konst("List"), nat())
+    }
+    fn nil() -> Term {
+        app(konst("List.nil"), nat())
+    }
+    fn cons(head: Term, tail: Term) -> Term {
+        apps(konst("List.cons"), [nat(), head, tail])
+    }
+
+    // Nat addition, defined only using the existing Nat.rec1:
+    // add(x, y) = Nat.rec1 (fun _ => Nat) y (fun _ ih => succ ih) x
+    fn add(x: Term, y: Term) -> Term {
+        apps(
+            konst("Nat.rec1"),
+            [
+                lam("_n", nat(), nat()),
+                y,
+                lam("_n", nat(), lam("ih", nat(), succ(var("ih")))),
+                x,
+            ],
+        )
+    }
+
+    // count(Tree): leaf=1, node(child)=1+count(child),
+    // branch(l,r)=1+count(l)+count(r).
+    fn tree_size(t: Term) -> Term {
+        let tree = konst("Tree");
+        let motive = lam("t", tree.clone(), nat());
+        let on_leaf = numeral(1);
+        let on_node = lam("child", tree.clone(), lam("ih", nat(), succ(var("ih"))));
+        let on_branch = lam(
+            "left",
+            tree.clone(),
+            lam(
+                "right",
+                tree,
+                lam(
+                    "ih_left",
+                    nat(),
+                    lam(
+                        "ih_right",
+                        nat(),
+                        succ(add(var("ih_left"), var("ih_right"))),
+                    ),
+                ),
+            ),
+        );
+        apps(konst("Tree.rec1"), [motive, on_leaf, on_node, on_branch, t])
+    }
+
+    // length(List Nat): nil=0, cons(head, tail)=1+length(tail).
+    fn list_length(xs: Term) -> Term {
+        let list = list_nat();
+        let motive = lam("xs", list.clone(), nat());
+        let on_nil = zero();
+        let on_cons = lam(
+            "head",
+            nat(),
+            lam("tail", list, lam("ih", nat(), succ(var("ih")))),
+        );
+        apps(konst("List.rec1"), [nat(), motive, on_nil, on_cons, xs])
+    }
+
+    #[test]
+    fn tree_constructors_have_expected_types() {
+        let mut k = Kernel::standard();
+        add_tree(&mut k);
+        let tree = konst("Tree");
+        assert!(k
+            .conv(k.type_of_const("Tree.leaf").unwrap(), &tree)
+            .unwrap());
+    }
+}
+
 mod textbook_kernel_tests {
     use super::*;
     use crate::term::lam;

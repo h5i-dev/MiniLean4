@@ -1,8 +1,12 @@
 [package]
-name = "minilean"
+name = "mini_lean4"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+
+[lib]
+name = "mini_lean4"
+path = "src/lib.rs"
 
 [[bin]]
-name = "minilean"
+name = "mini-lean"
 path = "src/main.rs"

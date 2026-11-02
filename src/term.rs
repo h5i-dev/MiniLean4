@@ -186,12 +186,3 @@ pub fn spine(t: &Term) -> (Term, Vec<Term>) {
         _ => (t.clone(), vec![]),
     }
 }
-
-pub fn occurs_const(t: &Term, name: &str) -> bool {
-    match t {
-        Term::Const(n) => n == name,
-        Term::App(f, a) => occurs_const(f, name) || occurs_const(a, name),
-        Term::Pi(_, a, b) | Term::Lam(_, a, b) => occurs_const(a, name) || occurs_const(b, name),
-        _ => false,
-    }
-}

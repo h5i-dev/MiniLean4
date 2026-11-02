@@ -6,7 +6,7 @@ use crate::{
         RecursiveField, RecursorInfo,
     },
     term::{
-        all_names, alpha, app, apps, arrow, fresh, fv, konst, occurs_const, pi, spine, subst,
+        all_names, alpha, app, apps, arrow, fresh, fv, konst, pi, spine, subst,
         subst_many, var,
         Term::{self, Sort},
     },
@@ -25,6 +25,15 @@ fn telescope(ctx: &Context, tail: Term) -> Term {
     ctx.iter()
         .rev()
         .fold(tail, |body, (n, ty)| pi(n, ty.clone(), body))
+}
+
+fn occurs_const(t: &Term, name: &str) -> bool {
+    match t {
+        Term::Const(n) => n == name,
+        Term::App(f, a) => occurs_const(f, name) || occurs_const(a, name),
+        Term::Pi(_, a, b) | Term::Lam(_, a, b) => occurs_const(a, name) || occurs_const(b, name),
+        _ => false,
+    }
 }
 
 fn rec_field(

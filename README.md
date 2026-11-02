@@ -1,53 +1,63 @@
-# Rust で作る小さな Lean 4: Proof Kernel から Tactics まで
+# Mini Lean 4: generic inductive declarations (educational prototype)
 
-**実装しながら学ぶ Interactive Theorem Prover (日本語・全10章)**
+The source uses named variables to mirror the textbook rules. Inductive declarations now enter through **both** the checked Rust `Kernel::add_inductive` API and a source-level `inductive ... where` parser. The recursor and ι-reduction are generated from constructor metadata; Nat and Eq are installed using the same API, not by recursor-name special cases.
 
-Rust 標準ライブラリのみで、簡単な dependent type theory の kernel と対話的な proof state を構築する教材です。`Sort` の宇宙階層、`Pi` / lambda / application、capture-avoiding substitution、β正規化、definitional equality、Nat の recursor、等式の transport、`intro` / `exact` / 限定版 `apply` を実装します。
+## Commands
 
-## すぐ試す
-
-```bash
+```sh
 cargo test
-cargo run
+cargo run -- examples/zero-add.leanmini
+cargo run -- examples/generic-list.leanmini
+cargo run -- examples/generic-vec.leanmini
+cargo run -- examples/identity.leanmini
+cargo run -- examples/nat-reflexivity.leanmini
 ```
 
-## 目次
+## Source-level inductive syntax
 
-1. [Curry–Howard と証明項](chapters/01-curry-howard.md)
-2. [Lambda calculus と束縛](chapters/02-lambda-calculus.md)
-3. [β簡約と operational semantics](chapters/03-reduction.md)
-4. [Dependent types と universes](chapters/04-dependent-types.md)
-5. [Definitional equality と conversion](chapters/05-conversion.md)
-6. [Trusted kernel の境界](chapters/06-trusted-kernel.md)
-7. [Goal、intro、exact、apply](chapters/07-tactics.md)
-8. [Nat inductive type と recursor](chapters/08-inductive-types.md)
-9. [Equality、rfl、transport、induction](chapters/09-equality-induction.md)
-10. [Elaborator の設計と未実装機能](chapters/10-elaboration.md)
+```text
+inductive List (A : Sort 1) : Sort 1 where
+  | nil
+  | cons (head : A) (tail : List A)
 
-補足: [言語の意味論と形式的ルール](SEMANTICS.md) / [設計上の制限と今後の課題](LIMITATIONS.md)
+goal forall (xs : List Nat), Eq (List Nat) xs xs
+intro xs
+induction xs
+rfl
+rfl
+qed
+```
 
-## ソースの読み方
+Indexed inductives are expressible with explicit index binders and constructor result indices:
 
-- `src/lib.rs`: kernel、証明状態、テスト (同じ実装をすべての章で参照)
-- `src/main.rs`: 対話的証明と NatRec の実行デモ
+```text
+inductive Vec (A : Sort 1) (index n : Nat) : Sort 1 where
+  | nil : Vec A Nat.zero
+  | cons (n : Nat) (head : A) (tail : Vec A n) : Vec A (Nat.succ n)
+```
 
-**信頼境界:** tactics は証明項の組み立てしか行わず、`ProofState::exact` は最初の goal に対して必ず空文脈の `check` を実行します。`Environment::theorem` も証明を再チェックします。
+The file-mode parser collects lines beginning with `|` as constructors until the next command. The Rust API offers richer explicit AST construction without surface syntax. `induction` is constructor-generic for **non-indexed** inductive types. Indexed recursor generation and reduction are supported, but indexed tactic elaboration is not. `rw` currently targets the built-in `Eq` declaration, which itself is generated through the general inductive API.
 
-## 重要な非対応範囲
+## Safety / missing features
 
-これは Lean 4 互換実装ではありません。独立した `Prop`、proof irrelevance、定義展開、完全な inductive declarations、universe polymorphism、metavariable unification、lexer/parser、エディタプロトコル、`rw` や `induction` **tactic commands** はありません。第9章はそれらの基礎となる core eliminators を実装して説明し、第10章は設計を扱います。詳しくは `LIMITATIONS.md`。
+- The conservative strict positivity validator supports direct recursive fields and function-valued recursive fields; nested strictly positive recursive occurrences are **rejected**, not accepted without checking.
+- Recursors are generated on demand for any concrete admissible universe level, using `Kernel::ensure_recursor_level("Nat", 5)` or the CLI `recursor Nat 5` command. `rec0` and applicable `rec1` are generated at declaration time for compatibility. Symbolic universe polymorphism is not implemented.
+- For proposition-valued inductives, large elimination is granted when there is at most one constructor and every field is a proposition or appears among result-index terms. This follows the simplified criterion in §12.6, not all of Lean 4's elimination rules.
+- Mutual/nested inductives and Lean 4's complete universe-polymorphism and proof-irrelevance rules remain outside scope. Unsupported higher-order positivity cases are conservatively rejected.
+- Source syntax needs explicit binders. It does not support Lean's normal `:= by`, implicit arguments, pattern matching, elaboration/unification, or a full interactive `inductive` editor.
+- Recursive `def` bodies cannot reference the name being defined, avoiding unrestricted recursion. The system is not a full totality checker.
+- Axioms are trusted assumptions. The named-variable core and higher-order ι evaluator have not received a formal soundness proof.
+- **Build status: not compiled or tested in this environment.** Rust toolchain is unavailable and internet resolution for downloading it is disabled. Run `cargo test` before using the code. Tests are included for generated Nat, Eq, List, Vec, negative recursive occurrences, basic tactics, the new declaration parser and general List induction.
 
-## 検証状況
+This is an implementation of a conservative **subset** of the textbook general induction algorithm, not a faithful full implementation of every Lean 4 inductive type. Unsupported cases fail explicitly.
 
-この実行環境には Rust コンパイラ / Cargo がなく、`cargo test` は未実行です。プロジェクトをコンパイルできる環境で必ずテストしてください。安全性と soundness について形式的保証はありません。
+## Textbook coverage additions (§12.6 and §13.5)
 
-## 追加章: フロントエンド、穴、rewrite と induction
+- Checks `w <= u` for each constructor field when the inductive lives in `Sort u` for `u >= 1`. `Sort 0` allows impredicative fields.
+- Enforces uniform parameters, constructor result index arity, simple strict positivity, and type checks result indices through the constructor result.
+- Computes the §12.6 subsingleton condition to decide whether recursors may eliminate a proposition into higher universes.
+- Provides `ensure_recursor_level` to generate `I.rec_v` for arbitrary **concrete** admissible `v`; the generated metadata drives generic ι reduction.
+- `examples/zero-add.leanmini` implements the full §13.5 sequence. An extra final `rfl` is explicit because this small `rw` tactic does not automatically run reflexivity.
+- `textbook_zero_add_tactic_proof`, `arbitrary_recursor_levels`, `reject_constructor_universe_overflow`, and `proposition_elimination_policy` are regression tests, but have **not** been executed here.
 
-11. [Lexer / Parser](chapters/11-parser.md)
-12. [Metavariables / Goal Refinement](chapters/12-metavariables.md)
-13. [`rw` / `induction` tactics](chapters/13-rewrite-induction.md)
-14. [Bidirectional elaboration の最小実装](chapters/14-elaborator.md)
-
-`src/advanced.rs` にこれらの実装を追加。`run_script` は改行区切りの `intro`, `exact`, `apply`, `rfl`, `rw`, `induction` を受け取り、kernel-checked proof term を返します。
-
-**注意:** 第10章の未実装範囲の一部が埋まりましたが、完全な higher-order metavariable solver、Lean 4 syntax や general-purpose elaborator は未実装です。第12・14章で未対応範囲と拡張方法を明記しています。コンパイル・テストの未実施にも注意してください。
+**Implementation caveats:** the positivity checker supports only the paper's stated direct/function-valued recursive-field fragment; names are still used internally, and kernel soundness has not been formally proved. The recursor generation and new tests need local compilation and debugging.

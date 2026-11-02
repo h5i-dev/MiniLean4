@@ -1,11 +1,10 @@
 [package]
-name = "lean-from-scratch"
+name = "mini_lean4"
 version = "0.1.0"
 edition = "2021"
-description = "Educational dependent-type proof kernel and tactic engine"
 
 [lib]
-name = "mini_lean"
+name = "mini_lean4"
 path = "src/lib.rs"
 
 [[bin]]

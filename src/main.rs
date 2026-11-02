@@ -94,6 +94,7 @@ fn run_line(k: &mut Kernel, state: &mut Option<ProofState>, line: &str) -> Resul
     }
     Ok(true)
 }
+
 fn main() {
     let mut k = Kernel::standard();
     let mut state = None;

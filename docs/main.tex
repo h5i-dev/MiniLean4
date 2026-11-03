@@ -395,11 +395,12 @@ Two of the rules rely on operations on terms that we treat as black boxes for no
   \item \emph{Definitional equality.} \textsc{T-Conv} writes $A \conv B$ when $A$ and $B$ are ``the same type'' in a sense the kernel can decide.
     Two kinds of differences are ignored.
     First, the names of bound variables: $\tPi{P}{\Sort{0}}{P \to P}$ and $\tPi{Q}{\Sort{0}}{Q \to Q}$ state the same proposition.
+    Terms that differ only in this way are called \emph{$\alpha$-equivalent}, written $\alphaeq$.
     Second, computation: if $\mathit{Id} = \tLam{X}{\Sort{0}}{X}$, then $\mathit{Id}\;P$ computes to $P$ by plugging $P$ in for $X$,
     so a proof of $\mathit{Id}\;P$ should also count as a proof of $P$.
     This computation step, $(\tLam{x}{A}{t})\;s \betared \subst{t}{x}{s}$, is called \emph{$\beta$-reduction}.
 \end{itemize}
-The kernel decides $A \conv B$ by computing both sides as far as possible and then comparing them up to the names of bound variables.
+The kernel decides $A \conv B$ by computing both sides as far as possible ($\beta$-reducing) and then checking whether the results are $\alpha$-equivalent.
 \S\ref{sec:machinery} defines both operations precisely and gives the algorithms; until then, an intuitive reading is enough.
 
 We read each rule from the bottom up, as a recipe for checking a term.
@@ -736,28 +737,22 @@ As described in \S\ref{sec:algorithm}, conversion is hidden in the call to \text
 \end{enumerate}
 Running \textsc{Infer} on these by hand, as in the examples above, is a good check of one's understanding of the algorithm.
 
-\section{Inductive Types: Natural Numbers and Equality}
+\section{Inductive Types: From Natural Numbers to Equality}
 \label{sec:inductive}
 
 So far the only types are universes and $\Pi$ types.
 This is enough for propositional logic, but not for mathematics: there are no numbers to reason about, and no way to state that two things are equal.
-Lean provides both through \emph{inductive types}.
-Declarations such as
-\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
-inductive Nat where
-  | zero : Nat
-  | succ (n : Nat) : Nat
-
-inductive Eq {A : Sort u} : A -> A -> Prop where
-  | refl (a : A) : Eq a a
-\end{lstlisting}
-make the kernel add a type, its constructors, and a \emph{recursor} that eliminates it, together with computation rules for the recursor.
-A general kernel derives all of these from the declaration.
-We first add the two types above by hand, which shows the ingredients, and then explain how a fixed kernel processes them as data (\S\ref{sec:iota-data}) and generates them from declarations (\S\ref{sec:inductive-decl}).
+Lean provides both through a single mechanism, \emph{inductive types}.
+We start with the natural numbers and ask two questions: how do we compute with them, and how do we prove things about them?
+The answers turn out to be the same constant, the \emph{recursor} (\S\ref{sec:nat}).
+We then generalize step by step, to more constructors (\S\ref{sec:tree}), and to parameters and indices (\S\ref{sec:list}),
+and arrive at a procedure that works for any inductive declaration (\S\ref{sec:inductive-decl}).
+Finally, we will see that even equality is an inductive type (\S\ref{sec:eq}).
 
 \subsection{Constants and Definitions}
 \label{sec:constants}
 
+First we need a way to add named objects to the kernel.
 Terms gain \emph{constants} $c$:
 \[
 t, A, B ::= \cdots \mid c
@@ -785,26 +780,128 @@ Like $\beta$, the step may be applied to any subterm.
 Constants are not variables: they are never bound, so $\FV(c) = \emptyset$ and substitution leaves them unchanged.
 Reduction now consists of $\beta$, $\delta$, and the $\iota$-rules introduced below, and conversion (\S\ref{sec:conversion}) is taken with respect to all three.
 
-\subsection{Natural Numbers}
+\subsection{Natural Numbers: Recursion and Induction}
 \label{sec:nat}
 
-Where does a recursor come from?
-Every natural number is built from $\zero$ by applying $\tsucc$ finitely often; for example, $2$ is $\tsucc\;(\tsucc\;\zero)$.
-So to show that a property $M\;n$ holds for every $n$, it suffices to handle the two ways of building $n$:
-\begin{itemize}[nosep]
-  \item a \emph{base case} $z : M\;\zero$, for the constructor $\zero$, which has no arguments;
-  \item a \emph{step} $s : \tPi{n}{\Nat}{M\;n \to M\;(\tsucc\;n)}$, for the constructor $\tsucc$.
-    Its argument $n$ is itself a $\Nat$, so the step may assume $M\;n$, the \emph{induction hypothesis}.
-\end{itemize}
-Given both, $M\;n$ follows for every $n$.
-This is the type of the recursor $\NatRec{u}$ in Fig.~\ref{fig:nat-eq}, which the kernel reads off the two constructors:
-one case per constructor, and one hypothesis per argument of the type being defined.
-\S\ref{sec:inductive-decl} turns this recipe into a procedure for any inductive declaration.
+In Lean, the natural numbers are declared as
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+inductive Nat where
+  | zero : Nat
+  | succ (n : Nat) : Nat
+\end{lstlisting}
+The declaration says that every natural number is built in one of two ways: it is $\zero$, or it is $\tsucc\;n$, the successor of a natural number $n$.
+For example, $2$ is $\tsucc\;(\tsucc\;\zero)$.
+In our kernel, the declaration adds three constants without bodies:
+\[
+\Nat : \Sort{1}, \qquad \zero : \Nat, \qquad \tsucc : \Nat \to \Nat.
+\]
+$\zero$ and $\tsucc$ are called \emph{constructors}.
+They build values but never compute: $\tsucc\;(\tsucc\;\zero)$ is already in normal form, and it \emph{is} the number $2$.
+We write $0, 1, 2, \ldots$ for $\zero$, $\tsucc\;\zero$, $\tsucc\;(\tsucc\;\zero)$, and so on.
 
-Fig.~\ref{fig:nat-eq} lists the constants for $\Nat$ and $\Eq{}$ and their $\iota$-rules.
-The recursor $\NatRec{u}$ takes a \emph{motive} $M$, which says what is to be built for each $n$,
-a value $z$ for $\zero$, and a step $s$ that turns a value for $n$ into a value for $\tsucc\;n$.
-The $\iota$-rules say that recursion unfolds along the constructors.
+This gives us numbers, but nothing to do with them.
+A function such as addition must look at a number and act differently on $\zero$ and on $\tsucc\;n$, and our terms have no way to do that yet.
+
+\paragraph{Computing: addition.}
+How should addition be defined?
+In Lean one writes it by pattern matching and recursion on the second argument:
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+def add : Nat -> Nat -> Nat
+  | m, zero   => m
+  | m, succ k => succ (add m k)
+\end{lstlisting}
+that is,
+\[
+\add\;m\;\zero = m, \qquad \add\;m\;(\tsucc\;k) = \tsucc\;(\add\;m\;k).
+\]
+Our kernel has neither pattern matching nor recursive definitions, and it should not get general recursion:
+a definition $\mathit{bad} : \tPi{P}{\Sort{0}}{P} \mathrel{:=} \mathit{bad}$ would type-check and prove False.
+
+Instead, look at the shape of the definition.
+For a fixed $m$, the function $\add\;m$ is determined by two pieces of data:
+its value on $\zero$, which is $m$, and a way to turn its value $r$ on $k$ into its value on $\tsucc\;k$, which is $\tsucc\;r$.
+Every function $f : \Nat \to C$ defined by recursion of this kind, called \emph{structural recursion}, has the same shape:
+\[
+f\;\zero = z, \qquad f\;(\tsucc\;k) = s\;k\;(f\;k),
+\]
+for some $z : C$ and $s : \Nat \to C \to C$; the step $s$ receives both $k$ and the result $f\;k$ of the recursive call.
+So instead of allowing recursive definitions, we add one constant that builds $f$ from $z$ and $s$, once and for all:
+\[
+\mathsf{rec}_C : C \to (\Nat \to C \to C) \to \Nat \to C,
+\]
+together with two computation rules, called \emph{$\iota$-rules}, which are exactly the equations above:
+\[
+\mathsf{rec}_C\;z\;s\;\zero \;\iotared\; z,
+\qquad
+\mathsf{rec}_C\;z\;s\;(\tsucc\;n) \;\iotared\; s\;n\;(\mathsf{rec}_C\;z\;s\;n).
+\]
+Addition is now an ordinary, non-recursive definition:
+\[
+\add : \Nat \to \Nat \to \Nat \mathrel{:=} \tLam{m}{\Nat}{\tLam{n}{\Nat}{\mathsf{rec}_{\Nat}\;m\;s\;n}},
+\qquad
+s = \tLam{k}{\Nat}{\tLam{r}{\Nat}{\tsucc\;r}}.
+\]
+We write $m + n$ for $\add\;m\;n$.
+The kernel computes $2 + 1$ with $\delta$, $\beta$, and $\iota$ steps only:
+\[
+\begin{array}{r@{\;}l}
+2 + 1
+&\to_{\delta\beta} \mathsf{rec}_{\Nat}\;2\;s\;(\tsucc\;0)
+\;\iotared\; s\;0\;(\mathsf{rec}_{\Nat}\;2\;s\;0) \\
+&\to_{\beta} \tsucc\;(\mathsf{rec}_{\Nat}\;2\;s\;0)
+\;\iotared\; \tsucc\;2 = 3.
+\end{array}
+\]
+Other functions follow the same pattern. Doubling, with $\mathit{double}\;(\tsucc\;k) = \tsucc\;(\tsucc\;(\mathit{double}\;k))$, is
+\[
+\mathit{double} \mathrel{:=} \tLam{n}{\Nat}{\mathsf{rec}_{\Nat}\;\zero\;(\tLam{k}{\Nat}{\tLam{r}{\Nat}{\tsucc\;(\tsucc\;r)}})\;n},
+\]
+and $\mathit{double}\;2 \to \tsucc\;(\tsucc\;(\mathit{double}\;1)) \to \tsucc^4\;(\mathit{double}\;0) \to \tsucc^4\;\zero = 4$.
+
+The interesting point is that no new recursion mechanism is needed.
+The constants of the inductive type, together with $\mathsf{rec}_C$ and its two rules, are enough to express every structurally recursive function on $\Nat$.
+And unlike general recursion, this one always terminates: each $\iota$-step removes one $\tsucc$ from the argument.
+
+\paragraph{Proving: induction.}
+Now consider proofs.
+To prove that a property $P\;n$ holds for every $n$, where $P : \Nat \to \Sort{0}$, mathematics uses induction:
+prove the \emph{base case} $P\;\zero$, and the \emph{step} $\tPi{k}{\Nat}{P\;k \to P\;(\tsucc\;k)}$, whose argument $P\;k$ is the \emph{induction hypothesis}.
+Through Curry--Howard, a proof of $\tPi{n}{\Nat}{P\;n}$ is a function $f$ that takes $n$ and returns a proof of $P\;n$.
+How do we build such an $f$ from $\mathit{base} : P\;\zero$ and $\mathit{step}$?
+For $3$, the proof is $\mathit{step}\;2\;(\mathit{step}\;1\;(\mathit{step}\;0\;\mathit{base}))$, and in general
+\[
+f\;\zero = \mathit{base}, \qquad f\;(\tsucc\;k) = \mathit{step}\;k\;(f\;k).
+\]
+This is a structurally recursive function again, with exactly the shape of $\add$ above: $z = \mathit{base}$ and $s = \mathit{step}$.
+Induction is recursion that returns proofs.
+
+There is one difference.
+For $\add$, the result type $C$ was the same for every $n$.
+Here it depends on $n$: $f\;\zero : P\;\zero$, $f\;1 : P\;1$, and so on.
+So $\mathsf{rec}_C$, whose type mentions a fixed $C$, cannot express induction as it stands.
+
+\paragraph{One recursor for both.}
+Putting the two cases side by side shows what to generalize:
+\begin{center}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lll@{}}
+\toprule
+& \textbf{Recursion} & \textbf{Induction} \\
+\midrule
+result for $n$ & $C$ & $P\;n$ \\
+case $\zero$ & $z : C$ & $\mathit{base} : P\;\zero$ \\
+case $\tsucc$ & $s : \tPi{k}{\Nat}{C \to C}$ & $\mathit{step} : \tPi{k}{\Nat}{P\;k \to P\;(\tsucc\;k)}$ \\
+result & $\Nat \to C$ & $\tPi{n}{\Nat}{P\;n}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The left column is the special case of the right column in which $P\;n$ is the same type $C$ for every $n$.
+So we take the right column, with $P$ replaced by an arbitrary function $M : \Nat \to \Sort{u}$ that gives the type of the result for each $n$.
+This function is called the \emph{motive}.
+The result is the \emph{recursor} $\NatRec{u}$ of Fig.~\ref{fig:nat}.
+Its arguments are the motive, one \emph{minor premise} for each constructor, and finally the number $n$ to recurse on, called the \emph{major premise}.
+Its $\iota$-rules are those of $\mathsf{rec}_C$.
 As in Lean, where the recursor is \texttt{Nat.rec.\{u\}}, there is one recursor for each universe level; since we have no universe polymorphism, the level is a subscript.
 
 \begin{figure}[ht]
@@ -819,139 +916,47 @@ $\Nat$ & $\Sort{1}$ & \texttt{Nat} \\
 $\zero$ & $\Nat$ & \texttt{Nat.zero} \\
 $\tsucc$ & $\Nat \to \Nat$ & \texttt{Nat.succ} \\
 $\NatRec{u}$ & $\begin{array}[t]{@{}l@{}}\tPi{M}{\Nat \to \Sort{u}}{M\;\zero \to {}} \\ \quad (\tPi{n}{\Nat}{M\;n \to M\;(\tsucc\;n)}) \to \tPi{n}{\Nat}{M\;n}\end{array}$ & \texttt{Nat.rec} \\
-$\Eq{u}$ & $\tPi{A}{\Sort{u}}{A \to A \to \Sort{0}}$ & \texttt{Eq} \\
-$\refl{u}$ & $\tPi{A}{\Sort{u}}{\tPi{a}{A}{\Eq{u}\;A\;a\;a}}$ & \texttt{Eq.refl} \\
-$\EqRecDep{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{(\tPi{b}{A}{\Eq{u}\;A\;a\;b \to \Sort{v}})}{{}}}} \\ \quad M\;a\;(\refl{u}\;A\;a) \to \tPi{b}{A}{\tPi{h}{\Eq{u}\;A\;a\;b}{M\;b\;h}}\end{array}$ & \texttt{Eq.rec} \\
-$\EqRec{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{A \to \Sort{v}}{{}}}} \\ \quad M\;a \to \tPi{b}{A}{\Eq{u}\;A\;a\;b \to M\;b}\end{array}$ & \texttt{Eq.ndrec} (definition) \\
 \bottomrule
 \end{tabular}
 \[
 \begin{array}{r@{\;}c@{\;}l}
 \NatRec{u}\;M\;z\;s\;\zero &\iotared& z \\
-\NatRec{u}\;M\;z\;s\;(\tsucc\;n) &\iotared& s\;n\;(\NatRec{u}\;M\;z\;s\;n) \\
-\EqRecDep{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\iotared& m \\
-\EqRec{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\to_{\delta\beta\iota}& m
+\NatRec{u}\;M\;z\;s\;(\tsucc\;n) &\iotared& s\;n\;(\NatRec{u}\;M\;z\;s\;n)
 \end{array}
 \]
-\caption{Constants for natural numbers and equality (top) and their $\iota$-rules (bottom).
-$\EqRec{u,v}$ is a definition built from $\EqRecDep{u,v}$ (\S\ref{sec:inductive-decl}), and its rule is derived.}
-\label{fig:nat-eq}
+\caption{The constants for natural numbers (top) and the $\iota$-rules of the recursor (bottom).}
+\label{fig:nat}
 \end{figure}
 
-The same recursor does two jobs, depending on the level.
-
-\paragraph{Recursion.}
-At level $1$ with a constant motive, $\NatRec{1}$ defines functions by primitive recursion.
-The motive $\tLam{\_}{\Nat}{\Nat}$ says ``build a $\Nat$ for each $n$'', and $\NatRec{1}$ instantiated with it has type
-$\Nat \to (\tPi{n}{\Nat}{\Nat \to \Nat}) \to \Nat \to \Nat$:
-a result for $\zero$, a way to turn the result for $n$ into the result for $\tsucc\;n$, and then a function on all of $\Nat$.
-For example, doubling is
-\[
-\begin{array}{l}
-\mathit{double} : \Nat \to \Nat \mathrel{:=} {} \\
-\qquad \tLam{n}{\Nat}{\NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;\zero\;(\tLam{k}{\Nat}{\tLam{r}{\Nat}{\tsucc\;(\tsucc\;r)}})\;n},
-\end{array}
-\]
-where $r$ is the result of the recursive call on $k$. The $\iota$-rules give the expected equations
-$\mathit{double}\;\zero \to \zero$ and $\mathit{double}\;(\tsucc\;k) \to \tsucc\;(\tsucc\;(\mathit{double}\;k))$, so
-\[
-\begin{array}{r@{\;}l}
-\mathit{double}\;(\tsucc\;(\tsucc\;\zero))
-&\to \tsucc\;(\tsucc\;(\mathit{double}\;(\tsucc\;\zero))) \\
-&\to \tsucc\;(\tsucc\;(\tsucc\;(\tsucc\;(\mathit{double}\;\zero))))
-\to \tsucc^4\;\zero.
-\end{array}
-\]
-No new recursion mechanism is needed: the kernel only knows how $\NatRec{1}$ unfolds on $\zero$ and on $\tsucc$.
-
-Addition, defined by recursion on the second argument as in Lean, is the definition
-\[
-\add : \Nat \to \Nat \to \Nat \mathrel{:=} \tLam{m}{\Nat}{\tLam{n}{\Nat}{\NatRec{1}\;M\;m\;s\;n}},
-\]
-with the constant motive $M = \tLam{\_}{\Nat}{\Nat}$ and the step $s = \tLam{k}{\Nat}{\tLam{r}{\Nat}{\tsucc\;r}}$.
-We write $m + n$ for $\add\;m\;n$, and $0, 1, 2, \ldots$ for $\zero, \tsucc\;\zero, \ldots$.
-The kernel computes $2 + 1$ as
-\[
-\begin{array}{r@{\;}l}
-2 + 1
-&\to_{\delta\beta} \NatRec{1}\;M\;2\;s\;(\tsucc\;0)
-\;\iotared\; s\;0\;(\NatRec{1}\;M\;2\;s\;0) \\
-&\to_{\beta} \tsucc\;(\NatRec{1}\;M\;2\;s\;0)
-\;\iotared\; \tsucc\;2 = 3.
-\end{array}
-\]
-
-\paragraph{Induction.}
-At level $0$, the motive $M : \Nat \to \Sort{0}$ is a predicate on natural numbers, and the type of $\NatRec{0}$ reads as the induction principle:
-\[
-M\;\zero \to (\forall n.\; M\;n \to M\;(\tsucc\;n)) \to \forall n.\; M\;n.
-\]
-Recursion and induction are the same constant at different levels.
-Here the choice of $\imax$ in \S\ref{sec:hierarchy} is essential.
-The conclusion $\tPi{n}{\Nat}{M\;n}$ has type $\Sort{\imax(1, 0)} = \Sort{0}$, so ``$M\;n$ for every $n$'' is a proposition although $\Nat$ lives in $\Sort{1}$.
-With $\max$, it would live in $\Sort{1}$, and statements about numbers would not be propositions.
-
-\subsection{Equality}
-\label{sec:eq}
-
-For $a, b : A$, the type $\Eq{u}\;A\;a\;b$ is the proposition that $a$ and $b$ are equal; when $A$ is $\Nat$ we write it $a = b$.
-Its only constructor $\refl{u}$ proves $a = a$.
-The recursor $\EqRecDep{u,v}$ has a motive that depends on both the right-hand side $b$ and the proof of $a = b$; \S\ref{sec:inductive-decl} explains where its type comes from.
-Most uses need only the non-dependent version $\EqRec{u,v}$, a definition built from $\EqRecDep{u,v}$.
-It is Leibniz's principle: if $a = b$, then whatever holds of $a$ holds of $b$.
-It \emph{transports} $m : M\;a$ along a proof of $a = b$ to $M\;b$, and its rule says that transporting along $\refl{}$ does nothing.
-In a well-typed redex, $b$ and $c$ are both convertible to $a$, so the rules can ignore them.
-
-For example, suppose $P : \Nat \to \Sort{0}$, $a, b : \Nat$, $h : a = b$, and $\mathit{pa} : P\;a$.
-Choosing the motive $M = P$ gives
-\[
-\EqRec{1,0}\;\Nat\;a\;P\;\mathit{pa}\;b\;h \;:\; P\;b.
-\]
-This one line is the logical content of rewriting: a fact about $a$ becomes a fact about $b$.
-The \texttt{rw} tactic of \S\ref{sec:tactics} builds such terms automatically.
-
-In Lean, the type argument of \texttt{Eq} is \emph{implicit}, written \texttt{\{A\}} above, and the elaborator fills it in.
-Our kernel sees only fully explicit terms, so we write every argument; filling them in is the job of the layer above the kernel (\S\ref{sec:tactics}).
-
-\paragraph{Definitional versus propositional equality.}
-There are now two notions of equality.
-Definitional equality $\conv$ is decided by the kernel by computation; propositional equality $\Eq{}$ is a type, whose proofs may require reasoning.
-The constructor $\refl{}$ connects them: by \textsc{T-Conv}, $\refl{u}\;A\;a : \Eq{u}\;A\;a\;b$ whenever $a \conv b$.
-For example,
-\[
-n + 0 \;\to_{\delta\beta}\; \NatRec{1}\;M\;n\;s\;\zero \;\iotared\; n,
-\]
-so $\refl{1}\;\Nat\;n : n + 0 = n$, and Lean proves this by \texttt{rfl}.
-In contrast, $0 + n \to_{\delta\beta} \NatRec{1}\;M\;0\;s\;n$ is stuck: $n$ is a variable, and the $\iota$-rules fire only on $\zero$ and $\tsucc$.
-So $0 + n = n$ is not provable by $\refl{}$ and needs induction.
-
-\subsection{Example: $0 + n = n$}
-\label{sec:zero-add}
-
-We prove $\tPi{n}{\Nat}{0 + n = n}$ by induction, using $\NatRec{0}$ with the motive $M_0 = \tLam{n}{\Nat}{0 + n = n}$.
+The one recursor does both jobs, depending on the motive.
 \begin{itemize}
-  \item \emph{Base.} We need $M_0\;0$, which is convertible to $0 + 0 = 0$. Since $0 + 0$ computes to $0$, the term $\refl{1}\;\Nat\;0$ works.
-  \item \emph{Step.} Given $k : \Nat$ and $\mathit{ih} : 0 + k = k$, we need $M_0\;(\tsucc\;k)$, that is, $0 + \tsucc\;k = \tsucc\;k$.
-    By the second $\iota$-rule, $0 + \tsucc\;k$ computes to $\tsucc\;(0 + k)$, so it suffices to prove $\tsucc\;(0 + k) = \tsucc\;k$.
-    We start from $\refl{1}\;\Nat\;(\tsucc\;(0 + k))$ and transport it along $\mathit{ih}$ with the motive $N = \tLam{b}{\Nat}{\tsucc\;(0 + k) = \tsucc\;b}$,
-    which replaces the second $0 + k$ by $k$:
+  \item \emph{Recursion.} With the constant motive $\tLam{\_}{\Nat}{C}$ at level $1$, the type of $\NatRec{1}\;(\tLam{\_}{\Nat}{C})$ is convertible to the type of $\mathsf{rec}_C$.
+    So $\mathsf{rec}_C$ is just $\NatRec{1}\;(\tLam{\_}{\Nat}{C})$, and from now on
     \[
-    \mathit{step} = \tLam{k}{\Nat}{\tLam{\mathit{ih}}{0 + k = k}{
-      \EqRec{1,0}\;\Nat\;(0 + k)\;N\;(\refl{1}\;\Nat\;(\tsucc\;(0 + k)))\;k\;\mathit{ih}}}.
+    \add \mathrel{:=} \tLam{m}{\Nat}{\tLam{n}{\Nat}{\NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;m\;(\tLam{k}{\Nat}{\tLam{r}{\Nat}{\tsucc\;r}})\;n}},
     \]
+    which is the definition in \texttt{examples/zero-add.leanmini}.
+  \item \emph{Induction.} With a predicate $M : \Nat \to \Sort{0}$ at level $0$, the type of $\NatRec{0}$ is the induction principle
+    \[
+    M\;\zero \to (\forall n.\; M\;n \to M\;(\tsucc\;n)) \to \forall n.\; M\;n.
+    \]
+    Here the choice of $\imax$ (\S\ref{sec:hierarchy}) is essential.
+    The conclusion $\tPi{n}{\Nat}{M\;n}$ has type $\Sort{\imax(1, 0)} = \Sort{0}$, so ``$M\;n$ for every $n$'' is a proposition although $\Nat$ lives in $\Sort{1}$.
+    With $\max$, it would live in $\Sort{1}$, and statements about numbers would not be propositions.
 \end{itemize}
-The proof is
-\[
-\mathit{zero\_add} = \NatRec{0}\;M_0\;(\refl{1}\;\Nat\;0)\;\mathit{step} \;:\; \tPi{n}{\Nat}{0 + n = n}.
-\]
-The kernel checks it with Algorithm~\ref{alg:infer}.
-Each argument is checked against the corresponding part of the type of $\NatRec{0}$, instantiated with $M_0$, and every comparison succeeds after normalization.
-Writing such terms by hand is tedious, and finding the right motive is the hard part; tactics (\S\ref{sec:tactics}) automate both.
 
-\subsection{A Second Example: Trees}
+The type of $\NatRec{u}$ is not arbitrary: it can be read off the declaration of $\Nat$.
+There is one minor premise per constructor.
+Each minor premise takes the constructor's arguments, plus one induction hypothesis for each argument whose type is $\Nat$ itself (a \emph{recursive} argument),
+and returns the motive applied to the constructor.
+$\zero$ has no arguments, so its case is just $M\;\zero$; $\tsucc$ has one recursive argument $n$, so its case is $\tPi{n}{\Nat}{M\;n \to M\;(\tsucc\;n)}$.
+The rest of this section applies this recipe to more and more general declarations.
+
+\subsection{More Constructors: Trees}
 \label{sec:tree}
 
-Before giving the general procedure, we apply the recipe of \S\ref{sec:nat} to a type with three constructors:
+$\Nat$ has two constructors, and only one of them has a recursive argument.
+Consider a type with three constructors:
 \begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
 inductive Tree where
   | leaf   : Tree
@@ -959,7 +964,7 @@ inductive Tree where
   | branch : Tree -> Tree -> Tree
 \end{lstlisting}
 For example, $\mathsf{branch}\;(\mathsf{node}\;\mathsf{leaf})\;\mathsf{leaf}$ is a tree with four constructors.
-To build $M\;t$ for every tree $t$, where $M : \mathsf{Tree} \to \Sort{v}$, we need one case per constructor,
+To build $M\;t$ for every tree $t$, where $M : \mathsf{Tree} \to \Sort{v}$, the recipe asks for one case per constructor,
 and each argument of type $\mathsf{Tree}$ contributes one hypothesis:
 \[
 \begin{array}{l@{\;:\;}l}
@@ -1000,15 +1005,91 @@ R\;(\mathsf{branch}\;(\mathsf{node}\;\mathsf{leaf})\;\mathsf{leaf})
 \to 1 + (1 + R\;\mathsf{leaf}) + 1
 \to 1 + (1 + 1) + 1 = 4.
 \]
-The kernel has no code specific to trees: it only needs to know, for each constructor, which case to pick and which fields to recurse on.
 With $M$ a predicate ($v = 0$), the same recursor is structural induction on trees.
+In general, a type with $n$ constructors gets a recursor with $n$ minor premises $m_1, \ldots, m_n$,
+and the kernel needs no code specific to the type: it only needs to know, for each constructor, which case to pick and which arguments to recurse on.
 
-\subsection{Inductive Declarations}
+\subsection{Parameters and Indices: Lists and Vectors}
+\label{sec:list}
+
+\paragraph{Parameters: lists.}
+
+Next, consider lists.
+A list of numbers is either empty or a number in front of a list of numbers, so we could declare a type $\mathsf{ListNat}$ with constructors $\mathsf{nil}$ and $\mathsf{cons} : \Nat \to \mathsf{ListNat} \to \mathsf{ListNat}$.
+But then lists of trees would need another declaration, $\mathsf{ListTree}$, with the same constructors and a separate recursor, and so on for every element type.
+It is better to make the element type an argument of the type itself:
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+inductive List (A : Sort 1) where
+  | nil  : List A
+  | cons : A -> List A -> List A
+\end{lstlisting}
+Now $\mathsf{List}\;\Nat$ and $\mathsf{List}\;\mathsf{Tree}$ are two instances of one declaration.
+The declaration adds
+\[
+\begin{array}{l}
+\mathsf{List} : \Sort{1} \to \Sort{1}, \qquad
+\mathsf{nil} : \tPi{A}{\Sort{1}}{\mathsf{List}\;A}, \\
+\mathsf{cons} : \tPi{A}{\Sort{1}}{A \to \mathsf{List}\;A \to \mathsf{List}\;A}.
+\end{array}
+\]
+The constructors take $A$ as an explicit first argument.
+For example, the one-element list $[5]$ is $\mathsf{cons}\;\Nat\;5\;(\mathsf{nil}\;\Nat)$.
+Within one list, $A$ never changes: the tail of $\mathsf{cons}\;A\;a\;\mathit{as}$ is again a $\mathsf{List}\;A$.
+An argument of the type that stays the same in every constructor and every recursive argument is called a \emph{parameter}.
+Because it never changes, the recursor can take it once, before the motive, and treat it as fixed:
+\[
+\begin{array}{l}
+\mathsf{List.rec}_v : \tPi{A}{\Sort{1}}{\tPi{M}{\mathsf{List}\;A \to \Sort{v}}{\;M\;(\mathsf{nil}\;A) \to {}}} \\
+\qquad (\tPi{a}{A}{\tPi{\mathit{as}}{\mathsf{List}\;A}{M\;\mathit{as} \to M\;(\mathsf{cons}\;A\;a\;\mathit{as})}}) \to \tPi{x}{\mathsf{List}\;A}{M\;x} \\[6pt]
+\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;(\mathsf{nil}\;A') \;\iotared\; m_1 \\
+\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;(\mathsf{cons}\;A'\;a\;\mathit{as}) \;\iotared\; m_2\;a\;\mathit{as}\;(\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;\mathit{as})
+\end{array}
+\]
+Apart from the leading $A$, this is the recipe of \S\ref{sec:nat} once more:
+$\mathsf{cons}$ has two arguments, of which only $\mathit{as}$ is recursive, so its case gets one induction hypothesis.
+The rules ignore the parameter $A'$ stored in the constructor; in a well-typed term it is convertible to $A$.
+For example, the length of a list is
+\[
+\begin{array}{l}
+\mathit{length} \mathrel{:=} \tLam{A}{\Sort{1}}{\tLam{x}{\mathsf{List}\;A}{{}}} \\
+\qquad \mathsf{List.rec}_1\;A\;(\tLam{\_}{\mathsf{List}\;A}{\Nat})\;\zero\;(\tLam{a}{A}{\tLam{\mathit{as}}{\mathsf{List}\;A}{\tLam{r}{\Nat}{\tsucc\;r}}})\;x.
+\end{array}
+\]
+
+\paragraph{Indices: vectors.}
+A $\mathsf{List}\;\Nat$ may have any length.
+What if we want the length to be part of the type, so that $\mathsf{Vec}\;\Nat\;0$ and $\mathsf{Vec}\;\Nat\;2$ are different types?
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+inductive Vec (A : Sort 1) : Nat -> Sort 1 where
+  | vnil  : Vec A 0
+  | vcons : (n : Nat) -> A -> Vec A n -> Vec A (succ n)
+\end{lstlisting}
+The element type $A$ is still a parameter.
+The length is not: $\mathsf{vnil}$ has length $0$, and $\mathsf{vcons}$ takes a vector of length $n$ and returns one of length $\tsucc\;n$.
+An argument of the type that may differ between constructors, and between a constructor and its recursive arguments, is called an \emph{index}.
+The constructors are
+\[
+\begin{array}{l}
+\mathsf{vnil} : \tPi{A}{\Sort{1}}{\mathsf{Vec}\;A\;\zero}, \\
+\mathsf{vcons} : \tPi{A}{\Sort{1}}{\tPi{n}{\Nat}{A \to \mathsf{Vec}\;A\;n \to \mathsf{Vec}\;A\;(\tsucc\;n)}}.
+\end{array}
+\]
+Because an index varies, the recursor cannot fix it in advance.
+Instead, the motive takes it as an argument, $M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$, and the case for $\mathsf{vcons}$ is
+\[
+\tPi{n}{\Nat}{\tPi{a}{A}{\tPi{\mathit{xs}}{\mathsf{Vec}\;A\;n}{M\;n\;\mathit{xs} \to M\;(\tsucc\;n)\;(\mathsf{vcons}\;A\;n\;a\;\mathit{xs})}}}.
+\]
+The induction hypothesis is about a vector of length $n$, read off the type $\mathsf{Vec}\;A\;n$ of the recursive argument,
+and the conclusion is about one of length $\tsucc\;n$, read off the result type of the constructor.
+\texttt{examples/generic-vec.leanmini} declares this type and checks a small term that uses it.
+
+\subsection{The General Recipe}
 \label{sec:inductive-decl}
 
-In Lean, a user never writes the constants of Fig.~\ref{fig:nat-eq} or the table of \S\ref{sec:iota-data}.
-The user writes an \texttt{inductive} declaration, and the kernel checks it and generates the type, the constructors, the recursor, and the rules.
-This subsection gives that procedure for a single inductive type with parameters and indices, which covers $\Nat$, lists, and $\Eq{}$.
+In Lean, a user never writes recursors or $\iota$-rules.
+The user writes an \texttt{inductive} declaration, and the kernel checks it and generates the type, the constructors, the recursor, and the rules,
+following the recipe that \S\S\ref{sec:nat}--\ref{sec:list} applied by hand.
+This subsection states that procedure for a single inductive type with parameters and indices.
 Mutual and nested inductive types, which Lean also supports, are out of scope.
 
 The procedure also answers a question that \textsc{T-Const} leaves open.
@@ -1031,7 +1112,7 @@ c_j &:& \tPi{\vec{p}}{\vec{P}}{\tPi{\vec{a}}{\vec{A}_j}{I\;\vec{p}\;\vec{t}_j}} 
 \]
 The \emph{parameters} $\vec{p}$ are shared by all constructors and appear unchanged in every result type.
 The \emph{indices} $\vec{\imath}$ may differ between constructors: the index terms $\vec{t}_j$ may mention $\vec{p}$ and the constructor's own arguments $\vec{a}$, which are called its \emph{fields}.
-For our three examples, with the leading $\Pi$ over the parameters omitted from the constructor types:
+For the examples so far, with the leading $\Pi$ over the parameters omitted from the constructor types:
 \begin{center}
 \footnotesize
 \renewcommand{\arraystretch}{1.2}
@@ -1041,15 +1122,14 @@ For our three examples, with the leading $\Pi$ over the parameters omitted from 
 \midrule
 $\Nat : \Sort{1}$ & none & none & $\zero : \Nat$, \\
 & & & $\tsucc : \Nat \to \Nat$ \\
+$\mathsf{Tree} : \Sort{1}$ & none & none & $\mathsf{leaf}$, $\mathsf{node}$, $\mathsf{branch}$ \\
 $\mathsf{List} : \Sort{1} \to \Sort{1}$ & $(A : \Sort{1})$ & none & $\mathsf{nil} : \mathsf{List}\;A$, \\
 & & & $\mathsf{cons} : A \to \mathsf{List}\;A \to \mathsf{List}\;A$ \\
-$\Eq{u} : \tPi{A}{\Sort{u}}{A \to A \to \Sort{0}}$ & $(A : \Sort{u})\,(a : A)$ & $(b : A)$ & $\refl{u} : \Eq{u}\;A\;a\;a$ \\
+$\mathsf{Vec} : \Sort{1} \to \Nat \to \Sort{1}$ & $(A : \Sort{1})$ & $(n : \Nat)$ & $\mathsf{vnil} : \mathsf{Vec}\;A\;\zero$, \\
+& & & $\mathsf{vcons} : \tPi{n}{\Nat}{A \to \mathsf{Vec}\;A\;n \to \mathsf{Vec}\;A\;(\tsucc\;n)}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
-In $\Eq{u}\;A\;a\;b$, the left-hand side $a$ is a parameter and the right-hand side $b$ is an index.
-The constructor $\refl{u}$ has no fields, and its index term is $a$: it can only prove equations whose two sides are the same.
-This is what makes $\Eq{}$ an \emph{inductive family} rather than a single type.
 
 \paragraph{Acceptance.}
 The kernel accepts a declaration only if the following conditions hold.
@@ -1101,8 +1181,8 @@ I.\mathsf{rec}_v :
 \tPi{m_1}{C_1}{\cdots\,\tPi{m_n}{C_n}{\;
 \tPi{\vec{\imath}}{\vec{J}}{\tPi{x}{I\;\vec{p}\;\vec{\imath}}{M\;\vec{\imath}\;x}}}}}}.
 \]
-The motive $M$ says what is to be built for each element $x$ and its indices.
-The \emph{minor premise} $C_j$ asks for the case of constructor $c_j$: given its fields and an induction hypothesis for each recursive field, build $M$ for $c_j$ applied to those fields:
+The parameters come first and stay fixed, as for lists; the motive takes the indices and the element, as for vectors.
+The minor premise $C_j$ asks for the case of constructor $c_j$: given its fields and an induction hypothesis for each recursive field, build $M$ for $c_j$ applied to those fields:
 \[
 \begin{array}{l}
 C_j = \tPi{\vec{a}}{\vec{A}_j}{\;\tPi{\vec{h}}{\vec{H}_j}{\;M\;\vec{t}_j\;(c_j\;\vec{p}\;\vec{a})}}, \\[4pt]
@@ -1110,7 +1190,7 @@ H_{j,k} = \tPi{\vec{y}}{\vec{B}}{M\;\vec{s}\;(a_k\;\vec{y})}
 \quad\text{for each recursive field } a_k : \tPi{\vec{y}}{\vec{B}}{I\;\vec{p}\;\vec{s}}.
 \end{array}
 \]
-The final arguments are the indices and the element $x$ itself, the \emph{major premise}.
+The final arguments are the indices and the element $x$ itself, the major premise.
 
 \paragraph{The rules.}
 For each constructor, the kernel generates one $\iota$-rule, which applies the minor premise to the fields and to the induction hypotheses, computed by recursive calls:
@@ -1122,7 +1202,9 @@ h_k = \tLam{\vec{y}}{\vec{B}}{I.\mathsf{rec}_v\;\vec{p}\;M\;\vec{m}\;\vec{s}\;(a
 As data for Algorithm~\ref{alg:whnf} (\S\ref{sec:iota-data}), the major premise is at position $|\vec{p}| + n + |\vec{\imath}| + 2$,
 the constructor has $|\vec{p}|$ parameters and $|\vec{a}|$ fields,
 and the right-hand side is $\lambda \vec{p}\,M\,\vec{m}\,\vec{\imath}.\;\lambda \vec{a}.\; m_j\;\vec{a}\;\vec{h}$.
-In a well-typed redex, $\vec{p}\,'$ is convertible to $\vec{p}$, so the rule ignores it, as the rules of \S\ref{sec:iota-data} ignore the parameters of $\refl{}$.
+In a well-typed redex, $\vec{p}\,'$ is convertible to $\vec{p}$, so the rule ignores it, as the rules for lists ignore $A'$.
+For $\Nat$, $\mathsf{Tree}$, $\mathsf{List}$, and $\mathsf{Vec}$, the procedure produces exactly the recursors and rules of \S\S\ref{sec:nat}--\ref{sec:list},
+and the recursor types agree with the ones Lean 4 generates, up to the names of bound variables and implicit arguments.
 
 \paragraph{Eliminating from propositions.}
 If $u \ge 1$, the recursor is generated for every level $v$.
@@ -1131,35 +1213,31 @@ it has at most one constructor, and each field either is a proof (its type lies 
 The restriction keeps data from depending on which proof of a proposition was given.
 For example, $P \vee Q$ has two constructors, so a function from proofs of $P \vee Q$ into $\Nat$ could return $0$ for one and $1$ for the other.
 Lean's \texttt{Or.rec} and \texttt{Exists.rec} therefore eliminate only into $\mathsf{Prop}$,
-while \texttt{And.rec} and \texttt{Eq.rec} eliminate into every universe: \texttt{And} has one constructor whose fields are proofs, and \texttt{Eq} has one constructor with no fields.
+while \texttt{And.rec} and \texttt{Eq.rec} eliminate into every universe: \texttt{And} has one constructor whose fields are proofs, and \texttt{Eq} (\S\ref{sec:eq}) has one constructor with no fields.
 
-\paragraph{Examples.}
-For $\Nat$, there are no parameters or indices, and the field of $\tsucc$ is recursive with no $\vec{y}$.
-The procedure produces exactly the recursor and rules of Fig.~\ref{fig:nat-eq}, and the data in the table of \S\ref{sec:iota-data}.
-For lists, it produces
+So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and a single reduction function runs their rules (\S\ref{sec:iota-data}).
+
+\subsection{Equality Is an Inductive Type Too}
+\label{sec:eq}
+
+To state facts about numbers, such as $0 + n = n$, we need a way to say that two things are equal.
+One might expect equality to be a primitive of the kernel.
+Surprisingly, it is just another inductive type:
+\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
+inductive Eq {A : Sort u} (a : A) : A -> Prop where
+  | refl : Eq a a
+\end{lstlisting}
+For $a, b : A$, the type $\Eq{u}\;A\;a\;b$ is the proposition that $a$ and $b$ are equal; when $A$ is $\Nat$ we write it $a = b$.
+In the terms of \S\ref{sec:inductive-decl}, $A$ and $a$ are parameters and $b$ is an index:
 \[
-\begin{array}{l}
-\mathsf{List.rec}_v : \tPi{A}{\Sort{1}}{\tPi{M}{\mathsf{List}\;A \to \Sort{v}}{\;M\;(\mathsf{nil}\;A) \to {}}} \\
-\qquad (\tPi{a}{A}{\tPi{\mathit{as}}{\mathsf{List}\;A}{M\;\mathit{as} \to M\;(\mathsf{cons}\;A\;a\;\mathit{as})}}) \to \tPi{x}{\mathsf{List}\;A}{M\;x} \\[6pt]
-\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;(\mathsf{nil}\;A') \;\iotared\; m_1 \\
-\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;(\mathsf{cons}\;A'\;a\;\mathit{as}) \;\iotared\; m_2\;a\;\mathit{as}\;(\mathsf{List.rec}_v\;A\;M\;m_1\;m_2\;\mathit{as})
-\end{array}
+\Eq{u} : \tPi{A}{\Sort{u}}{A \to A \to \Sort{0}}, \qquad
+\refl{u} : \tPi{A}{\Sort{u}}{\tPi{a}{A}{\Eq{u}\;A\;a\;a}}.
 \]
-The parameter $A$ is fixed before the motive, so $M$ talks about lists of one element type.
-An index, in contrast, becomes an argument of the motive.
-For example, length-indexed vectors have the parameter $A : \Sort{1}$, the index $n : \Nat$, and the constructors
-\[
-\mathsf{vnil} : \mathsf{Vec}\;A\;\zero, \qquad
-\mathsf{vcons} : \tPi{n}{\Nat}{A \to \mathsf{Vec}\;A\;n \to \mathsf{Vec}\;A\;(\tsucc\;n)},
-\]
-so $\mathsf{Vec}\;\Nat\;0$ and $\mathsf{Vec}\;\Nat\;2$ are different types (see \texttt{examples/generic-vec.leanmini}).
-The procedure gives the motive $M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$ and the case for $\mathsf{vcons}$
-\[
-\tPi{n}{\Nat}{\tPi{a}{A}{\tPi{\mathit{xs}}{\mathsf{Vec}\;A\;n}{M\;n\;\mathit{xs} \to M\;(\tsucc\;n)\;(\mathsf{vcons}\;A\;n\;a\;\mathit{xs})}}}.
-\]
-The induction hypothesis is about a vector of length $n$, read off the field type $\mathsf{Vec}\;A\;n$,
-and the conclusion is about one of length $\tsucc\;n$, read off the result index of the constructor.
-For equality, the motive depends on the index $b$ and on the proof itself:
+The only constructor $\refl{u}$ has no fields, and its index term is $a$: it can only prove equations whose two sides are the same.
+So $\Eq{}$ is an \emph{inductive family} like $\mathsf{Vec}$, not a single type.
+
+The general recipe gives its recursor.
+Because $b$ is an index, the motive takes $b$ and the proof $h : \Eq{u}\;A\;a\;b$, and there is one minor premise, for $\refl{u}$, with no fields and no hypotheses:
 \[
 \begin{array}{l}
 \EqRecDep{u,v} : \tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{(\tPi{b}{A}{\Eq{u}\;A\;a\;b \to \Sort{v}})}{{}}}} \\
@@ -1168,17 +1246,93 @@ For equality, the motive depends on the index $b$ and on the proof itself:
 \end{array}
 \]
 $\Eq{}$ is a subsingleton, so $v$ is arbitrary.
-The non-dependent recursor of Fig.~\ref{fig:nat-eq} is a definition built from it,
+Read logically, the recursor says: if something holds in the case where the two sides are identical, then it holds whenever we have a proof that they are equal.
+Most uses need only the non-dependent version $\EqRec{u,v}$, whose motive ignores the proof.
+It is a definition built from $\EqRecDep{u,v}$,
 \[
 \begin{array}{l}
 \EqRec{u,v} \mathrel{:=} \tLam{A}{\Sort{u}}{\tLam{a}{A}{\tLam{M}{A \to \Sort{v}}{\tLam{m}{M\;a}{\tLam{b}{A}{\tLam{h}{\Eq{u}\;A\;a\;b}{{}}}}}}} \\
 \qquad \EqRecDep{u,v}\;A\;a\;(\tLam{b'}{A}{\tLam{\_}{\Eq{u}\;A\;a\;b'}{M\;b'}})\;m\;b\;h,
 \end{array}
 \]
-and its rule in Fig.~\ref{fig:nat-eq} follows by $\delta$, $\beta$, and the rule for $\EqRecDep{u,v}$.
-These recursor types agree with the ones Lean 4 generates for \texttt{Nat}, \texttt{List}, and \texttt{Eq}, up to the names of bound variables and implicit arguments.
+and Fig.~\ref{fig:eq} summarizes the constants.
+$\EqRec{u,v}$ is Leibniz's principle: if $a = b$, then whatever holds of $a$ holds of $b$.
+It \emph{transports} $m : M\;a$ along a proof of $a = b$ to $M\;b$, and its rule says that transporting along $\refl{}$ does nothing.
+In a well-typed redex, $b$ and $c$ are both convertible to $a$, so the rules can ignore them.
 
-So the kernel's rules stay fixed while the signature grows: one generic procedure turns each declaration into signature entries, and a single reduction function runs their rules (\S\ref{sec:iota-data}).
+\begin{figure}[ht]
+\footnotesize
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}l@{\;:\;}l@{\qquad}l@{}}
+\toprule
+\multicolumn{2}{@{}l}{\textbf{Constant and type}} & \textbf{Lean} \\
+\midrule
+$\Eq{u}$ & $\tPi{A}{\Sort{u}}{A \to A \to \Sort{0}}$ & \texttt{Eq} \\
+$\refl{u}$ & $\tPi{A}{\Sort{u}}{\tPi{a}{A}{\Eq{u}\;A\;a\;a}}$ & \texttt{Eq.refl} \\
+$\EqRecDep{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{(\tPi{b}{A}{\Eq{u}\;A\;a\;b \to \Sort{v}})}{{}}}} \\ \quad M\;a\;(\refl{u}\;A\;a) \to \tPi{b}{A}{\tPi{h}{\Eq{u}\;A\;a\;b}{M\;b\;h}}\end{array}$ & \texttt{Eq.rec} \\
+$\EqRec{u,v}$ & $\begin{array}[t]{@{}l@{}}\tPi{A}{\Sort{u}}{\tPi{a}{A}{\tPi{M}{A \to \Sort{v}}{{}}}} \\ \quad M\;a \to \tPi{b}{A}{\Eq{u}\;A\;a\;b \to M\;b}\end{array}$ & \texttt{Eq.ndrec} (definition) \\
+\bottomrule
+\end{tabular}
+\[
+\begin{array}{r@{\;}c@{\;}l}
+\EqRecDep{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\iotared& m \\
+\EqRec{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A\;c) &\to_{\delta\beta\iota}& m
+\end{array}
+\]
+\caption{The constants for equality and their computation rules. The rule for $\EqRec{u,v}$ is derived from its definition by $\delta$, $\beta$, and the rule for $\EqRecDep{u,v}$.}
+\label{fig:eq}
+\end{figure}
+
+For example, suppose $P : \Nat \to \Sort{0}$, $a, b : \Nat$, $h : a = b$, and $\mathit{pa} : P\;a$.
+Choosing the motive $M = P$ gives
+\[
+\EqRec{1,0}\;\Nat\;a\;P\;\mathit{pa}\;b\;h \;:\; P\;b.
+\]
+This one line is the logical content of rewriting: a fact about $a$ becomes a fact about $b$.
+The \texttt{rw} tactic of \S\ref{sec:tactics} builds such terms automatically.
+
+In Lean, the type argument of \texttt{Eq} is \emph{implicit}, written \texttt{\{A\}} above, and the elaborator fills it in.
+Our kernel sees only fully explicit terms, so we write every argument; filling them in is the job of the layer above the kernel (\S\ref{sec:tactics}).
+
+\paragraph{Definitional versus propositional equality.}
+There are now two notions of equality.
+Definitional equality $\conv$ is decided by the kernel by computation; propositional equality $\Eq{}$ is a type, whose proofs may require reasoning.
+The constructor $\refl{}$ connects them: by \textsc{T-Conv}, $\refl{u}\;A\;a : \Eq{u}\;A\;a\;b$ whenever $a \conv b$.
+For example, with the definition of $\add$ from \S\ref{sec:nat} and $s$ its step,
+\[
+n + 0 \;\to_{\delta\beta}\; \NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;n\;s\;\zero \;\iotared\; n,
+\]
+so $\refl{1}\;\Nat\;n : n + 0 = n$, and Lean proves this by \texttt{rfl}.
+In contrast,
+\[
+0 + n \;\to_{\delta\beta}\; \NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;0\;s\;n
+\]
+is stuck: $n$ is a variable, and the $\iota$-rules fire only on $\zero$ and $\tsucc$.
+So $0 + n = n$ is not provable by $\refl{}$ and needs induction.
+
+\subsection{Example: $0 + n = n$}
+\label{sec:zero-add}
+
+We prove $\tPi{n}{\Nat}{0 + n = n}$ by induction, using $\NatRec{0}$ with the motive $M_0 = \tLam{n}{\Nat}{0 + n = n}$.
+\begin{itemize}
+  \item \emph{Base.} We need $M_0\;0$, which is convertible to $0 + 0 = 0$. Since $0 + 0$ computes to $0$, the term $\refl{1}\;\Nat\;0$ works.
+  \item \emph{Step.} Given $k : \Nat$ and $\mathit{ih} : 0 + k = k$, we need $M_0\;(\tsucc\;k)$, that is, $0 + \tsucc\;k = \tsucc\;k$.
+    By the second $\iota$-rule, $0 + \tsucc\;k$ computes to $\tsucc\;(0 + k)$, so it suffices to prove $\tsucc\;(0 + k) = \tsucc\;k$.
+    We start from $\refl{1}\;\Nat\;(\tsucc\;(0 + k))$ and transport it along $\mathit{ih}$ with the motive $N = \tLam{b}{\Nat}{\tsucc\;(0 + k) = \tsucc\;b}$,
+    which replaces the second $0 + k$ by $k$:
+    \[
+    \mathit{step} = \tLam{k}{\Nat}{\tLam{\mathit{ih}}{0 + k = k}{
+      \EqRec{1,0}\;\Nat\;(0 + k)\;N\;(\refl{1}\;\Nat\;(\tsucc\;(0 + k)))\;k\;\mathit{ih}}}.
+    \]
+\end{itemize}
+The proof is
+\[
+\mathit{zero\_add} = \NatRec{0}\;M_0\;(\refl{1}\;\Nat\;0)\;\mathit{step} \;:\; \tPi{n}{\Nat}{0 + n = n}.
+\]
+The kernel checks it with Algorithm~\ref{alg:infer}.
+Each argument is checked against the corresponding part of the type of $\NatRec{0}$, instantiated with $M_0$, and every comparison succeeds after normalization.
+Writing such terms by hand is tedious, and finding the right motive is the hard part; tactics (\S\ref{sec:tactics}) automate both.
 
 \subsection{Changes to the Kernel}
 
@@ -1660,7 +1814,7 @@ Applying a $\lambda$-abstraction to an argument is computed by substituting the 
 \]
 This step is called \emph{$\beta$-reduction}, and a subterm of the form $(\tLam{x}{A}{t})\;s$ is called a \emph{$\beta$-redex}.
 \S\ref{sec:inductive} added two more kinds of steps: $\delta$-reduction, which unfolds a definition (\S\ref{sec:constants}),
-and $\iota$-reduction, which runs a recursor on a constructor (Fig.~\ref{fig:nat-eq} and \S\ref{sec:inductive-decl}).
+and $\iota$-reduction, which runs a recursor on a constructor (Fig.~\ref{fig:nat} and \S\ref{sec:inductive-decl}).
 We allow each step anywhere inside a term, and write $\to$ for a single step of any kind.
 A term in which no step applies is in \emph{normal form}.
 For example, with $\mathit{Id} = \tLam{X}{\Sort{0}}{X}$,
@@ -1686,7 +1840,7 @@ A practical kernel also caps the number of reduction steps, so that a bug cannot
 \subsection{Computation Rules as Data}
 \label{sec:iota-data}
 
-Fig.~\ref{fig:nat-eq} writes each $\iota$-rule as a separate equation, which suggests that every new inductive type needs new reduction code in the kernel.
+Figs.~\ref{fig:nat} and~\ref{fig:eq} write each $\iota$-rule as a separate equation, which suggests that every new inductive type needs new reduction code in the kernel.
 It does not.
 A kernel stores the $\iota$-rules as data in the signature, next to the recursor, and a single piece of code applies them for every inductive type.
 
@@ -1717,7 +1871,7 @@ For example, $\NatRec{u}\;M\;z\;s\;(\tsucc\;n)$ selects the second rule and beco
 \[
 (\lambda M\,z\,s\,n.\; s\;n\;(\NatRec{u}\;M\;z\;s\;n))\;M\;z\;s\;n,
 \]
-which $\beta$-reduces to the right-hand side of the second equation in Fig.~\ref{fig:nat-eq}.
+which $\beta$-reduces to the right-hand side of the second equation in Fig.~\ref{fig:nat}.
 Likewise, the only rule of $\EqRecDep{u,v}$ fires on the term $\EqRecDep{u,v}\;A\;a\;M\;m\;b\;(\refl{u}\;A'\;c)$.
 The constructor $\refl{u}$ has two parameters, $A'$ and $c$, and no fields,
 so the $\mathit{rhs}$ receives just $A\;a\;M\;m\;b$ and returns $m$.

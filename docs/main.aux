@@ -8,116 +8,127 @@
 \newlabel{sec:curry-howard}{{1}{1}{Propositions as Types}{section.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Syntax}{1}{section.2}\protected@file@percent }
 \newlabel{sec:syntax}{{2}{1}{Syntax}{section.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Free Variables and Substitution}{2}{section.3}\protected@file@percent }
-\newlabel{sec:subst}{{3}{2}{Free Variables and Substitution}{section.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Alpha-Equivalence}{2}{section.4}\protected@file@percent }
-\newlabel{sec:alpha}{{4}{2}{Alpha-Equivalence}{section.4}{}}
-\citation{debruijn1972nameless}
-\newlabel{def:alpha}{{3}{3}{$\alpha $-equivalence}{definition.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Algorithmic $\alpha $-equivalence. By Theorem\nonbreakingspace \ref {thm:alpha}, two terms $s$ and $t$ are $\alpha $-equivalent iff $\cdot \,;\cdot \vdash s =_{\alpha }t$.}}{3}{figure.caption.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Typing Rules}{2}{section.3}\protected@file@percent }
+\newlabel{sec:typing}{{3}{2}{Typing Rules}{section.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Contexts and judgments.}{2}{section*.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Well-formed contexts and typing rules.}}{2}{figure.caption.3}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:alpha}{{1}{3}{Algorithmic $\alpha $-equivalence. By Theorem~\ref {thm:alpha}, two terms $s$ and $t$ are $\alpha $-equivalent iff $\cdot \,;\cdot \vdash s \alphaeq t$}{figure.caption.2}{}}
-\newlabel{thm:alpha}{{1}{3}{Correctness of algorithmic $\alpha $-equivalence}{theorem.1}{}}
+\newlabel{fig:typing}{{1}{2}{Well-formed contexts and typing rules}{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Two operations used by the rules.}{2}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Why application matters.}{3}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}The Typing Rules as a Logic}{3}{section.4}\protected@file@percent }
+\newlabel{sec:logic}{{4}{3}{The Typing Rules as a Logic}{section.4}{}}
 \citation{barendregt1992lambda}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Reduction and Conversion}{4}{section.5}\protected@file@percent }
-\newlabel{sec:conversion}{{5}{4}{Reduction and Conversion}{section.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Typing Rules}{4}{section.6}\protected@file@percent }
-\newlabel{sec:typing}{{6}{4}{Typing Rules}{section.6}{}}
-\@writefile{toc}{\contentsline {paragraph}{Contexts and judgments.}{4}{section*.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Well-formed contexts and typing rules.}}{5}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:typing}{{2}{5}{Well-formed contexts and typing rules}{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{Why application matters.}{5}{section*.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Universes: Why $\mathsf  {Sort}\tmspace  +\thickmuskip {.2777em}u$?}{5}{section.7}\protected@file@percent }
-\newlabel{sec:universes}{{7}{5}{Universes: Why $\mathsf {Sort}\;u$?}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}The Typing Rules as a Logic}{5}{subsection.7.1}\protected@file@percent }
-\newlabel{sec:logic}{{7.1}{5}{The Typing Rules as a Logic}{subsection.7.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Natural deduction (left) and the typing rules that implement it (right). Premises that only check that a type is well formed are omitted.}}{6}{figure.caption.6}\protected@file@percent }
-\newlabel{fig:logic}{{3}{6}{Natural deduction (left) and the typing rules that implement it (right). Premises that only check that a type is well formed are omitted}{figure.caption.6}{}}
-\newlabel{thm:pat}{{2}{6}{Proofs are terms}{theorem.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Natural deduction (left) and the typing rules that implement it (right). Premises that only check that a type is well formed are omitted.}}{4}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:logic}{{2}{4}{Natural deduction (left) and the typing rules that implement it (right). Premises that only check that a type is well formed are omitted}{figure.caption.6}{}}
+\newlabel{thm:pat}{{1}{4}{Proofs are terms}{theorem.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}A Type Checking Algorithm}{4}{section.5}\protected@file@percent }
+\newlabel{sec:algorithm}{{5}{4}{A Type Checking Algorithm}{section.5}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Type inference and checking. \textsc  {Whnf} and \textsc  {IsDefEq} are defined in Algorithm\nonbreakingspace \ref {alg:whnf}.}}{5}{algorithm.1}\protected@file@percent }
+\newlabel{alg:infer}{{1}{5}{Type inference and checking. \textsc {Whnf} and \textsc {IsDefEq} are defined in Algorithm~\ref {alg:whnf}}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Worked Examples}{6}{section.6}\protected@file@percent }
+\newlabel{sec:examples}{{6}{6}{Worked Examples}{section.6}{}}
+\@writefile{toc}{\contentsline {paragraph}{The identity proof.}{6}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A wrong proof.}{6}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Using a hypothesis: modus ponens.}{7}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Instantiating a universal statement.}{7}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Conversion.}{7}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Exercises.}{7}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Inductive Types: Natural Numbers and Equality}{8}{section.7}\protected@file@percent }
+\newlabel{sec:inductive}{{7}{8}{Inductive Types: Natural Numbers and Equality}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Constants and Definitions}{8}{subsection.7.1}\protected@file@percent }
+\newlabel{sec:constants}{{7.1}{8}{Constants and Definitions}{subsection.7.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Natural Numbers}{9}{subsection.7.2}\protected@file@percent }
+\newlabel{sec:nat}{{7.2}{9}{Natural Numbers}{subsection.7.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Constants for natural numbers and equality (top) and their $\iota $-rules (bottom). $\mathsf  {Eq.ndrec}_{u,v}$ is a definition built from $\mathsf  {Eq.rec}_{u,v}$ (\S  \ref {sec:inductive-decl}), and its rule is derived.}}{9}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:nat-eq}{{3}{9}{Constants for natural numbers and equality (top) and their $\iota $-rules (bottom). $\EqRec {u,v}$ is a definition built from $\EqRecDep {u,v}$ (\S \ref {sec:inductive-decl}), and its rule is derived}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {paragraph}{Recursion.}{9}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Induction.}{10}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Equality}{10}{subsection.7.3}\protected@file@percent }
+\newlabel{sec:eq}{{7.3}{10}{Equality}{subsection.7.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Definitional versus propositional equality.}{10}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Example: $0 + n = n$}{11}{subsection.7.4}\protected@file@percent }
+\newlabel{sec:zero-add}{{7.4}{11}{Example: $0 + n = n$}{subsection.7.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}A Second Example: Trees}{11}{subsection.7.5}\protected@file@percent }
+\newlabel{sec:tree}{{7.5}{11}{A Second Example: Trees}{subsection.7.5}{}}
+\citation{werner1994theorie}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}Inductive Declarations}{12}{subsection.7.6}\protected@file@percent }
+\newlabel{sec:inductive-decl}{{7.6}{12}{Inductive Declarations}{subsection.7.6}{}}
+\@writefile{toc}{\contentsline {paragraph}{Telescopes.}{12}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Declarations.}{12}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Acceptance.}{12}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The recursor.}{13}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The rules.}{13}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Eliminating from propositions.}{14}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Examples.}{14}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}Changes to the Kernel}{14}{subsection.7.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Tactics: Building Proof Terms Interactively}{15}{section.8}\protected@file@percent }
+\newlabel{sec:tactics}{{8}{15}{Tactics: Building Proof Terms Interactively}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Goals and Proof States}{15}{subsection.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A first example.}{15}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Basic Tactics}{15}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {intro x}.}{15}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {exact t}.}{16}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {apply f}.}{16}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {change T'}.}{16}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {rfl}.}{16}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Induction}{17}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Rewriting}{17}{subsection.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{When the motive is ill typed.}{17}{section*.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}Example: $0 + n = n$ with Tactics}{17}{subsection.8.5}\protected@file@percent }
+\newlabel{sec:zero-add-tactics}{{8.5}{17}{Example: $0 + n = n$ with Tactics}{subsection.8.5}{}}
+\citation{moura2021lean4}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.6}Why Tactics Need Not Be Trusted}{18}{subsection.8.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Under the Hood: Substitution, $\alpha $-Equivalence, and Conversion}{18}{section.9}\protected@file@percent }
+\newlabel{sec:machinery}{{9}{18}{Under the Hood: Substitution, $\alpha $-Equivalence, and Conversion}{section.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Free Variables and Substitution}{19}{subsection.9.1}\protected@file@percent }
+\newlabel{sec:subst}{{9.1}{19}{Free Variables and Substitution}{subsection.9.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Variable Capture in Contexts}{19}{subsection.9.2}\protected@file@percent }
+\newlabel{sec:capture}{{9.2}{19}{Variable Capture in Contexts}{subsection.9.2}{}}
+\citation{debruijn1972nameless}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}$\alpha $-Equivalence}{20}{subsection.9.3}\protected@file@percent }
+\newlabel{sec:alpha}{{9.3}{20}{$\alpha $-Equivalence}{subsection.9.3}{}}
+\newlabel{def:alpha}{{3}{20}{$\alpha $-equivalence}{definition.3}{}}
+\citation{debruijn1972nameless}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Algorithmic $\alpha $-equivalence. By Theorem\nonbreakingspace \ref {thm:alpha}, two terms $s$ and $t$ are $\alpha $-equivalent iff $\cdot \,;\cdot \vdash s =_{\alpha }t$.}}{21}{figure.caption.31}\protected@file@percent }
+\newlabel{fig:alpha}{{4}{21}{Algorithmic $\alpha $-equivalence. By Theorem~\ref {thm:alpha}, two terms $s$ and $t$ are $\alpha $-equivalent iff $\cdot \,;\cdot \vdash s \alphaeq t$}{figure.caption.31}{}}
+\@writefile{toc}{\contentsline {paragraph}{Examples.}{21}{section*.32}\protected@file@percent }
+\citation{barendregt1992lambda}
+\newlabel{thm:alpha}{{2}{22}{Correctness of algorithmic $\alpha $-equivalence}{theorem.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Reduction and Conversion}{22}{subsection.9.4}\protected@file@percent }
+\newlabel{sec:conversion}{{9.4}{22}{Reduction and Conversion}{subsection.9.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}Computation Rules as Data}{22}{subsection.9.5}\protected@file@percent }
+\newlabel{sec:iota-data}{{9.5}{22}{Computation Rules as Data}{subsection.9.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.6}Weak Head Normal Form and Normalization}{23}{subsection.9.6}\protected@file@percent }
+\newlabel{sec:whnf}{{9.6}{23}{Weak Head Normal Form and Normalization}{subsection.9.6}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Weak head normalization with $\beta $, $\delta $, and $\iota $; full normalization; and definitional equality.}}{23}{algorithm.2}\protected@file@percent }
+\newlabel{alg:whnf}{{2}{23}{Weak head normalization with $\beta $, $\delta $, and $\iota $; full normalization; and definitional equality}{algorithm.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Universes: Why $\mathsf  {Sort}\tmspace  +\thickmuskip {.2777em}u$?}{24}{section.10}\protected@file@percent }
+\newlabel{sec:universes}{{10}{24}{Universes: Why $\mathsf {Sort}\;u$?}{section.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}What Is the Type of $\mathsf  {Sort}\tmspace  +\thickmuskip {.2777em}0$?}{24}{subsection.10.1}\protected@file@percent }
 \citation{girard1972interpretation}
 \citation{hurkens1995simplification}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}What Is the Type of $\mathsf  {Sort}\tmspace  +\thickmuskip {.2777em}0$?}{7}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Type Is Not a Type}{7}{subsection.7.3}\protected@file@percent }
-\newlabel{sec:typetype}{{7.3}{7}{Type Is Not a Type}{subsection.7.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}A Hierarchy with an Impredicative Bottom}{7}{subsection.7.4}\protected@file@percent }
-\newlabel{sec:hierarchy}{{7.4}{7}{A Hierarchy with an Impredicative Bottom}{subsection.7.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}Type Is Not a Type}{25}{subsection.10.2}\protected@file@percent }
+\newlabel{sec:typetype}{{10.2}{25}{Type Is Not a Type}{subsection.10.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}A Hierarchy with an Impredicative Bottom}{25}{subsection.10.3}\protected@file@percent }
+\newlabel{sec:hierarchy}{{10.3}{25}{A Hierarchy with an Impredicative Bottom}{subsection.10.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Propositions are impredicative.}{25}{section*.33}\protected@file@percent }
 \citation{coquand1988calculus}
 \citation{hurkens1995simplification}
 \citation{moura2021lean4}
-\citation{barendregt1992lambda}
-\@writefile{toc}{\contentsline {paragraph}{Propositions are impredicative.}{8}{section*.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Types are predicative.}{8}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Why this is safe.}{8}{section*.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Comparison with Lean}{8}{subsection.7.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}A Type Checking Algorithm}{8}{section.8}\protected@file@percent }
-\newlabel{sec:algorithm}{{8}{8}{A Type Checking Algorithm}{section.8}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Design choices for universes.}}{9}{table.caption.10}\protected@file@percent }
-\newlabel{tab:universes}{{1}{9}{Design choices for universes}{table.caption.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Worked Examples}{9}{section.9}\protected@file@percent }
-\newlabel{sec:examples}{{9}{9}{Worked Examples}{section.9}{}}
-\@writefile{toc}{\contentsline {paragraph}{The identity proof.}{9}{section*.11}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Type inference, checking, and normalization.}}{10}{algorithm.1}\protected@file@percent }
-\newlabel{alg:infer}{{1}{10}{Type inference, checking, and normalization}{algorithm.1}{}}
-\@writefile{toc}{\contentsline {paragraph}{A wrong proof.}{11}{section*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Conversion.}{11}{section*.13}\protected@file@percent }
-\citation{debruijn1972nameless}
 \citation{coquand1988calculus}
 \citation{luo1990extended}
 \citation{barendregt1992lambda}
 \citation{girard1972interpretation,coquand1988calculus,luo1990extended}
-\@writefile{toc}{\contentsline {paragraph}{An exercise.}{12}{section*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {10}A Pitfall: Variable Capture in Contexts}{12}{section.10}\protected@file@percent }
-\newlabel{sec:capture}{{10}{12}{A Pitfall: Variable Capture in Contexts}{section.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {11}Properties}{12}{section.11}\protected@file@percent }
-\newlabel{sec:properties}{{11}{12}{Properties}{section.11}{}}
-\newlabel{thm:consistency}{{7}{13}{Consistency}{theorem.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {12}Inductive Types: Natural Numbers and Equality}{13}{section.12}\protected@file@percent }
-\newlabel{sec:inductive}{{12}{13}{Inductive Types: Natural Numbers and Equality}{section.12}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.1}Constants and Definitions}{13}{subsection.12.1}\protected@file@percent }
-\newlabel{sec:constants}{{12.1}{13}{Constants and Definitions}{subsection.12.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.2}Natural Numbers}{14}{subsection.12.2}\protected@file@percent }
-\newlabel{sec:nat}{{12.2}{14}{Natural Numbers}{subsection.12.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Constants for natural numbers and equality (top) and their $\iota $-rules (bottom). $\mathsf  {Eq.ndrec}_{u,v}$ is a definition built from $\mathsf  {Eq.rec}_{u,v}$ (\S  \ref {sec:inductive-decl}), and its rule is derived.}}{14}{figure.caption.15}\protected@file@percent }
-\newlabel{fig:nat-eq}{{4}{14}{Constants for natural numbers and equality (top) and their $\iota $-rules (bottom). $\EqRec {u,v}$ is a definition built from $\EqRecDep {u,v}$ (\S \ref {sec:inductive-decl}), and its rule is derived}{figure.caption.15}{}}
-\@writefile{toc}{\contentsline {paragraph}{Recursion.}{14}{section*.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Induction.}{15}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.3}Equality}{15}{subsection.12.3}\protected@file@percent }
-\newlabel{sec:eq}{{12.3}{15}{Equality}{subsection.12.3}{}}
-\@writefile{toc}{\contentsline {paragraph}{Definitional versus propositional equality.}{15}{section*.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.4}Example: $0 + n = n$}{15}{subsection.12.4}\protected@file@percent }
-\newlabel{sec:zero-add}{{12.4}{15}{Example: $0 + n = n$}{subsection.12.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.5}Computation Rules as Data}{16}{subsection.12.5}\protected@file@percent }
-\newlabel{sec:iota-data}{{12.5}{16}{Computation Rules as Data}{subsection.12.5}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces \textsc  {Whnf} with $\delta $ and $\iota $. Lines 6--12 are new; the rest is as in Algorithm\nonbreakingspace \ref {alg:infer}.}}{16}{algorithm.2}\protected@file@percent }
-\newlabel{alg:whnf-iota}{{2}{16}{\textsc {Whnf} with $\delta $ and $\iota $. Lines 6--12 are new; the rest is as in Algorithm~\ref {alg:infer}}{algorithm.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.6}Inductive Declarations}{16}{subsection.12.6}\protected@file@percent }
-\newlabel{sec:inductive-decl}{{12.6}{16}{Inductive Declarations}{subsection.12.6}{}}
-\citation{werner1994theorie}
-\@writefile{toc}{\contentsline {paragraph}{Telescopes.}{17}{section*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Declarations.}{17}{section*.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Acceptance.}{17}{section*.21}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{The recursor.}{18}{section*.22}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{The rules.}{18}{section*.23}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Eliminating from propositions.}{18}{section*.24}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Examples.}{18}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Types are predicative.}{26}{section*.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Why this is safe.}{26}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.4}Comparison with Lean}{26}{subsection.10.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Design choices for universes.}}{26}{table.caption.36}\protected@file@percent }
+\newlabel{tab:universes}{{1}{26}{Design choices for universes}{table.caption.36}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {11}Properties}{26}{section.11}\protected@file@percent }
+\newlabel{sec:properties}{{11}{26}{Properties}{section.11}{}}
 \citation{werner1994theorie}
 \citation{carneiro2019type}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.7}Changes to the Kernel and Its Properties}{19}{subsection.12.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13}Tactics: Building Proof Terms Interactively}{19}{section.13}\protected@file@percent }
-\newlabel{sec:tactics}{{13}{19}{Tactics: Building Proof Terms Interactively}{section.13}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.1}Goals and Proof States}{19}{subsection.13.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2}Basic Tactics}{19}{subsection.13.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {intro x}.}{19}{section*.26}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {exact t}.}{20}{section*.27}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {apply f}.}{20}{section*.28}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {change T'}.}{20}{section*.29}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {rfl}.}{20}{section*.30}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.3}Induction}{20}{subsection.13.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.4}Rewriting}{21}{subsection.13.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{When the motive is ill typed.}{21}{section*.31}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.5}Example: $0 + n = n$ with Tactics}{21}{subsection.13.5}\protected@file@percent }
-\newlabel{sec:zero-add-tactics}{{13.5}{21}{Example: $0 + n = n$ with Tactics}{subsection.13.5}{}}
-\citation{moura2021lean4}
 \bibcite{carneiro2019type}{{1}{}{{}}{{}}}
 \bibcite{coquand1988calculus}{{2}{}{{}}{{}}}
 \bibcite{luo1990extended}{{3}{}{{}}{{}}}
@@ -127,38 +138,39 @@
 \bibcite{girard1972interpretation}{{7}{}{{}}{{}}}
 \bibcite{hurkens1995simplification}{{8}{}{{}}{{}}}
 \bibcite{moura2021lean4}{{9}{}{{}}{{}}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.6}Why Tactics Need Not Be Trusted}{22}{subsection.13.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{22}{section*.33}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {A}Proof of Theorem\nonbreakingspace \ref {thm:alpha}}{22}{appendix.A}\protected@file@percent }
-\newlabel{app:alpha}{{A}{22}{Proof of Theorem~\ref {thm:alpha}}{appendix.A}{}}
-\@writefile{toc}{\contentsline {paragraph}{Nameless terms.}{22}{section*.34}\protected@file@percent }
-\newlabel{lem:alpha-alg}{{8}{22}{The algorithm compares nameless forms}{theorem.8}{}}
-\newlabel{lem:alpha-agree}{{9}{23}{Agreement}{theorem.9}{}}
-\newlabel{lem:alpha-rename}{{10}{23}{Renaming}{theorem.10}{}}
-\newlabel{lem:alpha-def}{{11}{24}{The definition compares nameless forms}{theorem.11}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {B}Proof of Theorem\nonbreakingspace \ref {thm:pat}}{24}{appendix.B}\protected@file@percent }
-\newlabel{app:pat}{{B}{24}{Proof of Theorem~\ref {thm:pat}}{appendix.B}{}}
-\@writefile{toc}{\contentsline {paragraph}{The precise statement.}{24}{section*.35}\protected@file@percent }
-\newlabel{thm:pat-precise}{{12}{24}{Theorem~\ref {thm:pat}, precise form}{theorem.12}{}}
-\@writefile{toc}{\contentsline {paragraph}{Facts about the translation.}{25}{section*.36}\protected@file@percent }
-\newlabel{lem:formula-type}{{13}{25}{Formulas are propositions}{theorem.13}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {C}Hurkens' Paradox}{25}{appendix.C}\protected@file@percent }
-\newlabel{app:hurkens}{{C}{25}{Hurkens' Paradox}{appendix.C}{}}
-\@writefile{toc}{\contentsline {paragraph}{How the term works.}{25}{section*.38}\protected@file@percent }
+\newlabel{thm:consistency}{{7}{27}{Consistency}{theorem.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{With inductive types.}{27}{section*.37}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{27}{section*.39}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Proof of Theorem\nonbreakingspace \ref {thm:pat}}{27}{appendix.A}\protected@file@percent }
+\newlabel{app:pat}{{A}{27}{Proof of Theorem~\ref {thm:pat}}{appendix.A}{}}
+\@writefile{toc}{\contentsline {paragraph}{The precise statement.}{27}{section*.40}\protected@file@percent }
+\newlabel{thm:pat-precise}{{8}{28}{Theorem~\ref {thm:pat}, precise form}{theorem.8}{}}
+\@writefile{toc}{\contentsline {paragraph}{Facts about the translation.}{28}{section*.41}\protected@file@percent }
+\newlabel{lem:formula-type}{{9}{28}{Formulas are propositions}{theorem.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Proof of Theorem\nonbreakingspace \ref {thm:alpha}}{28}{appendix.B}\protected@file@percent }
+\newlabel{app:alpha}{{B}{28}{Proof of Theorem~\ref {thm:alpha}}{appendix.B}{}}
+\@writefile{toc}{\contentsline {paragraph}{Nameless terms.}{28}{section*.42}\protected@file@percent }
+\newlabel{lem:alpha-alg}{{10}{29}{The algorithm compares nameless forms}{theorem.10}{}}
+\newlabel{lem:alpha-agree}{{11}{29}{Agreement}{theorem.11}{}}
+\newlabel{lem:alpha-rename}{{12}{29}{Renaming}{theorem.12}{}}
+\newlabel{lem:alpha-def}{{13}{30}{The definition compares nameless forms}{theorem.13}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {C}Hurkens' Paradox}{30}{appendix.C}\protected@file@percent }
+\newlabel{app:hurkens}{{C}{30}{Hurkens' Paradox}{appendix.C}{}}
+\@writefile{toc}{\contentsline {paragraph}{How the term works.}{30}{section*.44}\protected@file@percent }
 \citation{barendregt1992lambda}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Hurkens' paradox in a system with $\mathsf  {Type} : \mathsf  {Type}$. The first six lines are abbreviations, expanded in place; $t_{\mathrm  {H}}$ has type $\bot $.}}{26}{figure.caption.37}\protected@file@percent }
-\newlabel{fig:hurkens}{{5}{26}{Hurkens' paradox in a system with $\mathsf {Type} : \mathsf {Type}$. The first six lines are abbreviations, expanded in place; $t_{\mathrm {H}}$ has type $\bot $}{figure.caption.37}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {D}Proof of Theorem\nonbreakingspace \ref {thm:consistency}}{26}{appendix.D}\protected@file@percent }
-\newlabel{app:consistency}{{D}{26}{Proof of Theorem~\ref {thm:consistency}}{appendix.D}{}}
-\@writefile{toc}{\contentsline {paragraph}{Facts about the type system.}{26}{section*.39}\protected@file@percent }
-\newlabel{lem:pts}{{14}{26}{}{theorem.14}{}}
-\@writefile{toc}{\contentsline {paragraph}{Shapes of normal terms.}{26}{section*.40}\protected@file@percent }
-\newlabel{lem:normal-shape}{{15}{26}{Normal forms}{theorem.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Hurkens' paradox in a system with $\mathsf  {Type} : \mathsf  {Type}$. The first six lines are abbreviations, expanded in place; $t_{\mathrm  {H}}$ has type $\bot $.}}{31}{figure.caption.43}\protected@file@percent }
+\newlabel{fig:hurkens}{{5}{31}{Hurkens' paradox in a system with $\mathsf {Type} : \mathsf {Type}$. The first six lines are abbreviations, expanded in place; $t_{\mathrm {H}}$ has type $\bot $}{figure.caption.43}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {D}Proof of Theorem\nonbreakingspace \ref {thm:consistency}}{31}{appendix.D}\protected@file@percent }
+\newlabel{app:consistency}{{D}{31}{Proof of Theorem~\ref {thm:consistency}}{appendix.D}{}}
+\@writefile{toc}{\contentsline {paragraph}{Facts about the type system.}{31}{section*.45}\protected@file@percent }
+\newlabel{lem:pts}{{14}{31}{}{theorem.14}{}}
 \newlabel{tocindent-1}{0pt}
 \newlabel{tocindent0}{0pt}
 \newlabel{tocindent1}{9.29999pt}
 \newlabel{tocindent2}{16.14998pt}
 \newlabel{tocindent3}{0pt}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\newlabel{TotPages}{{27}{27}{}{page.27}{}}
-\gdef \@abspage@last{27}
+\@writefile{toc}{\contentsline {paragraph}{Shapes of normal terms.}{32}{section*.46}\protected@file@percent }
+\newlabel{lem:normal-shape}{{15}{32}{Normal forms}{theorem.15}{}}
+\newlabel{TotPages}{{32}{32}{}{page.32}{}}
+\gdef \@abspage@last{32}

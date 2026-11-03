@@ -1,0 +1,16 @@
+# Addition by recursion on the second argument:
+#   add m zero     = m
+#   add m (succ k) = succ (add m k)
+def add : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) m (fun (k : Nat) => fun (r : Nat) => Nat.succ r) n
+
+# add zero n = n is not definitional, so it needs induction on n.
+goal forall (n : Nat), Eq Nat (add Nat.zero n) n
+intro n
+induction n
+# Base case: add zero zero reduces to zero.
+rfl
+# Step case: unfold add zero (succ k) to succ (add zero k), then use ih.
+change Eq Nat (Nat.succ (add Nat.zero k)) (Nat.succ k)
+rw ih
+rfl
+qed

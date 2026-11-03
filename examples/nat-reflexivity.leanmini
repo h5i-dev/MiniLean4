@@ -1,0 +1,8 @@
+# Every natural number equals itself, proved by induction on Nat.
+# Each case closes by rfl because both sides are syntactically the same.
+goal forall (n : Nat), Eq Nat n n
+intro n
+induction n
+rfl
+rfl
+qed

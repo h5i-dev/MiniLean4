@@ -1,0 +1,6 @@
+# The polymorphic identity on propositions: for every P, P -> P.
+goal forall (P : Sort 0), P -> P
+intro P
+intro p
+exact p
+qed

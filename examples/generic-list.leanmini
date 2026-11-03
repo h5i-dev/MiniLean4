@@ -1,0 +1,12 @@
+# A user-declared polymorphic list. Declaring it generates List.rec0, List.rec1, ...
+inductive List (A : Sort 1) : Sort 1 where
+  | nil
+  | cons (head : A) (tail : List A)
+
+# induction works for any non-indexed inductive, not only Nat.
+goal forall (xs : List Nat), Eq (List Nat) xs xs
+intro xs
+induction xs
+rfl
+rfl
+qed

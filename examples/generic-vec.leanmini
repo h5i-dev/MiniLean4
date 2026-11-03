@@ -1,0 +1,14 @@
+# Length-indexed vectors. The index n varies between constructors,
+# so it is declared with the `index` keyword in the header.
+inductive Vec (A : Sort 1) (index n : Nat) : Sort 1 where
+  | nil : Vec A Nat.zero
+  | cons (n : Nat) (head : A) (tail : Vec A n) : Vec A (Nat.succ n)
+
+# Constructors take the parameter A explicitly.
+def one : Vec Nat (Nat.succ Nat.zero) := Vec.cons Nat Nat.zero Nat.zero (Vec.nil Nat)
+
+# The tactic `induction` does not support indexed families yet,
+# but the kernel still checks terms that use Vec directly.
+goal Eq (Vec Nat (Nat.succ Nat.zero)) one (Vec.cons Nat Nat.zero Nat.zero (Vec.nil Nat))
+rfl
+qed

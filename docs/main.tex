@@ -804,20 +804,11 @@ A function such as addition must look at a number and act differently on $\zero$
 
 \paragraph{Computing: addition.}
 How should addition be defined?
-In Lean one writes it by pattern matching and recursion on the second argument:
-\begin{lstlisting}[numbers=none, columns=fullflexible, keepspaces=true]
-def add : Nat -> Nat -> Nat
-  | m, zero   => m
-  | m, succ k => succ (add m k)
-\end{lstlisting}
-that is,
+It can be defined by recursion on the second argument:
 \[
 \add\;m\;\zero = m, \qquad \add\;m\;(\tsucc\;k) = \tsucc\;(\add\;m\;k).
 \]
-Our kernel has neither pattern matching nor recursive definitions, and it should not get general recursion:
-a definition $\mathit{bad} : \tPi{P}{\Sort{0}}{P} \mathrel{:=} \mathit{bad}$ would type-check and prove False.
-
-Instead, look at the shape of the definition.
+Look at the shape of this definition.
 For a fixed $m$, the function $\add\;m$ is determined by two pieces of data:
 its value on $\zero$, which is $m$, and a way to turn its value $r$ on $k$ into its value on $\tsucc\;k$, which is $\tsucc\;r$.
 Every function $f : \Nat \to C$ defined by recursion of this kind, called \emph{structural recursion}, has the same shape:
@@ -825,7 +816,7 @@ Every function $f : \Nat \to C$ defined by recursion of this kind, called \emph{
 f\;\zero = z, \qquad f\;(\tsucc\;k) = s\;k\;(f\;k),
 \]
 for some $z : C$ and $s : \Nat \to C \to C$; the step $s$ receives both $k$ and the result $f\;k$ of the recursive call.
-So instead of allowing recursive definitions, we add one constant that builds $f$ from $z$ and $s$, once and for all:
+So we add one constant that builds $f$ from $z$ and $s$, once and for all:
 \[
 \mathsf{rec}_C : C \to (\Nat \to C \to C) \to \Nat \to C,
 \]

@@ -1,37 +1,36 @@
-# Mini Lean 4
+# MiniLean4
 
-## Commands
+A minimal, self-contained implementation of a Lean 4-style theorem prover kernel in Rust.
 
-```sh
-cargo test
+`MiniLean4` is built from scratch to illustrate the core foundations of dependent type theory, inductive types, and kernel type checking without the complexity of a full production prover.
+
+## Features
+
+- **Dependent Type Theory Core**: Dependent function types ($\Pi$-types), universe hierarchy, and term representation (`src/term.rs`).
+- **Type Checking & Reduction**: Type inference (`src/typecheck.rs`), $\beta/\delta/\iota$-reduction (`src/reduction.rs`), capture-avoiding substitution, and $\alpha$-equivalence (`src/substitution.rs`).
+- **Inductive Types**: Support for inductive declarations, strict positivity checking (`src/inductive/positivity.rs`), and recursor generation (`src/inductive/recursor.rs`).
+- **Minimal DSL (`.leanmini`)**: Custom syntax parser (`src/syntax.rs`) and CLI runner for verifying `.leanmini` proof scripts.
+
+## Quick Start
+
+### Run Examples
+
+Verify the example proofs in the [`examples/`](./examples) directory using Cargo:
+
+```bash
+cargo run -- examples/identity.leanmini
+cargo run -- examples/nat-reflexivity.leanmini
 cargo run -- examples/zero-add.leanmini
 cargo run -- examples/generic-list.leanmini
 cargo run -- examples/generic-vec.leanmini
-cargo run -- examples/identity.leanmini
-cargo run -- examples/nat-reflexivity.leanmini
 ```
 
-## Source-level inductive syntax
+### Run Tests
 
-```text
-inductive List (A : Sort 1) : Sort 1 where
-  | nil
-  | cons (head : A) (tail : List A)
-
-goal forall (xs : List Nat), Eq (List Nat) xs xs
-intro xs
-induction xs
-rfl
-rfl
-qed
+```bash
+cargo test
 ```
 
-Indexed inductives are expressible with explicit index binders and constructor result indices:
+## License
 
-```text
-inductive Vec (A : Sort 1) (index n : Nat) : Sort 1 where
-  | nil : Vec A Nat.zero
-  | cons (n : Nat) (head : A) (tail : Vec A n) : Vec A (Nat.succ n)
-```
-
-The file-mode parser collects lines beginning with `|` as constructors until the next command. The Rust API offers richer explicit AST construction without surface syntax. `induction` is constructor-generic for **non-indexed** inductive types. Indexed recursor generation and reduction are supported, but indexed tactic elaboration is not. `rw` currently targets the built-in `Eq` declaration, which itself is generated through the general inductive API.
+See [LICENSE](./LICENSE) for details.

@@ -1,8 +1,6 @@
 # MiniLean4
 
-A minimal, self-contained implementation of a Lean 4-style theorem prover kernel in Rust.
-
-`MiniLean4` is built from scratch to illustrate the core foundations of dependent type theory, inductive types, and kernel type checking without the complexity of a full production prover.
+A minimal, self-contained implementation of a Lean 4-style theorem prover kernel in Rust. This repository is built from scratch to illustrate the core foundations of dependent type theory, inductive types, and kernel type checking without the complexity of a full production prover.
 
 ## Features
 

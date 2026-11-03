@@ -22,7 +22,7 @@ fn run_line(k: &mut Kernel, state: &mut Option<ProofState>, line: &str) -> Resul
             .trim()
             .parse::<u64>()
             .map_err(|_| "invalid universe level")?;
-        k.ensure_recursor_level(name.trim(), level)?;
+        k.register_recursor(name.trim(), level)?;
         println!("generated {}.rec{}", name.trim(), level);
         return Ok(true);
     }

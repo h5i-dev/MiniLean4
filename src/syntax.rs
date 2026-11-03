@@ -1,10 +1,10 @@
 //! Tiny, explicit-input frontend. Not a full Lean 4 elaborator.
 
 use crate::{
-    decl::{ConstructorSpec, Context, InductiveSpec},
+    declaration::{ConstructorSpec, Context, InductiveSpec},
     kernel::{Kernel, Result},
     term::{
-        all_names, app, arrow, fresh, fv, konst, lam, pi, subst, var,
+        app, arrow, const_term, lam, pi, var,
         Term::{self, Sort},
     },
 };
@@ -154,7 +154,7 @@ impl Parser<'_> {
         if self.locals.iter().any(|x| x == &name) {
             Ok(var(&name))
         } else if self.k.type_of_const(&name).is_some() || self.known.contains(&name) {
-            Ok(konst(&name))
+            Ok(const_term(&name))
         } else {
             Err(format!("unknown identifier: {name}"))
         }
@@ -281,7 +281,7 @@ pub fn parse_inductive(k: &Kernel, lines: &[String]) -> Result<InductiveSpec> {
     }
     let mut header_ctx = params.clone();
     header_ctx.extend(indices.clone());
-    let sort = match parse_term(k, &header_ctx, universe)? {
+    let universe_level = match parse_term(k, &header_ctx, universe)? {
         Term::Sort(u) => u,
         _ => return Err("inductive result must be Sort u".into()),
     };
@@ -342,7 +342,7 @@ pub fn parse_inductive(k: &Kernel, lines: &[String]) -> Result<InductiveSpec> {
         name: name.into(),
         params,
         indices,
-        sort,
+        universe_level,
         constructors,
     })
 }

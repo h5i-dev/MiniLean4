@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 
 use crate::{
-    decl::{ConstructorSpec, Context, DeclKind, InductiveSpec},
+    declaration::{Context, DeclKind},
+    inductive::recursor::{recursor_name, INDUCTION_HYPOTHESIS_PREFIX},
     kernel::{Kernel, Result},
+    substitution::{all_names, alpha, fresh, fv, subst},
     template::Template,
     term::{
-        all_names, alpha, app, apps, arrow, fresh, fv, konst, lam, pi, spine, subst, var,
+        app, apps, arrow, const_term, lam, pi, spine, var,
         Term::{self, App, Const, Lam, Pi},
     },
 };
@@ -114,7 +116,7 @@ impl ProofState {
         let mut proof = Template::Fixed(f);
         loop {
             ft = k.whnf(&ft)?;
-            if k.conv(&ft, &g.target)? {
+            if k.is_def_eq(&ft, &g.target)? {
                 break;
             }
             match ft {
@@ -143,7 +145,7 @@ impl ProofState {
     pub fn change(&mut self, k: &Kernel, ty: Term) -> Result<()> {
         let g = self.current()?;
         k.infer_sort(&g.context, &ty)?;
-        if !k.conv(&g.target, &ty)? {
+        if !k.is_def_eq(&g.target, &ty)? {
             return Err("change expects definitionally equal target".into());
         }
         self.pending[0].target = ty;
@@ -152,15 +154,15 @@ impl ProofState {
     pub fn rfl(&mut self, k: &Kernel) -> Result<()> {
         let g = self.current()?;
         let (h, args) = spine(&k.whnf(&g.target)?);
-        if h != konst("Eq") || args.len() != 3 {
+        if h != const_term("Eq") || args.len() != 3 {
             return Err("rfl expects Eq A lhs rhs".into());
         }
-        if !k.conv(&args[1], &args[2])? {
+        if !k.is_def_eq(&args[1], &args[2])? {
             return Err("rfl: sides are not definitionally equal".into());
         }
         self.exact(
             k,
-            apps(konst("Eq.refl"), [args[0].clone(), args[1].clone()]),
+            apps(const_term("Eq.refl"), [args[0].clone(), args[1].clone()]),
         )
     }
     /// Constructor-generic induction for non-indexed inductive families.
@@ -188,18 +190,21 @@ impl ProofState {
         if !matches!(decl.kind, DeclKind::Inductive) {
             return Err("induction expects inductive type".into());
         }
+        let inductive = k.inductive(&name).ok_or("unknown inductive")?;
         let level = k.infer_sort(&g.context, &g.target)?;
-        let rec_name = format!("{name}.rec{level}");
-        let rec_info = match k.decls.get(&rec_name).map(|d| &d.kind) {
-            Some(DeclKind::Recursor { spec }) => spec,
-            _ => return Err("no elimination recursor at target universe".into()),
-        };
-        if !rec_info.indices.is_empty() {
+        let rec_name = recursor_name(&name, level);
+        if !matches!(
+            k.decls.get(&rec_name).map(|d| &d.kind),
+            Some(DeclKind::Recursor(_))
+        ) {
+            return Err("no elimination recursor at target universe".into());
+        }
+        if !inductive.indices.is_empty() {
             return Err(
                 "indexed induction requires motive/index elaboration (not implemented)".into(),
             );
         }
-        if args.len() != rec_info.params.len() {
+        if args.len() != inductive.params.len() {
             return Err("inductive parameter arity mismatch".into());
         }
         let mut used = all_names(&g.target);
@@ -212,10 +217,10 @@ impl ProofState {
         let mut prefix: Vec<Term> = args.clone();
         prefix.push(motive);
         // The generated recursor *type* determines the branch binders and IHs.
-        let mut rec_ty = k.infer(&g.context, &apps(konst(&rec_name), prefix.clone()))?;
+        let mut rec_ty = k.infer(&g.context, &apps(const_term(&rec_name), prefix.clone()))?;
         let mut new_goals = vec![];
         let mut proof_args = vec![];
-        for ctor in &rec_info.constructors {
+        for ctor in &inductive.constructors {
             let mut branch: Vec<(String, Term)> = vec![];
             let (minor_name, minor_ty, rest) = match k.whnf(&rec_ty)? {
                 Term::Pi(old, domain, body) => (old, *domain, *body),
@@ -223,7 +228,7 @@ impl ProofState {
             };
             let mut target = minor_ty;
             let mut fields = vec![];
-            let binders = ctor.fields.len() + ctor.recursive.len();
+            let binders = ctor.fields.len() + ctor.recursive_fields.len();
             for _ in 0..binders {
                 match target {
                     Term::Pi(old, domain, body) => {
@@ -233,7 +238,7 @@ impl ProofState {
                             avoid.extend(all_names(ty));
                         }
                         // Readable names for the standard Nat induction example.
-                        let preferred = if old.starts_with("__ih_") {
+                        let preferred = if old.starts_with(INDUCTION_HYPOTHESIS_PREFIX) {
                             "ih"
                         } else if old == "n" && avoid.contains("n") {
                             "k"
@@ -272,7 +277,7 @@ impl ProofState {
         }
         // Need to apply the recursor to the original induction variable.
         let proof = tapps(
-            Template::Fixed(apps(konst(&rec_name), prefix)),
+            Template::Fixed(apps(const_term(&rec_name), prefix)),
             proof_args
                 .into_iter()
                 .chain(std::iter::once(Template::Fixed(var(n)))),
@@ -288,7 +293,7 @@ impl ProofState {
     pub fn rw(&mut self, k: &Kernel, equality: Term) -> Result<()> {
         let g = self.current()?;
         let (h, args) = spine(&k.whnf(&k.infer(&g.context, &equality)?)?);
-        if h != konst("Eq") || args.len() != 3 {
+        if h != const_term("Eq") || args.len() != 3 {
             return Err("rw expects proof of equality".into());
         }
         let (a, lhs, rhs) = (args[0].clone(), args[1].clone(), args[2].clone());
@@ -315,13 +320,13 @@ impl ProofState {
             a.clone(),
             lam(
                 &eq_proof,
-                apps(konst("Eq"), [a.clone(), lhs.clone(), var(&v)]),
+                apps(const_term("Eq"), [a.clone(), lhs.clone(), var(&v)]),
                 arrow(app(c.clone(), var(&v)), old.clone()),
             ),
         );
         let base = lam("rw_proof", old.clone(), var("rw_proof"));
         let transport = apps(
-            konst("Eq.rec0"),
+            const_term("Eq.rec0"),
             [a, lhs, transport_motive, base, rhs, equality],
         );
         let id = self.new_id();
@@ -389,7 +394,10 @@ fn replace_exact(t: &Term, from: &Term, to: &Term) -> (Term, bool) {
 
 #[cfg(test)]
 mod tests {
-    use crate::term::Term::Sort;
+    use crate::{
+        declaration::{ConstructorSpec, InductiveSpec},
+        term::Term::Sort,
+    };
 
     use super::*;
 
@@ -400,7 +408,7 @@ mod tests {
             name: "List".into(),
             params: vec![("A".into(), Sort(1))],
             indices: vec![],
-            sort: 1,
+            universe_level: 1,
             constructors: vec![
                 ConstructorSpec {
                     name: "List.nil".into(),
@@ -411,19 +419,19 @@ mod tests {
                     name: "List.cons".into(),
                     fields: vec![
                         ("head".into(), var("A")),
-                        ("tail".into(), app(konst("List"), var("A"))),
+                        ("tail".into(), app(const_term("List"), var("A"))),
                     ],
                     result_indices: vec![],
                 },
             ],
         })
         .unwrap();
-        let nat = konst("Nat");
-        let list_nat = app(konst("List"), nat);
+        let nat = const_term("Nat");
+        let list_nat = app(const_term("List"), nat);
         let goal = pi(
             "xs",
             list_nat.clone(),
-            apps(konst("Eq"), [list_nat, var("xs"), var("xs")]),
+            apps(const_term("Eq"), [list_nat, var("xs"), var("xs")]),
         );
         let mut state = ProofState::new(&k, goal).unwrap();
         state.intro(&k, "xs").unwrap();
@@ -437,39 +445,39 @@ mod tests {
     #[test]
     fn generic_indexed_vec_recursor_reduces() {
         let mut k = Kernel::standard();
-        let nat = konst("Nat");
+        let nat = const_term("Nat");
         k.add_inductive(InductiveSpec {
             name: "Vec".into(),
             params: vec![("A".into(), Sort(1))],
             indices: vec![("len".into(), nat.clone())],
-            sort: 1,
+            universe_level: 1,
             constructors: vec![
                 ConstructorSpec {
                     name: "Vec.nil".into(),
                     fields: vec![],
-                    result_indices: vec![konst("Nat.zero")],
+                    result_indices: vec![const_term("Nat.zero")],
                 },
                 ConstructorSpec {
                     name: "Vec.cons".into(),
                     fields: vec![
                         ("n".into(), nat.clone()),
                         ("head".into(), var("A")),
-                        ("tail".into(), apps(konst("Vec"), [var("A"), var("n")])),
+                        ("tail".into(), apps(const_term("Vec"), [var("A"), var("n")])),
                     ],
-                    result_indices: vec![app(konst("Nat.succ"), var("n"))],
+                    result_indices: vec![app(const_term("Nat.succ"), var("n"))],
                 },
             ],
         })
         .unwrap();
-        let vec_nat = apps(konst("Vec"), [nat.clone(), konst("Nat.zero")]);
-        let nil = app(konst("Vec.nil"), nat.clone());
+        let vec_nat = apps(const_term("Vec"), [nat.clone(), const_term("Nat.zero")]);
+        let nil = app(const_term("Vec.nil"), nat.clone());
         k.check(&vec![], &nil, &vec_nat).unwrap();
         let motive = lam(
             "n",
             nat.clone(),
             lam(
                 "xs",
-                apps(konst("Vec"), [nat.clone(), var("n")]),
+                apps(const_term("Vec"), [nat.clone(), var("n")]),
                 nat.clone(),
             ),
         );
@@ -481,24 +489,24 @@ mod tests {
                 nat.clone(),
                 lam(
                     "tail",
-                    apps(konst("Vec"), [nat.clone(), var("n")]),
-                    lam("ih", nat.clone(), app(konst("Nat.succ"), var("ih"))),
+                    apps(const_term("Vec"), [nat.clone(), var("n")]),
+                    lam("ih", nat.clone(), app(const_term("Nat.succ"), var("ih"))),
                 ),
             ),
         );
         let t = apps(
-            konst("Vec.rec1"),
+            const_term("Vec.rec1"),
             [
                 nat.clone(),
                 motive,
-                konst("Nat.zero"),
+                const_term("Nat.zero"),
                 succ,
-                konst("Nat.zero"),
+                const_term("Nat.zero"),
                 nil,
             ],
         );
         k.check(&vec![], &t, &nat).unwrap();
-        assert!(k.conv(&t, &konst("Nat.zero")).unwrap());
+        assert!(k.is_def_eq(&t, &const_term("Nat.zero")).unwrap());
     }
     #[test]
     fn rejects_negative_recursive_field() {
@@ -507,10 +515,10 @@ mod tests {
             name: "Bad".into(),
             params: vec![],
             indices: vec![],
-            sort: 1,
+            universe_level: 1,
             constructors: vec![ConstructorSpec {
                 name: "Bad.mk".into(),
-                fields: vec![("f".into(), arrow(konst("Bad"), konst("Nat")))],
+                fields: vec![("f".into(), arrow(const_term("Bad"), const_term("Nat")))],
                 result_indices: vec![],
             }],
         };
@@ -529,25 +537,25 @@ mod tests {
     #[test]
     fn nat_rec_reduction() {
         let k = Kernel::standard();
-        let nat = konst("Nat");
+        let nat = const_term("Nat");
         let m = lam("n", nat.clone(), nat.clone());
         let succ = lam(
             "n",
             nat.clone(),
-            lam("x", nat.clone(), app(konst("Nat.succ"), var("x"))),
+            lam("x", nat.clone(), app(const_term("Nat.succ"), var("x"))),
         );
-        let two = app(konst("Nat.succ"), app(konst("Nat.succ"), konst("Nat.zero")));
-        let t = apps(konst("Nat.rec1"), [m, konst("Nat.zero"), succ, two.clone()]);
+        let two = app(const_term("Nat.succ"), app(const_term("Nat.succ"), const_term("Nat.zero")));
+        let t = apps(const_term("Nat.rec1"), [m, const_term("Nat.zero"), succ, two.clone()]);
         k.check(&vec![], &t, &nat).unwrap();
-        assert!(k.conv(&t, &two).unwrap());
+        assert!(k.is_def_eq(&t, &two).unwrap());
     }
     #[test]
     fn eq_refl_and_rec() {
         let k = Kernel::standard();
-        let nat = konst("Nat");
-        let z = konst("Nat.zero");
-        let refl = apps(konst("Eq.refl"), [nat.clone(), z.clone()]);
-        let goal = apps(konst("Eq"), [nat.clone(), z.clone(), z.clone()]);
+        let nat = const_term("Nat");
+        let z = const_term("Nat.zero");
+        let refl = apps(const_term("Eq.refl"), [nat.clone(), z.clone()]);
+        let goal = apps(const_term("Eq"), [nat.clone(), z.clone(), z.clone()]);
         k.check(&vec![], &refl, &goal).unwrap();
         let motive = lam("n", nat.clone(), goal.clone());
         let dependent_motive = lam(
@@ -555,23 +563,23 @@ mod tests {
             nat.clone(),
             lam(
                 "p",
-                apps(konst("Eq"), [nat.clone(), z.clone(), var("b")]),
+                apps(const_term("Eq"), [nat.clone(), z.clone(), var("b")]),
                 goal.clone(),
             ),
         );
         let rec = apps(
-            konst("Eq.rec0"),
+            const_term("Eq.rec0"),
             [
                 nat,
                 z,
                 dependent_motive,
                 refl.clone(),
-                konst("Nat.zero"),
+                const_term("Nat.zero"),
                 refl.clone(),
             ],
         );
         k.check(&vec![], &rec, &goal).unwrap();
-        assert!(k.conv(&rec, &refl).unwrap());
+        assert!(k.is_def_eq(&rec, &refl).unwrap());
     }
     #[test]
     fn intro_exact_tactic() {
@@ -586,9 +594,9 @@ mod tests {
     #[test]
     fn rw_tactic() {
         let k = Kernel::standard();
-        let nat = konst("Nat");
-        let lhs = apps(konst("Eq"), [nat.clone(), var("a"), var("b")]);
-        let refl_goal = apps(konst("Eq"), [nat.clone(), var("a"), var("a")]);
+        let nat = const_term("Nat");
+        let lhs = apps(const_term("Eq"), [nat.clone(), var("a"), var("b")]);
+        let refl_goal = apps(const_term("Eq"), [nat.clone(), var("a"), var("a")]);
         let goal = pi(
             "a",
             nat.clone(),
@@ -607,20 +615,20 @@ mod tests {
         let k = Kernel::standard();
         let t = app(
             app(
-                lam("f", arrow(konst("Nat"), konst("Nat")), var("f")),
-                lam("x", konst("Nat"), var("x")),
+                lam("f", arrow(const_term("Nat"), const_term("Nat")), var("f")),
+                lam("x", const_term("Nat"), var("x")),
             ),
-            konst("Nat.zero"),
+            const_term("Nat.zero"),
         );
-        assert!(k.conv(&t, &konst("Nat.zero")).unwrap());
+        assert!(k.is_def_eq(&t, &const_term("Nat.zero")).unwrap());
     }
     #[test]
     fn induction_tactic() {
         let k = Kernel::standard();
         let goal = pi(
             "n",
-            konst("Nat"),
-            apps(konst("Eq"), [konst("Nat"), var("n"), var("n")]),
+            const_term("Nat"),
+            apps(const_term("Eq"), [const_term("Nat"), var("n"), var("n")]),
         );
         let mut s = ProofState::new(&k, goal).unwrap();
         s.intro(&k, "n").unwrap();
@@ -635,19 +643,19 @@ mod tests {
 mod textbook_completion_tests {
     use super::*;
     fn nat() -> Term {
-        konst("Nat")
+        const_term("Nat")
     }
     fn zero() -> Term {
-        konst("Nat.zero")
+        const_term("Nat.zero")
     }
     fn succ(t: Term) -> Term {
-        app(konst("Nat.succ"), t)
+        app(const_term("Nat.succ"), t)
     }
     fn eq_nat(a: Term, b: Term) -> Term {
-        apps(konst("Eq"), [nat(), a, b])
+        apps(const_term("Eq"), [nat(), a, b])
     }
     fn add(a: Term, b: Term) -> Term {
-        apps(konst("add"), [a, b])
+        apps(const_term("add"), [a, b])
     }
     fn with_add() -> Kernel {
         let mut k = Kernel::standard();
@@ -659,7 +667,7 @@ mod textbook_completion_tests {
             lam(
                 "n",
                 nat(),
-                apps(konst("Nat.rec1"), [motive, var("m"), step, var("n")]),
+                apps(const_term("Nat.rec1"), [motive, var("m"), step, var("n")]),
             ),
         );
         k.define("add", arrow(nat(), arrow(nat(), nat())), body)

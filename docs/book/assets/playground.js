@@ -31,6 +31,29 @@
     return new TextDecoder().decode(out);
   }
 
+  // Generic call into an exported function that takes a UTF-8 buffer and
+  // leaves its result in the shared result buffer (run_script, explore).
+  function callText(exports, name, text) {
+    var enc = new TextEncoder().encode(text);
+    var ptr = exports.alloc(enc.length);
+    new Uint8Array(exports.memory.buffer, ptr, enc.length).set(enc);
+    exports[name](ptr, enc.length);
+    exports.dealloc(ptr, enc.length);
+    var len = exports.result_len();
+    var out = new Uint8Array(exports.memory.buffer, exports.result_ptr(), len);
+    return new TextDecoder().decode(out);
+  }
+
+  // Shared with explorers.js.
+  window.MiniLean = {
+    load: loadWasm,
+    run: function (script) { return loadWasm().then(function (ex) { return runScript(ex, script); }); },
+    explore: function (request) {
+      return loadWasm().then(function (ex) { return JSON.parse(callText(ex, 'explore', request)); });
+    },
+    highlight: null // set below once the highlighter is defined
+  };
+
   function autosize(ta) {
     ta.style.height = 'auto';
     ta.style.height = (ta.scrollHeight + 4) + 'px';
@@ -64,6 +87,8 @@
     if (src.endsWith('\n')) out += ' ';
     return out;
   }
+
+  window.MiniLean.highlight = highlight;
 
   function setup(box) {
     var src = box.querySelector('pre, textarea');

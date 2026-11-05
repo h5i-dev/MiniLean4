@@ -87,9 +87,12 @@ The division into $\Infer$ and $\Check$ is sometimes called *bidirectional* type
 
 <aside class="code" markdown="1">
 
-Algorithm 5.1 is `Kernel::infer`, `Kernel::check`, and `Kernel::infer_sort` in `src/typecheck.rs`; `Freshen` is the helper `rename_binder_if_needed` in the same file. Below is the complete `infer`, with the constants case of Part II included.
+Algorithm 5.1 is `Kernel::infer`, `Kernel::check`, and `Kernel::infer_sort` in `src/typecheck.rs`; `Freshen` is the helper `rename_binder_if_needed` in the same file. The complete `infer` follows, with the constants case of Part II included; unfold it when you want to compare line by line.
 
 </aside>
+
+<details class="code-details" markdown="1">
+<summary>the complete infer function (about fifty lines)</summary>
 
 ```rust
 pub fn infer(&self, ctx: &Context, t: &Term) -> Result<Term> {
@@ -143,6 +146,8 @@ pub fn infer(&self, ctx: &Context, t: &Term) -> Result<Term> {
 }
 ```
 
+</details>
+
 A few details are worth noticing against the pseudocode.
 
 - The context lookup in the variable case searches from the end (`.rev()`). Because `rename_binder_if_needed` keeps names distinct, there is never more than one match, but searching from the end is the right behaviour if a caller passes a context with repeated names.
@@ -194,6 +199,12 @@ fn rename_binder_if_needed(ctx: &Context, x: &str, body: &Term) -> (String, Term
 ```
 
 The set of names to avoid is larger than the pseudocode's $\dom(\Gamma) \cup \FV(b)$: it includes every name appearing anywhere in the body and in the context's types, bound or free. Avoiding more names than necessary is always safe, and it keeps the renamed term readable. `fresh` appends primes until the name is unused, so a clash on `x` produces `x'`.
+
+## Watching Infer run
+
+The explorer below runs the algorithm on a term and records every recursive call: which case of $\Infer$ it entered, in which context, and what it returned. The notes report the hidden work, such as $\Whnf$ exposing a $\Pi$ or $\Freshen$ renaming a binder. The context field accepts assumptions such as `Q : Sort 0; q : Q`, separated by semicolons.
+
+<div class="explorer" data-kind="derive" data-term="fun (f : P -> Q) => fun (p : P) => f p" data-ctx="P : Sort 0; Q : Sort 0"></div>
 
 ## How a proof is checked
 

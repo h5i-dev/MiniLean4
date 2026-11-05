@@ -28,6 +28,10 @@ $$
 \underbrace{\tPi{P}{\Sort{0}}{P \to P}}_{\text{proposition, the type of the proof}}.
 $$
 
+The same two terms, seen as trees, make the shared grammar visible. Every node is one of the five constructors; the name on a $\Pi$ or $\lambda$ node is the variable it binds. Click a node to see the subterm it stands for, or type another term.
+
+<div class="explorer" data-kind="ast" data-term="fun (P : Sort 0) => fun (h : P) => h"></div>
+
 Whether a term is a valid *type* is not a syntactic property. It is decided by the type checker: a term is a type exactly when its own type is a universe ([Chapter 5](05-algorithm.md)).
 
 <aside class="note" markdown="1">

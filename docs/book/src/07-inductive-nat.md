@@ -92,46 +92,11 @@ $$
 s = \tLam{k}{\Nat}{\tLam{r}{\Nat}{\suc\;r}}.
 $$
 
-We write $m + n$ for $\add\;m\;n$. The kernel computes $2 + 1$ with delta, beta, and iota steps only. Step through it:
+We write $m + n$ for $\add\;m\;n$. The kernel computes $2 + 1$ with delta, beta, and iota steps only. The explorer below is the kernel doing exactly that, one head step at a time, with the $\add$ definition loaded.
 
-<div class="stepper" data-title="Computing 2 + 1" markdown="1">
-<div class="step" markdown="1">
-<p class="step-label">Start</p>
+<div class="explorer" data-kind="reduce" data-term="add (Nat.succ (Nat.succ Nat.zero)) (Nat.succ Nat.zero)"><pre class="prelude">def add : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) m (fun (k : Nat) => fun (r : Nat) => Nat.succ r) n</pre></div>
 
-$2 + 1$, that is, $\add\;(\suc\;(\suc\;\zero))\;(\suc\;\zero)$. The head is the constant $\add$, which has a body.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Delta: unfold the definition</p>
-
-$(\tLam{m}{\Nat}{\tLam{n}{\Nat}{\mathsf{rec}_{\Nat}\;m\;s\;n}})\;2\;1$
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Beta, twice: substitute the arguments</p>
-
-$\mathsf{rec}_{\Nat}\;2\;s\;1$, where $1 = \suc\;0$. The last argument of the recursor is a constructor application.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Iota: the successor rule fires</p>
-
-$s\;0\;(\mathsf{rec}_{\Nat}\;2\;s\;0)$. The step function receives the predecessor $0$ and the recursive call.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Beta, twice: apply the step function</p>
-
-$\suc\;(\mathsf{rec}_{\Nat}\;2\;s\;0)$. Now the inner recursor is applied to $\zero$.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Iota: the zero rule fires</p>
-
-$\suc\;2 = 3$. Normal form: no rule applies anywhere.
-
-</div>
-</div>
+Each row is one head step: the highlighted part is the redex, and the next row shows what it became. Change the numerals, or try `add Nat.zero n` with the context `n : Nat` to see the recursor get stuck.
 
 Other functions follow the same pattern. Doubling, with $\mathit{double}\;(\suc\;k) = \suc\;(\suc\;(\mathit{double}\;k))$, is
 

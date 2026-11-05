@@ -122,6 +122,10 @@ $$
 }{\cdot \vdash \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}} : \tPi{P}{\Sort{0}}{\tPi{h}{P}{P}}}\rulename{T-Lam}
 $$
 
+The kernel builds exactly this tree. Below, each node is one application of a rule, with the judgment it establishes; switch to the call view to read it top-down as the recursion that produces it. Replace the term with your own to see which rules fire.
+
+<div class="explorer" data-kind="derive" data-view="tree" data-term="fun (P : Sort 0) => fun (h : P) => h"></div>
+
 Two observations. First, the shape of the tree follows the shape of the term: a $\lambda$ at the root, a $\lambda$ below it, variables at the leaves. Second, the type at the root is $\tPi{P}{\Sort{0}}{\tPi{h}{P}{P}}$, whereas the stated proposition was $\tPi{P}{\Sort{0}}{P \to P}$. These differ only in the name of a bound variable ($h$ versus the anonymous `_` of the arrow), so they are alpha-equivalent, and T-Conv bridges the gap. [Chapter 6](06-worked-examples.md) revisits this example with the algorithm.
 
 <aside class="code" markdown="1">

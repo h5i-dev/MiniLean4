@@ -24,6 +24,10 @@ $$
 
 For example, $\FV(\tLam{x}{P}{f\;x\;y}) = \{P, f, y\}$, and $\FV(\tPi{P}{\Sort{0}}{P \to P}) = \emptyset$, so the latter is a *closed* term. Constants are never bound, so they contribute nothing.
 
+The explorer colours each bound variable like its binder and underlines free ones; hover a variable to see its binder. Try a term with shadowing, such as `fun (x : A) => fun (x : A) => x`.
+
+<div class="explorer" data-kind="scope" data-term="fun (x : P) => f x y"></div>
+
 We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences of $x$ in $t$ with $s$. The only subtle case is a binder. Consider $\subst{(\tLam{y}{A}{x})}{x}{y}$. The body says "ignore the argument and return the outer $x$". Replacing $x$ by $y$ naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: the free $y$ has been **captured** by the binder. Substitution must avoid this by renaming the binder first.
 
 <div class="definition" markdown="1">
@@ -56,7 +60,9 @@ The following examples exercise each binder case.
 | $\subst{(\tLam{y}{x}{y})}{x}{s}$ | $\tLam{y}{s}{y}$ | the annotation is outside the scope of $y$ |
 | $\subst{(\tLam{y}{A}{x\;y})}{x}{f\;y}$ | $\tLam{z}{A}{f\;y\;z}$ | $y \in \FV(f\;y)$, so the binder is renamed to $z$ |
 
-In the last example, the free $y$ of the replacement still refers to the outer $y$, and the bound variable, now $z$, still refers to the argument. Without the renaming, the result would be $\tLam{y}{A}{f\;y\;y}$, which passes its argument twice.
+In the last example, the free $y$ of the replacement still refers to the outer $y$, and the bound variable, now $z$, still refers to the argument. Without the renaming, the result would be $\tLam{y}{A}{f\;y\;y}$, which passes its argument twice. The explorer performs both substitutions side by side; the colours show whether the $y$ in the result is the free one from the replacement or the one the binder captured.
+
+<div class="explorer" data-kind="subst" data-term="fun (y : A) => x y" data-var="x" data-with="f y"></div>
 
 <aside class="code" markdown="1">
 
@@ -108,7 +114,9 @@ $$
 
 which says "from any element of any type, produce an element of every type". Given $A : \Sort{0}$ and $a : A$, the term $t\;A\;a$ then has type $\tPi{B}{\Sort{0}}{B}$, a proof of False. Such $A$ and $a$ exist even in the empty context: $A = \tPi{P}{\Sort{0}}{P \to P}$ is itself a proposition, and the identity function $a = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$ proves it.
 
-With $\Freshen$, the innermost binder is renamed to $x'$ before it enters the context, so the context becomes $x : \Sort{0},\; y : x,\; x' : \Sort{0}$, the lookup of $y$ returns $x$, which still refers to the outer binder, and $\Infer$ returns the correct type above.
+With $\Freshen$, the innermost binder is renamed to $x'$ before it enters the context, so the context becomes $x : \Sort{0},\; y : x,\; x' : \Sort{0}$, the lookup of $y$ returns $x$, which still refers to the outer binder, and $\Infer$ returns the correct type above. The derivation explorer shows the renaming happen: the note on the innermost T-Lam node reports it, and the context of the leaf contains $x'$.
+
+<div class="explorer" data-kind="derive" data-term="fun (x : Sort 0) => fun (y : x) => fun (x : Sort 0) => y"></div>
 
 <div class="playground" data-file="capture"><pre># The kernel renames the inner x to x' and infers the correct type.
 # A kernel that let the inner x shadow the outer one would accept this

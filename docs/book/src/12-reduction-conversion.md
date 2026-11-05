@@ -110,7 +110,9 @@ $$
 \Whnf(t) = t, \qquad \Normalize(t) = \tLam{h}{P}{h},
 $$
 
-because the head of $t$ is a $\lambda$ with no arguments, while $\Normalize$ continues into the annotation $\mathit{Id}\;P$. Likewise, $\Whnf(\mathit{Id}\;(\mathit{Id}\;P \to P)) = \mathit{Id}\;P \to P$, which already shows a $\Pi$ although its domain is not yet normal.
+because the head of $t$ is a $\lambda$ with no arguments, while $\Normalize$ continues into the annotation $\mathit{Id}\;P$. Likewise, $\Whnf(\mathit{Id}\;(\mathit{Id}\;P \to P)) = \mathit{Id}\;P \to P$, which already shows a $\Pi$ although its domain is not yet normal. Both are visible below: no head step applies, yet the normal form differs.
+
+<div class="explorer" data-kind="reduce" data-term="fun (h : (fun (X : Sort 0) => X) P) => h" data-ctx="P : Sort 0"></div>
 
 The three cases of $\Whnf$ have the following properties.
 
@@ -118,34 +120,12 @@ The three cases of $\Whnf$ have the following properties.
 - The major premise is put in weak head normal form *before* the rules are consulted, because it may become a constructor only after computation. For $2 + 1$ in Chapter 7, the major premise is the numeral $1 = \suc\;\zero$, already a constructor; for $\mathit{double}\;(1 + 1)$, it is $1 + 1$, which $\Whnf$ turns into $\suc\;(1 + 0)$ first.
 - If the major premise does not become a constructor, for instance because it is a variable, the term is **stuck** and stays as it is; this is why $0 + n$ does not reduce ([Chapter 9](09-equality.md)).
 
-Here is $\Whnf$ at work on $\mathit{double}\;(1 + 1)$, with $\mathit{double}$ as in Chapter 7. Only the head is ever reduced, but reducing the major premise forces an inner computation.
+Here is $\Whnf$ at work on $\mathit{double}\;(1 + 1)$, with $\mathit{double}$ as in Chapter 7, computed live. Only the head is ever reduced, but reducing the major premise forces an inner computation.
 
-<div class="stepper" data-title="Whnf of double (1 + 1)" markdown="1">
-<div class="step" markdown="1">
-<p class="step-label">Delta, then beta</p>
+<div class="explorer" data-kind="reduce" data-term="double (add (Nat.succ Nat.zero) (Nat.succ Nat.zero))"><pre class="prelude">def add : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) m (fun (k : Nat) => fun (r : Nat) => Nat.succ r) n
+def double : Nat -> Nat := fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) Nat.zero (fun (k : Nat) => fun (r : Nat) => Nat.succ (Nat.succ r)) n</pre></div>
 
-$\mathit{double}\;(1+1) \;\to\; \NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;\zero\;s_d\;(1 + 1)$, where $s_d = \tLam{k}{\Nat}{\tLam{r}{\Nat}{\suc\;(\suc\;r)}}$. The head is now a recursor whose major premise, the 4th argument, is $1 + 1$.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Iota needs a constructor: Whnf the major premise</p>
-
-$\Whnf(1 + 1)$: delta and beta give $\NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;1\;s\;(\suc\;\zero)$, whose major premise is a constructor, so iota gives $s\;\zero\;(\NatRec{1}\;\cdots\;1\;s\;\zero)$, and beta gives $\suc\;(\NatRec{1}\;\cdots\;1\;s\;\zero)$. That is a constructor at the head; $\Whnf$ stops. The argument $1 + 0$ inside is left unreduced.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Iota fires on the outer recursor</p>
-
-The major premise is $\suc\;(1 + 0)$, so the rule for $\suc$ applies with field $n = 1 + 0$: the term becomes $s_d\;(1 + 0)\;(\NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;\zero\;s_d\;(1 + 0))$.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">Beta, twice</p>
-
-$\suc\;(\suc\;(\NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;\zero\;s_d\;(1 + 0)))$. The head is the constructor $\suc$, which never reduces. $\Whnf$ returns this term. $\Normalize$ would continue into the argument and eventually produce $4$.
-
-</div>
-</div>
+The step marked *whnf* is the inner computation: the recursor needs its major premise to be a constructor, so $1 + 1$ is reduced at its head first. The final weak head normal form still contains a stuck inner recursor; the normal form below it is what $\Normalize$ produces by continuing inside.
 
 $\IsDefEq$ normalizes fully for simplicity, and our implementation does the same. Practical kernels compare lazily instead: they reduce both sides to weak head normal form, compare the heads, and recurse into the arguments only when needed, which avoids normalizing large terms that differ at the head. Termination of all three functions for well-typed terms is strong normalization.
 

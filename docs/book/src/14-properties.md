@@ -42,6 +42,33 @@ Computation preserves types. This is what justifies T-Conv and the whole strateg
 
 Every well-typed term reaches a normal form, whatever order reductions are performed in. This is the deep one. It is what makes $\Whnf$, $\Normalize$, and therefore $\IsDefEq$ and $\Infer$ terminate on well-typed input, and, as the next section shows, it is the key to consistency.
 
+The four properties support the two guarantees in a definite pattern, drawn below: the arrows read "is needed for".
+
+<div class="rulebox" markdown="1">
+
+<p class="caption">Figure 14.1. How the metatheory fits together.</p>
+
+<svg class="dep-diagram" viewBox="0 0 760 300" role="img" aria-label="Dependency diagram: uniqueness of types and type correctness support the algorithm; subject reduction and strong normalization support both decidability and consistency; the normal-form analysis joins strong normalization for consistency.">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g class="dep-box"><rect x="20" y="20" width="160" height="54" rx="8"/><text x="100" y="42" text-anchor="middle">uniqueness</text><text x="100" y="60" text-anchor="middle">of types (14.1)</text></g>
+<g class="dep-box"><rect x="200" y="20" width="160" height="54" rx="8"/><text x="280" y="42" text-anchor="middle">type</text><text x="280" y="60" text-anchor="middle">correctness (14.2)</text></g>
+<g class="dep-box"><rect x="400" y="20" width="160" height="54" rx="8"/><text x="480" y="42" text-anchor="middle">subject</text><text x="480" y="60" text-anchor="middle">reduction (14.3)</text></g>
+<g class="dep-box hot"><rect x="580" y="20" width="160" height="54" rx="8"/><text x="660" y="42" text-anchor="middle">strong</text><text x="660" y="60" text-anchor="middle">normalization (14.4)</text></g>
+<g class="dep-box"><rect x="110" y="140" width="180" height="54" rx="8"/><text x="200" y="162" text-anchor="middle">Infer and Check are</text><text x="200" y="180" text-anchor="middle">well defined (Ch. 5)</text></g>
+<g class="dep-box"><rect x="470" y="140" width="180" height="54" rx="8"/><text x="560" y="162" text-anchor="middle">analysis of</text><text x="560" y="180" text-anchor="middle">normal forms (App. D)</text></g>
+<g class="dep-box goal"><rect x="110" y="236" width="180" height="48" rx="8"/><text x="200" y="265" text-anchor="middle">decidability</text></g>
+<g class="dep-box goal"><rect x="470" y="236" width="180" height="48" rx="8"/><text x="560" y="265" text-anchor="middle">consistency (14.5)</text></g>
+<g class="dep-arrows">
+<path d="M100 74 L170 140"/><path d="M280 74 L230 140"/>
+<path d="M480 74 L300 150"/><path d="M660 74 L300 160"/>
+<path d="M480 74 L540 140"/><path d="M660 74 L580 140"/>
+<path d="M200 194 L200 236"/><path d="M560 194 L560 236"/>
+<path d="M660 74 L620 236"/>
+</g>
+</svg>
+
+</div>
+
 Together these give the two guarantees we want from a kernel.
 
 - **Decidability.** Algorithm 5.1 terminates on every input, so whether a proof is correct can always be determined.

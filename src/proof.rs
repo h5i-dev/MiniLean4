@@ -58,6 +58,11 @@ impl ProofState {
         &self.pending
     }
 
+    /// The proof term built so far, with every unsolved goal left as a hole.
+    pub fn partial_proof(&self) -> Template {
+        self.root.instantiate(&self.solutions)
+    }
+
     fn current(&self) -> Result<Goal> {
         self.pending.first().cloned().ok_or("no goals".into())
     }

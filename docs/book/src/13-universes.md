@@ -68,7 +68,9 @@ $$
 \end{cases}
 $$
 
-The case split in $\imax$ makes a $\Pi$-type *impredicative* when its body is a proposition, and *predicative* otherwise.
+The case split in $\imax$ makes a $\Pi$-type *impredicative* when its body is a proposition, and *predicative* otherwise. Pick the universes of $A$ and $B$ below and watch where the $\Pi$-type lands.
+
+<div class="explorer" data-kind="universes"></div>
 
 **Propositions are impredicative.** If the body $B$ is a proposition ($v = 0$), the whole $\Pi$ is a proposition, whatever it quantifies over. In particular $(\forall P.\,\varphi)^\ast = \tPi{P}{\Sort{0}}{\varphi^\ast}$ is in $\Sort{0}$, although it quantifies over all of $\Sort{0}$. A universe that contains types quantifying over itself is called **impredicative**. Because every translated formula lies in $\Sort{0}$, the premise $\psi^\ast : \Sort{0}$ of $\forall$-elim always holds, so a universal statement can be instantiated with any proposition, even with itself. For example, with $\mathit{id} = \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}}$,
 

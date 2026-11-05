@@ -103,6 +103,7 @@ qed</pre>
 <p>Throughout the book you will meet three kinds of interactive element.</p>
 <ul>
 <li><strong>Playgrounds</strong> run the kernel. Edit the script, press run, and read the transcript.</li>
+<li><strong>Explorers</strong> show the kernel's own view of a term: its syntax tree, its typing derivation rule by rule, its reduction one step at a time, which binder each variable belongs to, and the proof state after every tactic. Every explorer is live: change the term and the kernel recomputes.</li>
 <li><strong>Steppers</strong> walk through an algorithm one step at a time, showing the state after each step.</li>
 <li><strong>Trace trees</strong> show the exact sequence of recursive calls the type checker makes on a term, with the typing rule each call corresponds to.</li>
 </ul>
@@ -188,5 +189,6 @@ cargo test
 </div>
 <script src="assets/book.js"></script>
 <script src="assets/playground.js"></script>
+<script src="assets/explorers.js"></script>
 </body>
 </html>

@@ -25,56 +25,17 @@ Each tactic must make sure that its assignment has type $T$ in $\Gamma$, assumin
 
 ### A first example
 
-The script `examples/identity.leanmini` proves the opening example of Chapter 1. Step through the proof state.
+The script `examples/identity.leanmini` proves the opening example of Chapter 1. The explorer below runs it one command at a time.
 
-<div class="stepper" data-title="Proof state for identity.leanmini" markdown="1">
-<div class="step" markdown="1">
-<p class="step-label">goal forall (P : Sort 0), P -&gt; P</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?0</div><div class="goal-target">forall (P : Sort 0), P -&gt; P</div></div></div>
-
-Partial term: $\hole{0}$.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">intro P</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?1</div><div class="goal-hyp">P : Sort 0</div><div class="goal-target">P -&gt; P</div></div></div>
-
-Assignment: $\hole{0} \mathrel{:=} \tLam{P}{\Sort{0}}{\hole{1}}$. The partial term is now $\tLam{P}{\Sort{0}}{\hole{1}}$.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">intro p</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?2</div><div class="goal-hyp">P : Sort 0</div><div class="goal-hyp">p : P</div><div class="goal-target">P</div></div></div>
-
-Assignment: $\hole{1} \mathrel{:=} \tLam{p}{P}{\hole{2}}$. The partial term is $\tLam{P}{\Sort{0}}{\tLam{p}{P}{\hole{2}}}$.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">exact p</p>
-
-<div class="goals"><div class="goal-none">No goals.</div></div>
-
-Assignment: $\hole{2} \mathrel{:=} p$. The partial term is $\tLam{P}{\Sort{0}}{\tLam{p}{P}{p}}$, with no holes left.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">qed</p>
-
-The complete term $\tLam{P}{\Sort{0}}{\tLam{p}{P}{p}}$, the one we wrote by hand in Chapter 1, is sent to $\Check(\cdot, t, \tPi{P}{\Sort{0}}{P \to P})$. The kernel accepts it.
-
-</div>
-</div>
-
-A list of goals alone would not be enough: after `intro p`, the goal $P$ does not remember that its solution must be wrapped in two $\lambda$s. The partial term records exactly that.
-
-<div class="playground" data-file="examples/identity.leanmini"><pre>goal forall (P : Sort 0), P -> P
+<div class="explorer" data-kind="proof" data-title="proof explorer: identity"><pre class="script">goal forall (P : Sort 0), P -> P
 intro P
 intro p
 exact p
 qed</pre></div>
+
+Step through it with the buttons or the arrow keys. The middle panel is the list of goals after each command, and the right panel is the partial proof term, with the hole for the current goal highlighted. The three panels always agree: a tactic changes the goals *because* it assigns a term to a hole.
+
+A list of goals alone would not be enough: after `intro p`, the goal $P$ does not remember that its solution must be wrapped in two $\lambda$s. The partial term records exactly that.
 
 ## Basic tactics
 
@@ -110,7 +71,7 @@ The assignment has type $B$ by $n$ uses of T-App, and type $T$ by T-Conv. When t
 
 For example, transitivity of implication, the second exercise of Chapter 6, works backwards from the conclusion:
 
-<div class="playground" data-file="apply-transitivity"><pre>goal forall (P : Sort 0), forall (Q : Sort 0), forall (R : Sort 0), (P -> Q) -> (Q -> R) -> P -> R
+<div class="explorer" data-kind="proof" data-title="proof explorer: transitivity with apply"><pre class="script">goal forall (P : Sort 0), forall (Q : Sort 0), forall (R : Sort 0), (P -> Q) -> (Q -> R) -> P -> R
 intro P
 intro Q
 intro R
@@ -191,64 +152,19 @@ Tactics are methods of `ProofState` in `src/proof.rs`. The partial proof term is
 
 ## Example: 0 + n = n with tactics
 
-In our system the proof of Chapter 9 becomes the following script (the runnable version is `examples/zero-add.leanmini`, which writes `add Nat.zero n` for $0 + n$). Step through the proof state.
+In our system the proof of Chapter 9 becomes the following script, which is `examples/zero-add.leanmini` with the definition of $\add$ included (the script writes `add Nat.zero n` for $0 + n$).
 
-<div class="stepper" data-title="Proof state for zero-add.leanmini" markdown="1">
-<div class="step" markdown="1">
-<p class="step-label">goal forall (n : Nat), Eq Nat (add Nat.zero n) n</p>
+<div class="explorer" data-kind="proof" data-title="proof explorer: 0 + n = n"><pre class="script">def add : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) m (fun (k : Nat) => fun (r : Nat) => Nat.succ r) n
+goal forall (n : Nat), Eq Nat (add Nat.zero n) n
+intro n
+induction n
+rfl
+change Eq Nat (Nat.succ (add Nat.zero k)) (Nat.succ k)
+rw ih
+rfl
+qed</pre></div>
 
-<div class="goals"><div class="goal"><div class="goal-id">?0</div><div class="goal-target">forall (n : Nat), Eq Nat (add Nat.zero n) n</div></div></div>
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">intro n</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?1</div><div class="goal-hyp">n : Nat</div><div class="goal-target">Eq Nat (add Nat.zero n) n</div></div></div>
-
-$\hole{0} \mathrel{:=} \tLam{n}{\Nat}{\hole{1}}$.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">induction n</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?2</div><div class="goal-hyp">n : Nat</div><div class="goal-target">Eq Nat (add Nat.zero Nat.zero) Nat.zero</div></div><div class="goal"><div class="goal-id">?3</div><div class="goal-hyp">n : Nat</div><div class="goal-hyp">k : Nat</div><div class="goal-hyp">ih : Eq Nat (add Nat.zero k) k</div><div class="goal-target">Eq Nat (add Nat.zero (Nat.succ k)) (Nat.succ k)</div></div></div>
-
-$\hole{1} \mathrel{:=} \NatRec{0}\;(\tLam{z}{\Nat}{0 + z = z})\;\hole{2}\;(\tLam{k}{\Nat}{\tLam{\mathit{ih}}{0 + k = k}{\hole{3}}})\;n$. Two goals: the base case and the step.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">rfl</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?3</div><div class="goal-hyp">n : Nat</div><div class="goal-hyp">k : Nat</div><div class="goal-hyp">ih : Eq Nat (add Nat.zero k) k</div><div class="goal-target">Eq Nat (add Nat.zero (Nat.succ k)) (Nat.succ k)</div></div></div>
-
-$\hole{2} \mathrel{:=} \refl{1}\;\Nat\;(0 + 0)$, since $0 + 0 \conv 0$. The base case is closed.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">change Eq Nat (Nat.succ (add Nat.zero k)) (Nat.succ k)</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?3</div><div class="goal-hyp">n : Nat</div><div class="goal-hyp">k : Nat</div><div class="goal-hyp">ih : Eq Nat (add Nat.zero k) k</div><div class="goal-target">Eq Nat (Nat.succ (add Nat.zero k)) (Nat.succ k)</div></div></div>
-
-In the step goal, $0 + k$ does not occur syntactically, so `rw ih` would find nothing. `change` exposes it using $0 + \suc\;k \conv \suc\;(0 + k)$. The term is unchanged. In Lean, rewriting with the lemma `Nat.add_succ` produces the same goal.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">rw ih</p>
-
-<div class="goals"><div class="goal"><div class="goal-id">?4</div><div class="goal-hyp">n : Nat</div><div class="goal-hyp">k : Nat</div><div class="goal-hyp">ih : Eq Nat (add Nat.zero k) k</div><div class="goal-target">Eq Nat (Nat.succ k) (Nat.succ k)</div></div></div>
-
-`rw` abstracts $0 + k$ to get $C = (\suc\;x = \suc\;k)$ and assigns $\hole{3} \mathrel{:=} \EqRec{1,0}\;\Nat\;(0 + k)\;(\tLam{x}{\Nat}{C \to T})\;(\tLam{p}{T}{p})\;k\;\mathit{ih}\;\hole{4}$, with $T$ the goal before rewriting.
-
-</div>
-<div class="step" markdown="1">
-<p class="step-label">rfl</p>
-
-<div class="goals"><div class="goal-none">No goals.</div></div>
-
-$\hole{4} \mathrel{:=} \refl{1}\;\Nat\;(\suc\;k)$. Substituting all assignments into $\hole{0}$ gives a closed term, and `qed` runs $\Check(\cdot, t, \tPi{n}{\Nat}{0 + n = n})$ on it.
-
-</div>
-</div>
+Watch the partial term grow: `induction n` inserts $\NatRec{0}$ with two holes, `rfl` fills the first, `change` leaves the term alone and only rewrites the goal, and `rw ih` inserts the transport with one hole left for the final `rfl`. Delete the `change` line and apply the script to see `rw` fail to find its left-hand side.
 
 <div class="playground" data-file="examples/zero-add.leanmini"><pre># Addition by recursion on the second argument:
 #   add m zero     = m

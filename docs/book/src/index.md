@@ -47,6 +47,7 @@ The book is self-contained. You need to be comfortable reading a recursive funct
 Throughout the book you will meet three kinds of interactive element.
 
 - **Playgrounds** run the kernel. Edit the script, press run, and read the transcript.
+- **Explorers** show the kernel's own view of a term: its syntax tree, its typing derivation rule by rule, its reduction one step at a time, which binder each variable belongs to, and the proof state after every tactic. Every explorer is live: change the term and the kernel recomputes.
 - **Steppers** walk through an algorithm one step at a time, showing the state after each step.
 - **Trace trees** show the exact sequence of recursive calls the type checker makes on a term, with the typing rule each call corresponds to.
 

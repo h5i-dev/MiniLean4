@@ -13,6 +13,8 @@ use mini_lean4::{
 };
 use std::fmt::Write as _;
 
+mod explore;
+
 // ---------------------------------------------------------------------------
 // C ABI: memory management and the result buffer
 // ---------------------------------------------------------------------------
@@ -41,6 +43,20 @@ pub unsafe extern "C" fn run_script(ptr: *const u8, len: usize) -> usize {
     let bytes = std::slice::from_raw_parts(ptr, len);
     let script = String::from_utf8_lossy(bytes);
     let out = run(&script);
+    let result = &mut *std::ptr::addr_of_mut!(RESULT);
+    *result = out.into_bytes();
+    result.len()
+}
+
+/// Structured queries for the ebook's explorers; see `explore.rs`.
+///
+/// # Safety
+/// `ptr..ptr+len` must be readable UTF-8 bytes.
+#[no_mangle]
+pub unsafe extern "C" fn explore(ptr: *const u8, len: usize) -> usize {
+    let bytes = std::slice::from_raw_parts(ptr, len);
+    let request = String::from_utf8_lossy(bytes);
+    let out = explore::explore(&request);
     let result = &mut *std::ptr::addr_of_mut!(RESULT);
     *result = out.into_bytes();
     result.len()
@@ -215,6 +231,18 @@ fn run_line(k: &mut Kernel, state: &mut Option<ProofState>, line: &str, out: &mu
         return Err(format!("unknown command: {line}"));
     }
     print_goals(out, s);
+    Ok(())
+}
+
+/// Runs one declaration line (`def`, `axiom`, `recursor`) with no proof in
+/// progress and no transcript. Used for explorer preludes.
+fn run_setup_line(k: &mut Kernel, line: &str) -> Result<()> {
+    let mut state: Option<ProofState> = None;
+    let mut sink = String::new();
+    run_line(k, &mut state, line, &mut sink)?;
+    if state.is_some() {
+        return Err("a prelude may only declare things; it cannot start a goal".into());
+    }
     Ok(())
 }
 

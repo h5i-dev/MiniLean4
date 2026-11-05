@@ -61,6 +61,13 @@ $$
 
 With $M$ a predicate ($v = 0$), the same recursor is structural induction on trees. In general, a type with $n$ constructors gets a recursor with $n$ minor premises $m_1, \ldots, m_n$, and the kernel needs no code specific to the type: it only needs to know, for each constructor, which case to pick and which arguments to recurse on.
 
+Here is that tree as the kernel sees it. Each box is a constructor application; the recursive fields hang below it, and the line at the bottom of each box is the recursor case that handles it, with $(R\;l)$ and $(R\;r)$ the induction hypotheses computed by recursive calls. Type another tree to see its cases.
+
+<div class="explorer" data-kind="ctree" data-term="Tree.branch (Tree.node Tree.leaf) Tree.leaf"><pre class="prelude">inductive Tree : Sort 1 where
+  | leaf
+  | node (t : Tree)
+  | branch (l : Tree) (r : Tree)</pre></div>
+
 <div class="playground" data-file="tree-count"><pre>inductive Tree : Sort 1 where
   | leaf
   | node (t : Tree)
@@ -112,6 +119,12 @@ $$
 \mathit{length} \mathrel{:=} \tLam{A}{\Sort{1}}{\tLam{x}{\mathsf{List}\;A}{
 \mathsf{List.rec}_1\;A\;(\tLam{\_}{\mathsf{List}\;A}{\Nat})\;\zero\;(\tLam{a}{A}{\tLam{\mathit{as}}{\mathsf{List}\;A}{\tLam{r}{\Nat}{\suc\;r}}})\;x}}.
 $$
+
+A list value carries the parameter $A$ in every constructor, which the tree below shows next to each box: the parameter is repeated, the fields differ.
+
+<div class="explorer" data-kind="ctree" data-term="List.cons Nat (Nat.succ Nat.zero) (List.cons Nat Nat.zero (List.nil Nat))"><pre class="prelude">inductive List (A : Sort 1) : Sort 1 where
+  | nil
+  | cons (head : A) (tail : List A)</pre></div>
 
 <div class="playground" data-file="examples/generic-list.leanmini"><pre>inductive List (A : Sort 1) : Sort 1 where
   | nil

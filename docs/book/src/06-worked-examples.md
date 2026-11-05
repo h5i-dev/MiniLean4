@@ -44,6 +44,10 @@ The algorithm builds the same derivation from the bottom up. The call $\Infer(\c
 
 Each call that returns a type corresponds to one node of the derivation tree, and no call uses computation. Finally, $\Check$ compares the result with the stated type $\tPi{P}{\Sort{0}}{P \to P}$. The two differ only in the name of one bound variable, because $P \to P$ abbreviates $\tPi{\_}{P}{P}$ and neither $h$ nor $\_$ occurs in the body. So $\IsDefEq$ succeeds and the proof is accepted.
 
+The same run, recorded by the kernel itself. The call view matches the list above; the proof-tree view matches the derivation.
+
+<div class="explorer" data-kind="derive" data-term="fun (P : Sort 0) => fun (h : P) => h"></div>
+
 <div class="playground" data-file="examples/identity.leanmini"><pre># The same proof, given as a complete term. The kernel infers its type
 # and compares it with the goal.
 goal forall (P : Sort 0), P -> P
@@ -61,6 +65,8 @@ $$
 The term $t$ is perfectly well typed; it is just not a proof of the claimed proposition. $\Check$ then compares the two types. Neither can compute any further, and no renaming of bound variables makes them equal: the innermost body is $\Sort{0}$ on one side and $P$ on the other. So $\IsDefEq$ fails and $\Check$ reports a type mismatch. ([Chapter 11](11-substitution-alpha.md#alpha-equivalence) replays this comparison step by step with the algorithm that $\IsDefEq$ uses.)
 
 The error is found only because the user *stated* the proposition to be proved. A kernel that only ran $\Infer$ would accept $t$ and silently assign it a different type. This is why `goal` comes first in every script, and why `qed` checks against it.
+
+<div class="explorer" data-kind="derive" data-term="fun (P : Sort 0) => fun (h : P) => P"></div>
 
 <div class="playground" data-file="wrong-proof"><pre>goal forall (P : Sort 0), P -> P
 exact fun (P : Sort 0) => fun (h : P) => P
@@ -94,7 +100,9 @@ which says "if $P$ implies $Q$ and $P$ holds, then $Q$ holds". The four $\lambda
 </li>
 </ul>
 
-If the user had written $f\;f$ instead, the second step would call $\Check(\Gamma, f, P)$, which fails because $P \to Q$ is not $P$: a function cannot be fed to itself here.
+If the user had written $f\;f$ instead, the second step would call $\Check(\Gamma, f, P)$, which fails because $P \to Q$ is not $P$: a function cannot be fed to itself here. Try it: change `f p` to `f f` below.
+
+<div class="explorer" data-kind="derive" data-term="fun (P : Sort 0) => fun (Q : Sort 0) => fun (f : P -> Q) => fun (p : P) => f p"></div>
 
 <div class="playground" data-file="modus-ponens"><pre>goal forall (P : Sort 0), forall (Q : Sort 0), (P -> Q) -> P -> Q
 exact fun (P : Sort 0) => fun (Q : Sort 0) => fun (f : P -> Q) => fun (p : P) => f p
@@ -114,7 +122,9 @@ In a *dependent* application the substitution in T-App does real work. Let $\mat
 </li>
 </ul>
 
-Logically, this is $\forall$-elimination: from "every proposition implies itself" we obtain "$Q$ implies $Q$". The type of the result depends on the *value* of the argument $Q$, which is exactly what the dependent $\Pi$-type expresses and exactly why T-App substitutes.
+Logically, this is $\forall$-elimination: from "every proposition implies itself" we obtain "$Q$ implies $Q$". The type of the result depends on the *value* of the argument $Q$, which is exactly what the dependent $\Pi$-type expresses and exactly why T-App substitutes. In the explorer, $\mathit{id}$ is a defined constant and $Q$ comes from the context; the note on the T-App node records the substitution.
+
+<div class="explorer" data-kind="derive" data-term="id Q" data-ctx="Q : Sort 0"><pre class="prelude">def id : forall (P : Sort 0), P -> P := fun (P : Sort 0) => fun (h : P) => h</pre></div>
 
 ## Conversion
 
@@ -145,6 +155,10 @@ $$
 $$
 
 The algorithm never decides *where* to apply T-Conv. As described in [Chapter 5](05-algorithm.md), conversion is hidden in the call to $\IsDefEq$, which runs only where two types are compared.
+
+The live derivation shows where the computation happens: the annotation $\mathit{Id}\;P$ is checked by T-App, and the inferred type still contains $\mathit{Id}\;P$ until $\Check$ compares it with the goal.
+
+<div class="explorer" data-kind="derive" data-term="fun (P : Sort 0) => fun (h : (fun (X : Sort 0) => X) P) => h"></div>
 
 <div class="playground" data-file="conversion"><pre># The annotation of h is (fun (X : Sort 0) => X) P, which computes to P.
 goal forall (P : Sort 0), P -> P

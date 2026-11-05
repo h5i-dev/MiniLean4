@@ -9,6 +9,10 @@ A minimal, self-contained implementation of a Lean 4-style theorem prover kernel
 - **Inductive Types**: Support for inductive declarations, strict positivity checking (`src/inductive/positivity.rs`), and recursor generation (`src/inductive/recursor.rs`).
 - **Minimal DSL (`.leanmini`)**: Custom syntax parser (`src/syntax.rs`) and CLI runner for verifying `.leanmini` proof scripts.
 
+## Book
+
+The directory [`docs/ebook/`](./docs/ebook) contains a complete ebook, *Implementing an Interactive Theorem Prover from Scratch*, that explains this kernel chapter by chapter, with the real kernel compiled to WebAssembly so that every example can be run and edited in the browser. Open `docs/ebook/index.html` through a local web server (for example `python3 -m http.server` inside `docs/ebook`) to use the interactive playgrounds. The sources and build script are in [`docs/book/`](./docs/book).
+
 ## Quick Start
 
 ### Run Examples

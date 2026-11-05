@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="A guided tour of MiniLean4, a small Lean 4-style proof kernel in Rust: propositions as types, inductive types, tactics, and universes.">
+<meta name="color-scheme" content="dark light">
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<link rel="stylesheet" href="assets/book.css">
+<script>
+  (function () {
+    if (localStorage.getItem("minilean-theme") === "light") {
+      document.documentElement.classList.add("light");
+    }
+  })();
+</script>
+</head>
+<body class="{{body_class}}">
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a class="logo" href="index.html">MiniLean4</a>
+      <p class="book-sub">Implementing an Interactive Theorem Prover from Scratch</p>
+    </div>
+    {{sidebar}}
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
+      <div class="topbar-spacer"></div>
+      <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
+    </div>
+    <div class="layout">
+      <main id="content" class="content">
+        {{content}}
+        {{pager}}
+      </main>
+      <aside class="margin">
+        {{onpage}}
+      </aside>
+    </div>
+    <footer class="footer">
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
+      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+    </footer>
+  </div>
+</div>
+<script src="assets/book.js"></script>
+<script src="assets/playground.js"></script>
+</body>
+</html>

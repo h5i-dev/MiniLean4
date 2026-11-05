@@ -42,7 +42,7 @@ The damage reaches the algorithm as well. Subject reduction still holds, so if $
 
 <aside class="history" markdown="1">
 
-Martin-Löf's first type theory of 1971 had exactly this rule, and Girard's paradox was discovered against it the following year. Every dependent type theory since then has had either a hierarchy of universes or some other device to break the self-reference. The paradox is not a curiosity: the self-containing universe is the *obvious* design, and the obvious design is wrong.
+Martin-Löf's first type theory of 1971 had this rule, and Girard's paradox was discovered against it the following year. Every dependent type theory since then has had either a hierarchy of universes or some other device to break the self-reference. The paradox is not a curiosity: the self-containing universe is the *obvious* design, and the obvious design is wrong.
 
 </aside>
 
@@ -108,13 +108,13 @@ This property is called **predicativity**. For example, the identity on types $\
 
 <aside class="intuition" markdown="1">
 
-Why may propositions be impredicative when types may not? Because a proof of a proposition carries no data that a program could extract (this is exactly what the elimination restriction of Chapter 8 enforces). Quantifying over all propositions to define a proposition is like defining a set by a property that mentions all sets: dangerous when the result is itself an object that the quantifier ranges over and can be inspected, harmless when all one can do with it is use it as a hypothesis. The paradox needs to *inspect* the thing it builds; propositions cannot be inspected.
+Why may propositions be impredicative when types may not? Because a proof of a proposition carries no data that a program could extract (this is what the elimination restriction of Chapter 8 enforces). Quantifying over all propositions to define a proposition is like defining a set by a property that mentions all sets: dangerous when the result is itself an object that the quantifier ranges over and can be inspected, harmless when all one can do with it is use it as a hypothesis. The paradox needs to *inspect* the thing it builds; propositions cannot be inspected.
 
 </aside>
 
 ## Comparison with Lean
 
-In Lean [de Moura and Ullrich 2021], $\Sort{0}$ is `Prop`, $\Sort{(u+1)}$ is `Type u`, and $\Pi$-types are assigned universes with $\imax$ exactly as above. Two differences remain.
+In Lean [de Moura and Ullrich 2021], $\Sort{0}$ is `Prop`, $\Sort{(u+1)}$ is `Type u`, and $\Pi$-types are assigned universes with $\imax$ as above. Two differences remain.
 
 First, `Prop` in Lean has **definitional proof irrelevance**: any two proofs of the same proposition are definitionally equal. Our conversion does not identify proofs; adding this would make conversion depend on types, so the simple "normalize and compare" check of [Chapter 12](12-reduction-conversion.md) would no longer suffice.
 

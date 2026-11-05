@@ -190,7 +190,7 @@ Why does $\Whnf$ not reduce under a $\lambda$? What would go wrong in $\Infer$ i
 <details markdown="1">
 <summary>Solution</summary>
 
-Nothing would be *wrong*: the result would still be convertible to the input. But it would be wasted work. $\Infer$ calls $\Whnf$ only to learn the outermost shape, which is already visible once the head is a $\lambda$. Reducing inside could be arbitrarily expensive, for instance in an annotation that is never compared with anything. Keeping $\Whnf$ shallow is what makes type inference cheap on large terms.
+Nothing would be *wrong*: the result would still be convertible to the input. But it would be wasted work. $\Infer$ calls $\Whnf$ only to learn the outermost shape, which is already visible once the head is a $\lambda$. Reducing inside could be arbitrarily expensive, for instance in an annotation that is never compared with anything. Keeping $\Whnf$ shallow keeps type inference cheap on large terms.
 
 </details>
 

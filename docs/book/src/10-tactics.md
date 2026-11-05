@@ -35,7 +35,7 @@ qed</pre></div>
 
 Step through it with the buttons or the arrow keys. The middle panel is the list of goals after each command, and the right panel is the partial proof term, with the hole for the current goal highlighted. The three panels always agree: a tactic changes the goals *because* it assigns a term to a hole.
 
-A list of goals alone would not be enough: after `intro p`, the goal $P$ does not remember that its solution must be wrapped in two $\lambda$s. The partial term records exactly that.
+A list of goals alone would not be enough: after `intro p`, the goal $P$ does not remember that its solution must be wrapped in two $\lambda$s. The partial term records that.
 
 ## Basic tactics
 
@@ -140,7 +140,7 @@ Let $h : \Eq{u}\;A\;a\;b$, and let the goal $T$ be a proposition. The tactic `rw
    \hole{m} \mathrel{:=} \EqRec{u,0}\;A\;a\;(\tLam{x}{A}{C \to T})\;(\tLam{p}{T}{p})\;b\;h\;\hole{1}.
    $$
 
-To see that the assignment has type $T$, write $N = \tLam{x}{A}{C \to T}$ for the motive. Since $\subst{C}{x}{a} = T$, the term $N\;a$ is convertible to $T \to T$, which the identity $\tLam{p}{T}{p}$ inhabits. Transport along $h$ then gives $N\;b$, which is convertible to $\subst{C}{x}{b} \to T$, and applying it to $\hole{1}$ gives $T$. Lean builds a different term, `Eq.mpr (congrArg (fun x => C) h)`, from the same idea, and additionally tries to close the new goal with `rfl`; ours leaves that to an explicit `rfl`, so the two steps are visible in the script.
+To see that the assignment has type $T$, write $N = \tLam{x}{A}{C \to T}$ for the motive. Since $\subst{C}{x}{a} = T$, the term $N\;a$ is convertible to $T \to T$, which the identity $\tLam{p}{T}{p}$ inhabits. Transport along $h$ then gives $N\;b$, which is convertible to $\subst{C}{x}{b} \to T$, and applying it to $\hole{1}$ gives $T$. Lean builds a different term, `Eq.mpr (congrArg (fun x => C) h)`, from the same idea, and also tries to close the new goal with `rfl`; ours leaves that to an explicit `rfl`, so the two steps are visible in the script.
 
 **When the motive is ill typed.** Abstracting $a$ can break the goal. Let $\Gamma = n : \Nat,\; h : n = 2,\; q : n = 0$, and suppose we run `rw h` on the goal $\Eq{0}\;(n = 0)\;q\;q$, a statement about the proof $q$. Abstracting $n$ gives $C = \Eq{0}\;(x = 0)\;q\;q$, which is ill typed: $q$ has type $n = 0$, not $x = 0$, and $q$ itself cannot be abstracted. Step 2 fails, and Lean reports the same situation as "motive is not type correct". Without step 2 the tactic would produce a term that the kernel rejects, which is harmless for soundness but unhelpful for the user.
 

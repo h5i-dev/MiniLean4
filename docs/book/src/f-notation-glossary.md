@@ -169,6 +169,6 @@ Every symbol, judgment, and technical term used in the book, with the chapter th
 What to remember
 
 - Terms, judgments, and algorithms each have a fixed notation used consistently throughout the book; the tables above map each to its Rust counterpart.
-- The two equalities (definitional and propositional) and the two kinds of universe (impredicative and predicative) are the distinctions most worth keeping straight.
+- The two equalities (definitional and propositional) and the two kinds of universe (impredicative and predicative) are the distinctions to keep straight.
 
 </div>

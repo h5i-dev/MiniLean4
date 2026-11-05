@@ -138,7 +138,7 @@ pub fn spine(t: &Term) -> (Term, Vec<Term>) {
 }
 ```
 
-`apps` and `spine` are inverses of each other: `apps(h, args)` builds the left-nested application $h\;a_1 \cdots a_n$, and `spine` takes it apart again. The spine view is how the reduction engine of [Chapter 12](12-reduction-conversion.md) looks at a term, so it is worth being comfortable with it now. The nested term $((f\;a)\;b)\;c$ has head $f$ and arguments $[a, b, c]$; walking down the function side of each application reaches the head, and the arguments collected on the way, read from the inside out, are in the right order.
+`apps` and `spine` are inverses of each other: `apps(h, args)` builds the left-nested application $h\;a_1 \cdots a_n$, and `spine` takes it apart again. The spine view is how the reduction engine of [Chapter 12](12-reduction-conversion.md) looks at a term, so get comfortable with it now. The nested term $((f\;a)\;b)\;c$ has head $f$ and arguments $[a, b, c]$; walking down the function side of each application reaches the head, and the arguments collected on the way, read from the inside out, are in the right order.
 
 The surface syntax of the `.leanmini` scripts used throughout the book writes the same terms as `Sort 0`, `forall (x : A), B`, `A -> B`, `fun (x : A) => b`, and juxtaposition for application. [Appendix E](e-leanmini-reference.md) gives the full grammar.
 

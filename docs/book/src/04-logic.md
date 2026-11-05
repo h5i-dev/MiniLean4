@@ -113,7 +113,7 @@ Consistency is the property that every design decision in this book must preserv
 
 <aside class="note" markdown="1">
 
-One might hope for the full converse of Theorem 4.1: every term of type $\varphi^\ast$ comes from a proof of $\varphi$. That stronger property is called *conservativity*, and it is harder to establish here, because $\Sort{0}$ also contains types that are not translations of formulas, such as $\tPi{F}{\Sort{0} \to \Sort{0}}{F\;P \to F\;P}$, and a term may pass through them on its way to $\varphi^\ast$. We do not need conservativity. Consistency is what makes the kernel's "yes" worth something, and it is enough.
+One might hope for the full converse of Theorem 4.1: every term of type $\varphi^\ast$ comes from a proof of $\varphi$. That stronger property is called *conservativity*, and it is harder to establish here, because $\Sort{0}$ also contains types that are not translations of formulas, such as $\tPi{F}{\Sort{0} \to \Sort{0}}{F\;P \to F\;P}$, and a term may pass through them on its way to $\varphi^\ast$. We do not need conservativity. Without consistency the kernel's "yes" would mean nothing; with it, the "yes" is enough.
 
 </aside>
 

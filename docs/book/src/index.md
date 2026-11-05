@@ -16,7 +16,7 @@ a Lean 4-style proof kernel, built from nothing. five kinds of terms and eight t
 
 </div>
 
-<p class="punch">proofs are programs. the kernel checks them. that's the whole trick.</p>
+<p class="punch">proofs are programs. the kernel checks them. nothing else is trusted.</p>
 
 </div>
 <div class="hero-term" markdown="1">
@@ -32,7 +32,7 @@ qed</pre></div>
 
 ## What this book is
 
-Interactive theorem provers such as Lean, Coq, and Agda rest on a surprisingly small core: a *kernel* that decides whether a term has a given type. Everything else, including tactics, notation, and automation, is scaffolding that produces terms for the kernel to check. If the kernel is right, a bug anywhere else can make the system fail to prove a theorem, but never make it accept a false one.
+Interactive theorem provers such as Lean, Coq, and Agda rest on a small core: a *kernel* that decides whether a term has a given type. Everything else, including tactics, notation, and automation, is scaffolding that produces terms for the kernel to check. If the kernel is right, a bug anywhere else can make the system fail to prove a theorem, but never make it accept a false one.
 
 The goal here is to make that kernel concrete. Each chapter introduces one idea on paper, states it precisely, and then shows the Rust code that implements it. The whole implementation, kernel plus tactics and parser, is under three thousand lines with no dependencies, and this book covers all of it.
 

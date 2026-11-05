@@ -172,7 +172,7 @@ cargo test                                 # the kernel&#x27;s own test suite
 </code></pre></div>
 <p><code>recursor I v</code> generates <code>I.recv</code> for the elimination universe <code>v</code>, if it does not exist yet, and prints <code>generated I.recv</code>. Levels 0 and 1 are generated automatically by <code>inductive</code>; use this command when a motive needs to return a type in <code>Sort 2</code> or higher. It fails for a proposition that does not allow large elimination (<code>I is not a subsingleton proposition; cannot eliminate into Sort v</code>).</p>
 <h2 id="the-standard-kernel">The standard kernel</h2>
-<p>Every session starts with <code>Nat</code> and <code>Eq</code> already declared, exactly as if the following declarations had been run. The generated binder names begin with <code>__</code>; they are shown here as <code>M</code> and <code>m</code> for readability, and renaming bound variables does not change a type.</p>
+<p>Every session starts with <code>Nat</code> and <code>Eq</code> already declared, as if the following declarations had been run. The generated binder names begin with <code>__</code>; they are shown here as <code>M</code> and <code>m</code> for readability, and renaming bound variables does not change a type.</p>
 <div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini">Nat      : <span class="k">Sort</span> 1
 <span class="n">Nat.zero</span> : Nat
 <span class="n">Nat.succ</span> : Nat -&gt; Nat

@@ -293,7 +293,7 @@ The kernel never special-cases $\Nat$. `Kernel::standard` in `src/kernel.rs` dec
 
 <aside class="warning" markdown="1">
 
-The positivity check is a soundness requirement, not a convenience. Lean, Coq, and Agda have each had bugs over the years in exactly this part of the kernel, because the general case (nested and mutual inductives, universe constraints, indices mentioning other inductives) is intricate. Our restricted schema keeps the check to eighty lines. When extending it, the question to ask of every new feature is: can a value of the type be built from a function that consumes the type?
+The positivity check is a soundness requirement, not a convenience. Lean, Coq, and Agda have each had bugs over the years in this part of the kernel, because the general case (nested and mutual inductives, universe constraints, indices mentioning other inductives) is complicated. Our restricted schema keeps the check to eighty lines. When extending it, the question to ask of every new feature is: can a value of the type be built from a function that consumes the type?
 
 </aside>
 

@@ -53,7 +53,7 @@ The context $\Delta^\ast$ of Chapter 4 lists the proposition variables first and
 
 </div>
 
-Theorem 4.1 is the special case $\Gamma = \Delta^\ast$. Indeed, when $\Theta$ lists the free proposition variables, the context $\Delta^\ast$ contains exactly the required assumptions; it is well formed by Lemma A.3 below together with the rule C-Ext, since each hypothesis type $\chi^\ast$ is a proposition once the proposition variables are in scope.
+Theorem 4.1 is the special case $\Gamma = \Delta^\ast$. When $\Theta$ lists the free proposition variables, the context $\Delta^\ast$ contains exactly the required assumptions; it is well formed by Lemma A.3 below together with the rule C-Ext, since each hypothesis type $\chi^\ast$ is a proposition once the proposition variables are in scope.
 
 ## Facts about the translation
 

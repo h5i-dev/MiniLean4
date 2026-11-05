@@ -110,7 +110,7 @@ recursor Nat 2
 
 ## The standard kernel
 
-Every session starts with `Nat` and `Eq` already declared, exactly as if the following declarations had been run. The generated binder names begin with `__`; they are shown here as `M` and `m` for readability, and renaming bound variables does not change a type.
+Every session starts with `Nat` and `Eq` already declared, as if the following declarations had been run. The generated binder names begin with `__`; they are shown here as `M` and `m` for readability, and renaming bound variables does not change a type.
 
 ```leanmini
 Nat      : Sort 1

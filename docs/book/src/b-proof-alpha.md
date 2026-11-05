@@ -87,7 +87,7 @@ Under a binder $x$, the lists $E_1, x$ and $E_2, x$ again agree on the free vari
 
 </div>
 
-The second lemma is the heart of the appendix: renaming a binder does not change the nameless form. It is stated for a binder sitting at an arbitrary depth, with binder lists $E$ before it and $E'$ after it, because the induction has to go under further binders.
+The second lemma does the main work of the appendix: renaming a binder does not change the nameless form. It is stated for a binder sitting at an arbitrary depth, with binder lists $E$ before it and $E'$ after it, because the induction has to go under further binders.
 
 We use that substituting a variable for a variable preserves the size of a term, even when binders are renamed along the way; this is a routine induction on the definition of substitution.
 

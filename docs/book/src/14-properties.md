@@ -16,7 +16,7 @@ The theorems below concern the *core* system: the rules of Figure 3.1, with the 
 
 </div>
 
-A term has, up to conversion, one type. This is what makes $\Infer$ meaningful: there is a single answer for it to compute, and $\Check$ can compare against it without worrying that some other derivation would have produced a different, non-convertible type.
+A term has, up to conversion, one type. $\Infer$ depends on this: there is a single answer for it to compute, and $\Check$ can compare against it without worrying that some other derivation would have produced a different, non-convertible type.
 
 <div class="theorem" markdown="1">
 
@@ -40,7 +40,7 @@ Computation preserves types. This is what justifies T-Conv and the whole strateg
 
 </div>
 
-Every well-typed term reaches a normal form, whatever order reductions are performed in. This is the deep one. It is what makes $\Whnf$, $\Normalize$, and therefore $\IsDefEq$ and $\Infer$ terminate on well-typed input, and, as the next section shows, it is the key to consistency.
+Every well-typed term reaches a normal form, whatever order reductions are performed in. This is the deep one. $\Whnf$, $\Normalize$, and therefore $\IsDefEq$ and $\Infer$ terminate on well-typed input because of it, and the next section shows that consistency rests on it too.
 
 The four properties support the two guarantees in a definite pattern, drawn below: the arrows read "is needed for".
 
@@ -88,7 +88,7 @@ Strong normalization is stated for well-typed terms only. The kernel can receive
 
 </div>
 
-The argument has two halves, and it is worth seeing their shape even without the details.
+The argument has two halves, and their shape is visible without the details.
 
 **Reduce to normal forms.** By strong normalization, such a term $t$ would have a normal form $n$, and by subject reduction, $n$ would have the same type. So it suffices to show that no *normal* closed term has type $\tPi{P}{\Sort{0}}{P}$. This step is where all the difficulty lies, because it uses Theorem 14.4.
 
@@ -112,7 +112,7 @@ Lean's full theory, with definitional proof irrelevance, universe polymorphism, 
 
 <aside class="lean" markdown="1">
 
-Lean's kernel, like ours, does not *prove* any of this; it assumes it. The theorems are about the type system, not about the code, and they are established once, on paper, for the system as designed. What the code must do is implement that system faithfully. The compact kernel of this book, and the even more compact description of it in Figure 3.1, Chapter 8, and Algorithm 12.1, is what makes "faithfully" checkable by a human reader.
+Lean's kernel, like ours, does not *prove* any of this; it assumes it. The theorems are about the type system, not about the code, and they are established once, on paper, for the system as designed. What the code must do is implement that system faithfully. The compact kernel of this book, and the even more compact description of it in Figure 3.1, Chapter 8, and Algorithm 12.1, is what lets a human reader check "faithfully".
 
 </aside>
 

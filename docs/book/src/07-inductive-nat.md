@@ -12,7 +12,7 @@ $$
 t, A, B \;::=\; \cdots \;\mid\; c
 $$
 
-A **signature** $\Sigma$ lists the constants. Each entry either *declares* a constant with its type, written $c : C$, or also gives it a body, written $c : C \mathrel{:=} t$. Entries with a body are **definitions**. For example, $\Nat : \Sort{1}$ below is a declaration, and $\add$ later in this chapter is a definition. Before an entry is added, its type is checked to be a type in the empty context, and its body, if any, is checked against that type, exactly as Lean does for each `def`.
+A **signature** $\Sigma$ lists the constants. Each entry either *declares* a constant with its type, written $c : C$, or also gives it a body, written $c : C \mathrel{:=} t$. Entries with a body are **definitions**. For example, $\Nat : \Sort{1}$ below is a declaration, and $\add$ later in this chapter is a definition. Before an entry is added, its type is checked to be a type in the empty context, and its body, if any, is checked against that type, as Lean does for each `def`.
 
 The signature is used in two ways. First, a constant has the type the signature gives it:
 
@@ -76,7 +76,7 @@ $$
 \mathsf{rec}_C : C \to (\Nat \to C \to C) \to \Nat \to C,
 $$
 
-together with two computation rules, called **iota-rules**, which are exactly the equations above:
+together with two computation rules, called **iota-rules**, which are the equations above:
 
 $$
 \mathsf{rec}_C\;z\;s\;\zero \;\iotared\; z,
@@ -92,7 +92,7 @@ $$
 s = \tLam{k}{\Nat}{\tLam{r}{\Nat}{\suc\;r}}.
 $$
 
-We write $m + n$ for $\add\;m\;n$. The kernel computes $2 + 1$ with delta, beta, and iota steps only. The explorer below is the kernel doing exactly that, one head step at a time, with the $\add$ definition loaded.
+We write $m + n$ for $\add\;m\;n$. The kernel computes $2 + 1$ with delta, beta, and iota steps only. The explorer below is the kernel doing that, one head step at a time, with the $\add$ definition loaded.
 
 <div class="explorer" data-kind="reduce" data-term="add (Nat.succ (Nat.succ Nat.zero)) (Nat.succ Nat.zero)"><pre class="prelude">def add : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) m (fun (k : Nat) => fun (r : Nat) => Nat.succ r) n</pre></div>
 
@@ -106,7 +106,7 @@ $$
 
 and $\mathit{double}\;2 \to \suc\;(\suc\;(\mathit{double}\;1)) \to \suc^4\;(\mathit{double}\;0) \to \suc^4\;\zero = 4$.
 
-The interesting point is that no new recursion mechanism is needed. The constants of the inductive type, together with $\mathsf{rec}_C$ and its two rules, are enough to express every structurally recursive function on $\Nat$. And unlike general recursion, this one always terminates: each iota-step removes one $\suc$ from the argument.
+No new recursion mechanism is needed. The constants of the inductive type, together with $\mathsf{rec}_C$ and its two rules, are enough to express every structurally recursive function on $\Nat$. And unlike general recursion, this one always terminates: each iota-step removes one $\suc$ from the argument.
 
 <aside class="intuition" markdown="1">
 
@@ -200,7 +200,7 @@ The `Eq` in the goal is the equality type, declared in [Chapter 9](09-equality.m
 
 <aside class="lean" markdown="1">
 
-Lean generates `Nat.rec` from the `inductive` declaration exactly as described here, and its type agrees with Figure 7.1 up to the names of bound variables and implicit arguments. Lean's compiler then replaces the recursor by efficient machine arithmetic for execution, and its elaborator lets users write recursive functions by pattern matching, compiling them to recursors behind the scenes. The kernel, however, only ever sees recursors.
+Lean generates `Nat.rec` from the `inductive` declaration as described here, and its type agrees with Figure 7.1 up to the names of bound variables and implicit arguments. Lean's compiler then replaces the recursor by efficient machine arithmetic for execution, and its elaborator lets users write recursive functions by pattern matching, compiling them to recursors behind the scenes. The kernel, however, only ever sees recursors.
 
 </aside>
 
@@ -245,6 +245,6 @@ What to remember
 - An inductive type adds a type former and constructors, which build values and do not compute.
 - Structural recursion on $\Nat$ is captured by one constant, the recursor, with one iota-rule per constructor.
 - Induction is the same recursor with a dependent motive $M : \Nat \to \Sort{0}$. Recursion and induction are one operation.
-- The $\imax$ rule is what makes "for all $n$, $M\;n$" a proposition.
+- The $\imax$ rule makes "for all $n$, $M\;n$" a proposition.
 
 </div>

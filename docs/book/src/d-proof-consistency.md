@@ -44,7 +44,7 @@ Recall from [Chapter 12](12-reduction-conversion.md) that every term is a spine 
 
 <div class="lemma" markdown="1">
 
-**Lemma D.2 (Normal forms).** Let $n$ be a normal term with $\Gamma \vdash n : T$. Then $n$ is a universe, a $\Pi$, a $\lambda$, or a *neutral* term $x\;a_1 \cdots a_k$ with $k \ge 0$ whose head $x$ is a variable in $\dom(\Gamma)$. Moreover, if $k \ge 1$, then $\Gamma \vdash x : C$ for some $C$ that is convertible to a $\Pi$.
+**Lemma D.2 (Normal forms).** Let $n$ be a normal term with $\Gamma \vdash n : T$. Then $n$ is a universe, a $\Pi$, a $\lambda$, or a *neutral* term $x\;a_1 \cdots a_k$ with $k \ge 0$ whose head $x$ is a variable in $\dom(\Gamma)$. And if $k \ge 1$, then $\Gamma \vdash x : C$ for some $C$ that is convertible to a $\Pi$.
 
 </div>
 

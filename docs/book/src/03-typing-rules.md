@@ -18,7 +18,7 @@ Order matters. A later type may mention an earlier variable, as in $P : \Sort{0}
 
 Two judgments are defined together.
 
-- $\ctxok{\Gamma}$ means that the context $\Gamma$ is *well formed*: each assumed type is a genuine type in the context before it.
+- $\ctxok{\Gamma}$ means that the context $\Gamma$ is *well formed*: each assumed type is a type in the context before it.
 - $\Gamma \vdash t : A$ means that under the assumptions in $\Gamma$, the term $t$ has type $A$.
 
 Through the Curry-Howard lens, $\Gamma \vdash t : A$ says that $t$ is a proof of $A$ from the hypotheses $\Gamma$.
@@ -122,7 +122,7 @@ $$
 }{\cdot \vdash \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}} : \tPi{P}{\Sort{0}}{\tPi{h}{P}{P}}}\rulename{T-Lam}
 $$
 
-The kernel builds exactly this tree. Below, each node is one application of a rule, with the judgment it establishes; switch to the call view to read it top-down as the recursion that produces it. Replace the term with your own to see which rules fire.
+The kernel builds this tree. Below, each node is one application of a rule, with the judgment it establishes; switch to the call view to read it top-down as the recursion that produces it. Replace the term with your own to see which rules fire.
 
 <div class="explorer" data-kind="derive" data-view="tree" data-term="fun (P : Sort 0) => fun (h : P) => h"></div>
 

@@ -26,7 +26,7 @@ Three examples show how far this already goes. On the left is a proposition, in 
 | $A \to B \to A$ | $\lambda a.\,\lambda b.\,a$ | Ignore the second assumption. |
 | $(A \to B) \to (B \to C) \to A \to C$ | $\lambda f.\,\lambda g.\,\lambda a.\,g\,(f\,a)$ | Compose the two implications. |
 
-The third row deserves a second look. To prove that implication is transitive, you assume $A \to B$ and $B \to C$, and then, given $A$, you apply the first assumption to get $B$ and the second to get $C$. The proof term says exactly that: $f$ and $g$ are the assumptions, $a$ is the proof of $A$, and $g\,(f\,a)$ applies them in order. *Using* an assumption is *applying* a function; this is the step that distinguishes real reasoning from merely restating hypotheses, and we will return to it in [Chapter 3](03-typing-rules.md).
+Look at the third row again. To prove that implication is transitive, you assume $A \to B$ and $B \to C$, and then, given $A$, you apply the first assumption to get $B$ and the second to get $C$. The proof term says exactly that: $f$ and $g$ are the assumptions, $a$ is the proof of $A$, and $g\,(f\,a)$ applies them in order. *Using* an assumption is *applying* a function; this is the step that distinguishes real reasoning from merely restating hypotheses, and we will return to it in [Chapter 3](03-typing-rules.md).
 
 <aside class="intuition" markdown="1">
 
@@ -70,7 +70,7 @@ This gives us the central idea behind a theorem prover.
 
 The kernel does not reason about truth. It implements typing rules, which say when a term has a type, and it mechanically checks that a given term has a given type under those rules. Whether that counts as proof checking depends on whether the typing rules faithfully implement a logic, which is the subject of [Chapter 4](04-logic.md). Whether the rules are *sound*, so that no term inhabits the type of a false proposition, is the subject of [Chapter 13](13-universes.md) and [Chapter 14](14-properties.md).
 
-This division of labour has a consequence that shapes the design of every serious prover. Everything that *finds* proofs (tactics, automation, decision procedures, a large language model) can be arbitrarily clever and arbitrarily buggy, because its output is just a term, and the kernel checks the term. The kernel is the only part that must be right. Keeping it small is the whole game, and the kernel in this book is under fifteen hundred lines of Rust, comments included.
+This division of labour has a consequence that shapes the design of every serious prover. Everything that *finds* proofs (tactics, automation, decision procedures, a large language model) can be arbitrarily clever and arbitrarily buggy, because its output is just a term, and the kernel checks the term. The kernel is the only part that must be right. Keeping it small is the design goal, and the kernel in this book is under fifteen hundred lines of Rust, comments included.
 
 <aside class="lean" markdown="1">
 
@@ -88,7 +88,7 @@ The chapters of Part I build the kernel for a type theory that is just large eno
 4. [Chapter 5](05-algorithm.md) turns the rules into an algorithm and matches it against the Rust implementation.
 5. [Chapter 6](06-worked-examples.md) runs the algorithm by hand on correct proofs, incorrect proofs, and proofs that need computation.
 
-Two operations are deliberately treated as black boxes until Part III: substitution and definitional equality. Both are easy to state and surprisingly easy to get wrong, and the kernel's correctness depends on them.
+Two operations are deliberately treated as black boxes until Part III: substitution and definitional equality. Both are easy to state and easy to get wrong, and the kernel's correctness depends on them.
 
 <div class="summary-box" markdown="1">
 

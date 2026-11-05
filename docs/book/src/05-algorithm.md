@@ -148,12 +148,12 @@ pub fn infer(&self, ctx: &Context, t: &Term) -> Result<Term> {
 
 </details>
 
-A few details are worth noticing against the pseudocode.
+A few details differ from the pseudocode.
 
 - The context lookup in the variable case searches from the end (`.rev()`). Because `rename_binder_if_needed` keeps names distinct, there is never more than one match, but searching from the end is the right behaviour if a caller passes a context with repeated names.
 - The $\imax$ of T-Pi is the `if body_level == 0` expression: a $\Pi$ whose body is a proposition is a proposition, otherwise it lives in the maximum of the two levels.
 - The universe level is a `u64` and `checked_add` guards against overflow. No real proof comes anywhere near level $2^{64}$, but a kernel should not have undefined behaviour on any input.
-- The application case calls `whnf` on the inferred type of `f` before matching on it, exactly as the pseudocode does. Without this, a function whose type is written as $\mathit{Id}\;(A \to B)$ could not be applied.
+- The application case calls `whnf` on the inferred type of `f` before matching on it, as the pseudocode does. Without this, a function whose type is written as $\mathit{Id}\;(A \to B)$ could not be applied.
 
 The remaining two functions are short.
 

@@ -88,7 +88,7 @@ t = \tLam{P}{\Sort{0}}{\tLam{Q}{\Sort{0}}{\tLam{f}{P \to Q}{\tLam{p}{P}{f\;p}}}}
 \tPi{P}{\Sort{0}}{\tPi{Q}{\Sort{0}}{(P \to Q) \to P \to Q}},
 $$
 
-which says "if $P$ implies $Q$ and $P$ holds, then $Q$ holds". The four $\lambda$s extend the context to $\Gamma = P : \Sort{0},\; Q : \Sort{0},\; f : P \to Q,\; p : P$ exactly as before. The body $f\;p$ reaches the application case of $\Infer$:
+which says "if $P$ implies $Q$ and $P$ holds, then $Q$ holds". The four $\lambda$s extend the context to $\Gamma = P : \Sort{0},\; Q : \Sort{0},\; f : P \to Q,\; p : P$ as before. The body $f\;p$ reaches the application case of $\Infer$:
 
 <ul class="trace">
 <li>$\Infer(\Gamma,\; f\;p)$ <span class="rule">T-App</span>
@@ -122,7 +122,7 @@ In a *dependent* application the substitution in T-App does real work. Let $\mat
 </li>
 </ul>
 
-Logically, this is $\forall$-elimination: from "every proposition implies itself" we obtain "$Q$ implies $Q$". The type of the result depends on the *value* of the argument $Q$, which is exactly what the dependent $\Pi$-type expresses and exactly why T-App substitutes. In the explorer, $\mathit{id}$ is a defined constant and $Q$ comes from the context; the note on the T-App node records the substitution.
+Logically, this is $\forall$-elimination: from "every proposition implies itself" we obtain "$Q$ implies $Q$". The type of the result depends on the *value* of the argument $Q$, which is what the dependent $\Pi$-type expresses and why T-App substitutes. In the explorer, $\mathit{id}$ is a defined constant and $Q$ comes from the context; the note on the T-App node records the substitution.
 
 <div class="explorer" data-kind="derive" data-term="id Q" data-ctx="Q : Sort 0"><pre class="prelude">def id : forall (P : Sort 0), P -> P := fun (P : Sort 0) => fun (h : P) => h</pre></div>
 
@@ -136,7 +136,7 @@ t = \tLam{P}{\Sort{0}}{\tLam{h}{\mathit{Id}\;P}{h}}
 \tPi{P}{\Sort{0}}{P \to P}.
 $$
 
-$\Infer$ first checks that the annotation $\mathit{Id}\;P$ is a type. $\InferSort(\Gamma_1, \mathit{Id}\;P)$ reaches the application case of $\Infer$: the function $\tLam{X}{\Sort{0}}{X}$ has type $\tPi{X}{\Sort{0}}{\Sort{0}}$, the argument $P$ passes $\Check(\Gamma_1, P, \Sort{0})$, and the result is $\subst{\Sort{0}}{X}{P} = \Sort{0}$. So $\mathit{Id}\;P$ is a type (a proposition, in fact). The body $h$ then has type $\mathit{Id}\;P$, so
+$\Infer$ first checks that the annotation $\mathit{Id}\;P$ is a type. $\InferSort(\Gamma_1, \mathit{Id}\;P)$ reaches the application case of $\Infer$: the function $\tLam{X}{\Sort{0}}{X}$ has type $\tPi{X}{\Sort{0}}{\Sort{0}}$, the argument $P$ passes $\Check(\Gamma_1, P, \Sort{0})$, and the result is $\subst{\Sort{0}}{X}{P} = \Sort{0}$. So $\mathit{Id}\;P$ is a type, and a proposition. The body $h$ then has type $\mathit{Id}\;P$, so
 
 $$
 \Infer(\cdot, t) \;=\; \tPi{P}{\Sort{0}}{\tPi{h}{\mathit{Id}\;P}{\mathit{Id}\;P}}.

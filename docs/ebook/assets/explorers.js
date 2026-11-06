@@ -147,7 +147,7 @@
 
   function setupAst(box) {
     var prelude = childText(box, 'prelude');
-    var ui = frame(box, t('syntax tree'), [{ name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true }]);
+    var ui = frame(box, t('syntax tree'), [{ name: 'term', label: t('term'), value: attr(box, 'term', ''), wide: true }]);
     var picked = el('div', 'ex-picked');
     function run() {
       ui.busy(true);
@@ -231,7 +231,7 @@
 
   function setupDerive(box) {
     var prelude = childText(box, 'prelude');
-    var inputs = [{ name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true }];
+    var inputs = [{ name: 'term', label: t('term'), value: attr(box, 'term', ''), wide: true }];
     inputs.push({ name: 'ctx', label: t('context'), value: attr(box, 'ctx', '') });
     var ui = frame(box, t('typing derivation'), inputs);
     var asTree = attr(box, 'view', 'list') === 'tree';
@@ -286,7 +286,7 @@
   function setupReduce(box) {
     var prelude = childText(box, 'prelude');
     var ui = frame(box, t('reduction'), [
-      { name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true },
+      { name: 'term', label: t('term'), value: attr(box, 'term', ''), wide: true },
       { name: 'ctx', label: t('context'), value: attr(box, 'ctx', '') }
     ]);
     function run() {
@@ -337,7 +337,7 @@
   // ----- scope -----
 
   function setupScope(box) {
-    var ui = frame(box, t('binders and scope'), [{ name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true }]);
+    var ui = frame(box, t('binders and scope'), [{ name: 'term', label: t('term'), value: attr(box, 'term', ''), wide: true }]);
     function run() {
       ui.busy(true);
       request('scope', [ui.fields.term.value]).then(function (j) {
@@ -362,9 +362,9 @@
 
   function setupSubst(box) {
     var ui = frame(box, t('substitution'), [
-      { name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true },
+      { name: 'term', label: t('term'), value: attr(box, 'term', ''), wide: true },
       { name: 'var', label: t('replace'), value: attr(box, 'var', 'x') },
-      { name: t('with'), label: t('with'), value: attr(box, t('with'), '') }
+      { name: 'with', label: t('with'), value: attr(box, 'with', '') }
     ]);
     function run() {
       ui.busy(true);
@@ -551,7 +551,7 @@
 
   function setupCtree(box) {
     var prelude = childText(box, 'prelude');
-    var ui = frame(box, t('constructor tree'), [{ name: t('term'), label: t('value'), value: attr(box, t('term'), ''), wide: true }]);
+    var ui = frame(box, t('constructor tree'), [{ name: 'term', label: t('value'), value: attr(box, 'term', ''), wide: true }]);
     function run() {
       ui.busy(true);
       request('ctree', [ui.fields.term.value], prelude).then(function (j) {

@@ -995,3 +995,5 @@ html[lang="ja"] .summary-box > p:first-child, html[lang="zh-Hans"] .summary-box 
   color: var(--fg2);
 }
 .page-print .notice { margin-bottom: 2rem; }
+.topbar-h5i { color: #ff6258; font-weight: 700; }
+.topbar-h5i:hover { color: #ff6258; border-color: #e0241b; }

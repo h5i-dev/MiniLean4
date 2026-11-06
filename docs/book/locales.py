@@ -6,6 +6,15 @@ Sources live in docs/book/src (en), docs/book/src-ja, docs/book/src-zh.
 Output goes to docs/ebook (en), docs/ebook/ja, docs/ebook/zh.
 """
 
+# Absolute URL of the published English edition, with a trailing slash. Used
+# for canonical links, hreflang alternates, Open Graph URLs, and sitemap.xml.
+# Change this if the book is published somewhere else.
+SITE_URL = "https://h5i-dev.github.io/MiniLean4/ebook/"
+SITE_NAME = "MiniLean4"
+AUTHOR = "Hideaki Takahashi"
+AUTHOR_URL = "https://github.com/Koukyosyumei"
+REPO_URL = "https://github.com/h5i-dev/MiniLean4"
+
 # Chapter order is shared by every locale. (kind, slug)
 ORDER = [
     ("part", "part1"),

@@ -67,3 +67,13 @@ python3 docs/book/tools/check-translation.py docs/book/src/FILE.md docs/book/src
 
 The build produces a language switcher in the top bar for every language whose
 source directory exists.
+
+## Publishing and SEO
+
+`locales.py` holds `SITE_URL`, the absolute URL of the published English edition
+(default `https://h5i-dev.github.io/MiniLean4/ebook/`). Every page gets a
+canonical link, `hreflang` alternates for the three editions, Open Graph and
+Twitter card metadata, and JSON-LD (`Book` on the cover, `TechArticle` on
+chapters) derived from it; the build also writes `sitemap.xml` and `robots.txt`
+into `docs/ebook/`. Change `SITE_URL` before publishing elsewhere. The social
+preview images in `assets/og/` are rendered by `tools/make-og.py`.

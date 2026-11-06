@@ -4,8 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>型検査アルゴリズム | 対話的定理証明器をゼロから実装する</title>
-<meta name="description" content="Rust で書かれた小さな Lean 4 風の証明カーネル MiniLean4 を案内する本。命題と型、帰納型、タクティク、宇宙。">
+<meta name="description" content="規則を Infer と Check に変え、typecheck.rs と一行ずつ突き合わせる。">
+<meta name="author" content="Hideaki Takahashi">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://h5i-dev.github.io/MiniLean4/ebook/ja/05-algorithm.html">
+<link rel="alternate" hreflang="en" href="https://h5i-dev.github.io/MiniLean4/ebook/05-algorithm.html">
+<link rel="alternate" hreflang="ja" href="https://h5i-dev.github.io/MiniLean4/ebook/ja/05-algorithm.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://h5i-dev.github.io/MiniLean4/ebook/zh/05-algorithm.html">
+<link rel="alternate" hreflang="x-default" href="https://h5i-dev.github.io/MiniLean4/ebook/05-algorithm.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MiniLean4">
+<meta property="og:title" content="第 5 章: 型検査アルゴリズム">
+<meta property="og:description" content="規則を Infer と Check に変え、typecheck.rs と一行ずつ突き合わせる。">
+<meta property="og:url" content="https://h5i-dev.github.io/MiniLean4/ebook/ja/05-algorithm.html">
+<meta property="og:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/ja.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="第 5 章: 型検査アルゴリズム">
+<meta name="twitter:description" content="規則を Infer と Check に変え、typecheck.rs と一行ずつ突き合わせる。">
+<meta name="twitter:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/ja.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "第 5 章: 型検査アルゴリズム", "description": "規則を Infer と Check に変え、typecheck.rs と一行ずつ突き合わせる。", "url": "https://h5i-dev.github.io/MiniLean4/ebook/ja/05-algorithm.html", "inLanguage": "ja", "author": {"@type": "Person", "name": "Hideaki Takahashi", "url": "https://github.com/Koukyosyumei"}, "isPartOf": {"@type": "Book", "name": "対話的定理証明器をゼロから実装する", "url": "https://h5i-dev.github.io/MiniLean4/ebook/ja/index.html"}, "position": "5"}</script>
 <meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/mono-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../assets/book.css">
 <script>
@@ -59,14 +84,14 @@
 <li><a href="f-notation-glossary.html"><span class="toc-num">F</span><span class="toc-title">記法と用語集</span></a></li>
 <li><a href="bibliography.html"><span class="toc-num"></span><span class="toc-title">参考文献</span></a></li>
 </ol>
-<a class="toc-print" href="print.html">1 ページ版</a>
 </nav>
   </aside>
   <div class="main">
     <div class="topbar">
       <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">目次</button>
       <div class="topbar-spacer"></div>
-      <a class="topbar-btn topbar-link" href="https://github.com/h5i-dev/MiniLean4" aria-label="MiniLean4 on GitHub"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+      <a class="topbar-btn topbar-link topbar-icon" href="https://github.com/h5i-dev/MiniLean4" aria-label="MiniLean4 on GitHub" title="MiniLean4 on GitHub"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <a class="topbar-btn topbar-link" href="https://github.com/h5i-dev/h5i" title="h5i on GitHub">h5i</a>
       <nav class="langs" aria-label="Language"><a class="lang" href="../05-algorithm.html" hreflang="en">English</a><span class="lang current">日本語</span><a class="lang" href="../zh/05-algorithm.html" hreflang="zh-Hans">中文</a></nav>
       <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">ライト</button>
     </div>

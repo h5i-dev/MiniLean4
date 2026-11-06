@@ -25,7 +25,7 @@ from pathlib import Path
 import markdown
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from locales import LOCALES, ORDER  # noqa: E402
+from locales import LOCALES, ORDER, SITE_URL, SITE_NAME, AUTHOR, AUTHOR_URL, REPO_URL  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
 OUT_ROOT = ROOT.parent / "ebook"
@@ -282,7 +282,6 @@ class Site:
             num = f'<span class="toc-num">{e["short"]}</span>'
             parts.append(f'<li{cls}><a href="{e["file"]}">{num}<span class="toc-title">{html.escape(e["title"])}</span></a></li>')
         parts.append("</ol>")
-        parts.append(f'<a class="toc-print" href="print.html">{html.escape(self.ui["print"])}</a>')
         parts.append("</nav>")
         return "\n".join(parts)
 
@@ -320,6 +319,61 @@ class Site:
             _ = target
         return '<nav class="langs" aria-label="Language">' + "".join(links) + "</nav>"
 
+    def page_url(self, page, loc=None):
+        L = LOCALES[loc or self.loc]
+        return SITE_URL + (L["out"] + "/" if L["out"] else "") + page
+
+    def head_extra(self, page, title, description, kind, entry=None):
+        """Per-page metadata: description, canonical, hreflang alternates,
+        Open Graph and Twitter cards, and JSON-LD structured data."""
+        url = self.page_url(page)
+        og_image = SITE_URL + f"assets/og/{self.loc}.png"
+        lines = [
+            f'<meta name="description" content="{html.escape(description)}">',
+            f'<meta name="author" content="{html.escape(AUTHOR)}">',
+            '<meta name="robots" content="index, follow, max-image-preview:large">',
+            f'<link rel="canonical" href="{url}">',
+        ]
+        for other, L in LOCALES.items():
+            if (ROOT / L["src"]).exists():
+                lines.append(f'<link rel="alternate" hreflang="{L["html_lang"]}" href="{self.page_url(page, other)}">')
+        lines.append(f'<link rel="alternate" hreflang="x-default" href="{self.page_url(page, "en")}">')
+        lines += [
+            f'<meta property="og:type" content="{"book" if kind == "cover" else "article"}">',
+            f'<meta property="og:site_name" content="{SITE_NAME}">',
+            f'<meta property="og:title" content="{html.escape(title)}">',
+            f'<meta property="og:description" content="{html.escape(description)}">',
+            f'<meta property="og:url" content="{url}">',
+            f'<meta property="og:image" content="{og_image}">',
+            '<meta property="og:image:width" content="1200">',
+            '<meta property="og:image:height" content="630">',
+            f'<meta property="og:locale" content="{ {"en": "en_US", "ja": "ja_JP", "zh": "zh_CN"}[self.loc] }">',
+            '<meta name="twitter:card" content="summary_large_image">',
+            f'<meta name="twitter:title" content="{html.escape(title)}">',
+            f'<meta name="twitter:description" content="{html.escape(description)}">',
+            f'<meta name="twitter:image" content="{og_image}">',
+        ]
+        book = {
+            "@type": "Book", "name": self.L["title"], "url": self.page_url("index.html"),
+            "author": {"@type": "Person", "name": AUTHOR, "url": AUTHOR_URL},
+            "inLanguage": self.L["html_lang"], "isAccessibleForFree": True,
+            "license": REPO_URL + "/blob/main/LICENSE",
+            "about": ["type theory", "theorem proving", "Lean 4", "dependent types", "Rust"],
+        }
+        if kind == "cover":
+            data = {"@context": "https://schema.org", **book, "description": description}
+        else:
+            data = {
+                "@context": "https://schema.org", "@type": "TechArticle",
+                "headline": title, "description": description, "url": url,
+                "inLanguage": self.L["html_lang"], "author": book["author"],
+                "isPartOf": {"@type": "Book", "name": self.L["title"], "url": book["url"]},
+                "position": entry["short"] if entry else None,
+            }
+            data = {k: v for k, v in data.items() if v is not None}
+        lines.append('<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False) + '</script>')
+        return "\n".join(lines)
+
     def fill(self, page, **kv):
         out = TEMPLATE
         values = {
@@ -345,9 +399,11 @@ class Site:
         heading = (f'<header class="chapter-head">'
                    f'<p class="chapter-label">{html.escape(entry["label"])}</p>'
                    f'<h1>{html.escape(entry["title"])}</h1></header>')
+        desc = entry["desc"] or self.L["description"]
         return self.fill(
             entry["file"],
             title=f'{entry["title"]} | {self.L["title"]}',
+            head_extra=self.head_extra(entry["file"], f'{entry["label"]}: {entry["title"]}'.strip(": "), desc, "chapter", entry),
             body_class=f'page-{entry["kind"]}',
             sidebar=self.sidebar_html(entry["slug"]),
             onpage=self.on_this_page(toc_tokens),
@@ -371,7 +427,8 @@ class Site:
         body = body.replace("<p>CONTENTS_GO_HERE</p>", '<div class="contents">' + "".join(cards) + "</div>")
         return self.fill(
             "index.html",
-            title=self.L["title"],
+            title=f'{self.L["title"]} | {SITE_NAME}',
+            head_extra=self.head_extra("index.html", self.L["title"], self.L["description"], "cover"),
             body_class="page-cover",
             sidebar=self.sidebar_html(None),
             onpage="",
@@ -424,9 +481,33 @@ class Site:
         else:
             missing.append("index.md")
         if not check_only:
-            (self.out / "print.html").write_text(self.build_print(pages), encoding="utf-8")
+            print_page = self.out / "print.html"
+            if print_page.exists():
+                print_page.unlink()
         print(f"  {len(pages)} chapters" + (f", missing: {', '.join(missing)}" if missing else ""))
         return missing
+
+
+def write_sitemap():
+    """sitemap.xml and robots.txt for every page of every built locale."""
+    urls = []
+    for loc, L in LOCALES.items():
+        if not (ROOT / L["src"]).exists():
+            continue
+        site = Site(loc)
+        pages = ["index.html"] + [e["file"] for e in site.entries]
+        for page in pages:
+            alts = "".join(
+                f'<xhtml:link rel="alternate" hreflang="{LOCALES[o]["html_lang"]}" href="{site.page_url(page, o)}"/>'
+                for o in LOCALES if (ROOT / LOCALES[o]["src"]).exists()
+            )
+            urls.append(f'<url><loc>{site.page_url(page)}</loc>{alts}</url>')
+    xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+           + "\n".join(urls) + "\n</urlset>\n")
+    (OUT_ROOT / "sitemap.xml").write_text(xml, encoding="utf-8")
+    (OUT_ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n", encoding="utf-8")
+    print(f"  sitemap.xml ({len(urls)} urls), robots.txt")
 
 
 def main():
@@ -444,6 +525,7 @@ def main():
         if m:
             missing[loc] = m
     if not check_only:
+        write_sitemap()
         if (OUT_ROOT / "assets").exists():
             shutil.rmtree(OUT_ROOT / "assets")
         shutil.copytree(ASSETS, OUT_ROOT / "assets")

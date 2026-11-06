@@ -182,7 +182,7 @@ goal forall (n : Nat), Eq Nat (add Nat.zero n) n
 exact Nat.rec0 (fun (n : Nat) => Eq Nat (add Nat.zero n) n) (Eq.refl Nat Nat.zero) (fun (k : Nat) => fun (ih : Eq Nat (add Nat.zero k) k) => ndrec Nat (add Nat.zero k) (fun (b : Nat) => Eq Nat (Nat.succ (add Nat.zero k)) (Nat.succ b)) (Eq.refl Nat (Nat.succ (add Nat.zero k))) k ih)
 qed</pre></div>
 
-こうした項を手で書くのは退屈で、しかも難しいのは正しい motive を見つける部分である。motive $N$ は、$0 + k$ が現れる二箇所のうち、ちょうど一方だけで $b$ に言及しなければならなかった。タクティク（[第 10 章](10-tactics.md)）は、この帳簿付けと motive の選択の両方を自動化する。
+こうした項を手で書くのは手間がかかり、とくに正しい motive を見つけるのが難しい。motive $N$ は、$0 + k$ が現れる二箇所のうち、ちょうど一方だけで $b$ に言及しなければならなかった。タクティク（[第 10 章](10-tactics.md)）は、項の組み立てと motive の選択を自動化する。
 
 ## カーネルへの変更
 

@@ -4,7 +4,7 @@
 Sources:   docs/book/src/*.md (English), docs/book/src-ja/*.md, docs/book/src-zh/*.md
 Template:  docs/book/template.html
 Assets:    docs/book/assets/    (CSS, JS, fonts, KaTeX, kernel wasm)
-Output:    docs/ebook/          (English), docs/ebook/ja/, docs/ebook/zh/
+Output:    docs/ (English), docs/ja/, docs/zh/   (GitHub Pages serves docs/)
 
 Math is pre-rendered with KaTeX through Node (tools/render-math.mjs), so the
 output pages need no JavaScript to display formulas. Chapter order, titles,
@@ -28,7 +28,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from locales import LOCALES, ORDER, SITE_URL, SITE_NAME, AUTHOR, AUTHOR_URL, REPO_URL  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
-OUT_ROOT = ROOT.parent / "ebook"
+OUT_ROOT = ROOT.parent  # docs/, served by GitHub Pages
 ASSETS = ROOT / "assets"
 TOOLS = ROOT / "tools"
 TEMPLATE = (ROOT / "template.html").read_text(encoding="utf-8")

@@ -11,7 +11,7 @@ A minimal, self-contained implementation of a Lean 4-style theorem prover kernel
 
 ## Book
 
-The directory [`docs/ebook/`](./docs/ebook) contains a complete ebook, *Implementing an Interactive Theorem Prover from Scratch*, that explains this kernel chapter by chapter, with the real kernel compiled to WebAssembly so that every example can be run and edited in the browser. Open `docs/ebook/index.html` through a local web server (for example `python3 -m http.server` inside `docs/ebook`) to use the interactive playgrounds. The book is also available in Japanese (`docs/ebook/ja/`) and Simplified Chinese (`docs/ebook/zh/`). The sources and build script are in [`docs/book/`](./docs/book).
+The book *Implementing an Interactive Theorem Prover from Scratch* explains this kernel chapter by chapter, with the real kernel compiled to WebAssembly so every example can be run and edited in the browser. It is published at [learn.h5i.dev](https://learn.h5i.dev/) in English, [Japanese](https://learn.h5i.dev/ja/), and [Simplified Chinese](https://learn.h5i.dev/zh/). The built site is the [`docs/`](./docs) folder (open it through a local web server, for example `python3 -m http.server` inside `docs`, to use the playgrounds); the sources and build script are in [`docs/book/`](./docs/book), and the original paper is in [`docs/paper/`](./docs/paper).
 
 ## Quick Start
 

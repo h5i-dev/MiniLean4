@@ -3,13 +3,13 @@ interface strings. The English entry is the reference; the other locales must
 list the same slugs in the same order.
 
 Sources live in docs/book/src (en), docs/book/src-ja, docs/book/src-zh.
-Output goes to docs/ebook (en), docs/ebook/ja, docs/ebook/zh.
+Output goes to docs/ (en), docs/ja, docs/zh, which GitHub Pages serves at learn.h5i.dev.
 """
 
 # Absolute URL of the published English edition, with a trailing slash. Used
 # for canonical links, hreflang alternates, Open Graph URLs, and sitemap.xml.
 # Change this if the book is published somewhere else.
-SITE_URL = "https://h5i-dev.github.io/MiniLean4/ebook/"
+SITE_URL = "https://learn.h5i.dev/"
 SITE_NAME = "MiniLean4"
 AUTHOR = "Hideaki Takahashi"
 AUTHOR_URL = "https://github.com/Koukyosyumei"

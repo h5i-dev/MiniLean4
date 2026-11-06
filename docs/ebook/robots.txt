@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://h5i-dev.github.io/MiniLean4/ebook/sitemap.xml

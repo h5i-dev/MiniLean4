@@ -332,6 +332,7 @@ class Site:
             f'<meta name="description" content="{html.escape(description)}">',
             f'<meta name="author" content="{html.escape(AUTHOR)}">',
             '<meta name="robots" content="index, follow, max-image-preview:large">',
+            f'<meta name="keywords" content="{html.escape(", ".join(self.L.get("keywords", [])))}">',
             f'<link rel="canonical" href="{url}">',
         ]
         for other, L in LOCALES.items():
@@ -359,6 +360,7 @@ class Site:
             "inLanguage": self.L["html_lang"], "isAccessibleForFree": True,
             "license": REPO_URL + "/blob/main/LICENSE",
             "about": ["type theory", "theorem proving", "Lean 4", "dependent types", "Rust"],
+            "keywords": ", ".join(self.L.get("keywords", [])),
         }
         if kind == "cover":
             data = {"@context": "https://schema.org", **book, "description": description}
@@ -368,6 +370,7 @@ class Site:
                 "headline": title, "description": description, "url": url,
                 "inLanguage": self.L["html_lang"], "author": book["author"],
                 "isPartOf": {"@type": "Book", "name": self.L["title"], "url": book["url"]},
+                "keywords": book["keywords"],
                 "position": entry["short"] if entry else None,
             }
             data = {k: v for k, v in data.items() if v is not None}

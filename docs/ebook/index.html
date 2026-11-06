@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Implementing an Interactive Theorem Prover from Scratch | MiniLean4</title>
-<meta name="description" content="A guided tour of MiniLean4, a small Lean 4-style proof kernel in Rust: propositions as types, inductive types, tactics, and universes.">
+<meta name="description" content="A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.">
 <meta name="author" content="Hideaki Takahashi">
 <meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="keywords" content="Lean 4, proof assistant, formal verification, dependent type theory, theorem prover, type checker, Curry-Howard correspondence, inductive types, tactics, Rust">
 <link rel="canonical" href="https://h5i-dev.github.io/MiniLean4/ebook/index.html">
 <link rel="alternate" hreflang="en" href="https://h5i-dev.github.io/MiniLean4/ebook/index.html">
 <link rel="alternate" hreflang="ja" href="https://h5i-dev.github.io/MiniLean4/ebook/ja/index.html">
@@ -15,7 +16,7 @@
 <meta property="og:type" content="book">
 <meta property="og:site_name" content="MiniLean4">
 <meta property="og:title" content="Implementing an Interactive Theorem Prover from Scratch">
-<meta property="og:description" content="A guided tour of MiniLean4, a small Lean 4-style proof kernel in Rust: propositions as types, inductive types, tactics, and universes.">
+<meta property="og:description" content="A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.">
 <meta property="og:url" content="https://h5i-dev.github.io/MiniLean4/ebook/index.html">
 <meta property="og:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/en.png">
 <meta property="og:image:width" content="1200">
@@ -23,9 +24,9 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Implementing an Interactive Theorem Prover from Scratch">
-<meta name="twitter:description" content="A guided tour of MiniLean4, a small Lean 4-style proof kernel in Rust: propositions as types, inductive types, tactics, and universes.">
+<meta name="twitter:description" content="A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.">
 <meta name="twitter:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/en.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Book", "name": "Implementing an Interactive Theorem Prover from Scratch", "url": "https://h5i-dev.github.io/MiniLean4/ebook/index.html", "author": {"@type": "Person", "name": "Hideaki Takahashi", "url": "https://github.com/Koukyosyumei"}, "inLanguage": "en", "isAccessibleForFree": true, "license": "https://github.com/h5i-dev/MiniLean4/blob/main/LICENSE", "about": ["type theory", "theorem proving", "Lean 4", "dependent types", "Rust"], "description": "A guided tour of MiniLean4, a small Lean 4-style proof kernel in Rust: propositions as types, inductive types, tactics, and universes."}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Book", "name": "Implementing an Interactive Theorem Prover from Scratch", "url": "https://h5i-dev.github.io/MiniLean4/ebook/index.html", "author": {"@type": "Person", "name": "Hideaki Takahashi", "url": "https://github.com/Koukyosyumei"}, "inLanguage": "en", "isAccessibleForFree": true, "license": "https://github.com/h5i-dev/MiniLean4/blob/main/LICENSE", "about": ["type theory", "theorem proving", "Lean 4", "dependent types", "Rust"], "keywords": "Lean 4, proof assistant, formal verification, dependent type theory, theorem prover, type checker, Curry-Howard correspondence, inductive types, tactics, Rust", "description": "A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs."}</script>
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0b0d10">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -124,6 +125,7 @@ qed</pre>
 </header>
 <h2 id="what-this-book-is">What this book is</h2>
 <p>Interactive theorem provers such as Lean, Coq, and Agda rest on a small core: a <em>kernel</em> that decides whether a term has a given type. Everything else, including tactics, notation, and automation, is scaffolding that produces terms for the kernel to check. If the kernel is right, a bug anywhere else can make the system fail to prove a theorem, but never make it accept a false one.</p>
+<p>MiniLean4 is a proof assistant kernel at teaching scale: the same kind of dependent type theory that Lean 4, Coq, and Agda use for formal verification, cut down to what fits in a few files of Rust. If you want to understand how Lean 4 checks a proof, what the Curry-Howard correspondence buys you in practice, or where formal verification tools get their trust, this is the machinery with nothing hidden.</p>
 <p>The goal here is to make that kernel concrete. Each chapter introduces one idea on paper, states it precisely, and then shows the Rust code that implements it. The whole implementation, kernel plus tactics and parser, is under three thousand lines with no dependencies, and this book covers all of it.</p>
 <p>The book is self-contained. You need to be comfortable reading a recursive function and a little set notation. No prior exposure to type theory or to Lean is assumed, although readers who know Lean will recognize much of what they see.</p>
 <h2 id="how-to-read-it">How to read it</h2>

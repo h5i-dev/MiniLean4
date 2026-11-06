@@ -54,7 +54,8 @@ LOCALES = {
         "notice": "",
         "title": "Implementing an Interactive Theorem Prover from Scratch",
         "subtitle": "Implementing an Interactive Theorem Prover from Scratch",
-        "description": "A guided tour of MiniLean4, a small Lean 4-style proof kernel in Rust: propositions as types, inductive types, tactics, and universes.",
+        "description": "A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.",
+        "keywords": ["Lean 4", "proof assistant", "formal verification", "dependent type theory", "theorem prover", "type checker", "Curry-Howard correspondence", "inductive types", "tactics", "Rust"],
         "parts": {
             "part1": "A Kernel for Propositional Logic",
             "part2": "Growing the Kernel",
@@ -113,7 +114,8 @@ LOCALES = {
         "notice": "",
         "title": "対話的定理証明器をゼロから実装する",
         "subtitle": "対話的定理証明器をゼロから実装する",
-        "description": "Rust で書かれた小さな Lean 4 風の証明カーネル MiniLean4 を案内する本。命題と型、帰納型、タクティク、宇宙。",
+        "description": "Lean 4 風の証明支援系カーネルを Rust でゼロから作る無料のオンライン書籍。依存型理論、命題と型、帰納型、タクティク、宇宙を扱い、カーネルはブラウザ内で動く。形式検証や Lean 4 の証明検査のしくみを学びたい人向け。",
+        "keywords": ["Lean 4", "証明支援系", "形式検証", "依存型理論", "定理証明器", "型検査", "Curry-Howard 対応", "帰納型", "タクティク", "Rust"],
         "parts": {
             "part1": "命題論理のためのカーネル",
             "part2": "カーネルを育てる",
@@ -211,7 +213,8 @@ LOCALES = {
         "notice": "本中文版由作者借助 AI 翻译而成。作者并非中文母语者，译文未经人工逐句校对，可能存在错误。如发现问题，请在 <a href=\"https://github.com/h5i-dev/MiniLean4/issues\">GitHub 上提交 issue</a>。",
         "title": "从零实现交互式定理证明器",
         "subtitle": "从零实现交互式定理证明器",
-        "description": "一本带你读懂 MiniLean4 的书。MiniLean4 是用 Rust 写成的小型 Lean 4 风格证明内核：命题即类型、归纳类型、策略与宇宙。",
+        "description": "一本免费的在线书，用 Rust 从零构建 Lean 4 风格的证明助手内核：依赖类型理论、命题即类型、归纳类型、策略与宇宙，内核可直接在浏览器中运行。适合学习形式化验证或想了解 Lean 4 如何检查证明的读者。",
+        "keywords": ["Lean 4", "证明助手", "形式化验证", "依赖类型理论", "定理证明器", "类型检查", "Curry-Howard 对应", "归纳类型", "策略", "Rust"],
         "parts": {
             "part1": "命题逻辑的内核",
             "part2": "扩展内核",

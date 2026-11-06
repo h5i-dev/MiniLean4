@@ -48,7 +48,7 @@
     var group = null; // consecutive marked tokens share one highlight box
     tokens.forEach(function (t) {
       var s = el('span', 'tk tk-' + t.k, t.t);
-      if ((t.k === 'binder' || t.k === t('bound')) && t.id >= 0) {
+      if ((t.k === 'binder' || t.k === 'bound') && t.id >= 0) {
         s.classList.add('tk-b' + (t.id % HUES));
         s.setAttribute('data-bind', String(t.id));
       }
@@ -368,7 +368,7 @@
     ]);
     function run() {
       ui.busy(true);
-      request('subst', [ui.fields.term.value, ui.fields['var'].value, ui.fields[t('with')].value]).then(function (j) {
+      request('subst', [ui.fields.term.value, ui.fields['var'].value, ui.fields['with'].value]).then(function (j) {
         ui.busy(false);
         if (j.error) { ui.error(j.error); return; }
         ui.error('');
@@ -415,7 +415,7 @@
   }
 
   function setupProof(box) {
-    var script = childText(box, t('script'));
+    var script = childText(box, 'script');
     box.innerHTML = '';
     var bar = el('div', 'ex-bar');
     bar.appendChild(el('span', 'ex-title', attr(box, 'title', t('proof explorer'))));

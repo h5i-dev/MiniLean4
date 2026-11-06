@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bibliography | Implementing an Interactive Theorem Prover from Scratch</title>
+<meta name="description" content="A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.">
+<meta name="author" content="Hideaki Takahashi">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="keywords" content="Lean 4, proof assistant, formal verification, dependent type theory, theorem prover, type checker, Curry-Howard correspondence, inductive types, tactics, Rust">
+<link rel="canonical" href="https://h5i-dev.github.io/MiniLean4/ebook/bibliography.html">
+<link rel="alternate" hreflang="en" href="https://h5i-dev.github.io/MiniLean4/ebook/bibliography.html">
+<link rel="alternate" hreflang="ja" href="https://h5i-dev.github.io/MiniLean4/ebook/ja/bibliography.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://h5i-dev.github.io/MiniLean4/ebook/zh/bibliography.html">
+<link rel="alternate" hreflang="x-default" href="https://h5i-dev.github.io/MiniLean4/ebook/bibliography.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MiniLean4">
+<meta property="og:title" content="Bibliography">
+<meta property="og:description" content="A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.">
+<meta property="og:url" content="https://h5i-dev.github.io/MiniLean4/ebook/bibliography.html">
+<meta property="og:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bibliography">
+<meta name="twitter:description" content="A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.">
+<meta name="twitter:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/en.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Bibliography", "description": "A free online book that builds a Lean 4-style proof assistant kernel from scratch in Rust: dependent type theory, propositions as types, inductive types, tactics, and universes, with the kernel running live in your browser. For anyone learning formal verification or how Lean 4 checks proofs.", "url": "https://h5i-dev.github.io/MiniLean4/ebook/bibliography.html", "inLanguage": "en", "author": {"@type": "Person", "name": "Hideaki Takahashi", "url": "https://github.com/Koukyosyumei"}, "isPartOf": {"@type": "Book", "name": "Implementing an Interactive Theorem Prover from Scratch", "url": "https://h5i-dev.github.io/MiniLean4/ebook/index.html"}, "keywords": "Lean 4, proof assistant, formal verification, dependent type theory, theorem prover, type checker, Curry-Howard correspondence, inductive types, tactics, Rust", "position": ""}</script>
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/mono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<link rel="stylesheet" href="assets/book.css">
+<script>
+  (function () {
+    if (localStorage.getItem("minilean-theme") === "light") {
+      document.documentElement.classList.add("light");
+    }
+  })();
+  window.MINILEAN_WASM_URL = "assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "contents", "close": "close", "theme_light": "light", "theme_dark": "dark"}, "js": {}};
+</script>
+</head>
+<body class="page-app">
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a class="logo" href="index.html">MiniLean4</a>
+      <p class="book-sub">Implementing an Interactive Theorem Prover from Scratch</p>
+    </div>
+    <nav class="toc" aria-label="Table of contents">
+<a class="toc-cover" href="index.html">Cover and contents</a>
+<h3 class="toc-part">A Kernel for Propositional Logic</h3><ol class="toc-list">
+<li class="past"><a href="01-propositions-as-types.html"><span class="toc-num">1</span><span class="toc-title">Propositions as Types</span></a></li>
+<li class="past"><a href="02-syntax.html"><span class="toc-num">2</span><span class="toc-title">The Language of Terms</span></a></li>
+<li class="past"><a href="03-typing-rules.html"><span class="toc-num">3</span><span class="toc-title">Typing Rules</span></a></li>
+<li class="past"><a href="04-logic.html"><span class="toc-num">4</span><span class="toc-title">The Typing Rules as a Logic</span></a></li>
+<li class="past"><a href="05-algorithm.html"><span class="toc-num">5</span><span class="toc-title">A Type Checking Algorithm</span></a></li>
+<li class="past"><a href="06-worked-examples.html"><span class="toc-num">6</span><span class="toc-title">Worked Examples</span></a></li>
+</ol>
+<h3 class="toc-part">Growing the Kernel</h3><ol class="toc-list">
+<li class="past"><a href="07-inductive-nat.html"><span class="toc-num">7</span><span class="toc-title">Inductive Types I: Natural Numbers</span></a></li>
+<li class="past"><a href="08-inductive-recipe.html"><span class="toc-num">8</span><span class="toc-title">Inductive Types II: The General Recipe</span></a></li>
+<li class="past"><a href="09-equality.html"><span class="toc-num">9</span><span class="toc-title">Equality Is an Inductive Type Too</span></a></li>
+<li class="past"><a href="10-tactics.html"><span class="toc-num">10</span><span class="toc-title">Tactics: Building Proof Terms Interactively</span></a></li>
+</ol>
+<h3 class="toc-part">Under the Hood</h3><ol class="toc-list">
+<li class="past"><a href="11-substitution-alpha.html"><span class="toc-num">11</span><span class="toc-title">Substitution, Capture, and Alpha-Equivalence</span></a></li>
+<li class="past"><a href="12-reduction-conversion.html"><span class="toc-num">12</span><span class="toc-title">Reduction and Conversion</span></a></li>
+</ol>
+<h3 class="toc-part">Foundations</h3><ol class="toc-list">
+<li class="past"><a href="13-universes.html"><span class="toc-num">13</span><span class="toc-title">Universes: Why Sort u?</span></a></li>
+<li class="past"><a href="14-properties.html"><span class="toc-num">14</span><span class="toc-title">Properties of the System</span></a></li>
+</ol>
+<h3 class="toc-part">Appendices</h3><ol class="toc-list">
+<li class="past"><a href="a-proof-pat.html"><span class="toc-num">A</span><span class="toc-title">Proof that Proofs Are Terms</span></a></li>
+<li class="past"><a href="b-proof-alpha.html"><span class="toc-num">B</span><span class="toc-title">Correctness of Alpha-Equivalence</span></a></li>
+<li class="past"><a href="c-hurkens.html"><span class="toc-num">C</span><span class="toc-title">Hurkens&#x27; Paradox</span></a></li>
+<li class="past"><a href="d-proof-consistency.html"><span class="toc-num">D</span><span class="toc-title">Proof of Consistency</span></a></li>
+<li class="past"><a href="e-leanmini-reference.html"><span class="toc-num">E</span><span class="toc-title">The leanmini Language</span></a></li>
+<li class="past"><a href="f-notation-glossary.html"><span class="toc-num">F</span><span class="toc-title">Notation and Glossary</span></a></li>
+<li class="current"><a href="bibliography.html"><span class="toc-num"></span><span class="toc-title">Bibliography</span></a></li>
+</ol>
+</nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
+      <div class="topbar-spacer"></div>
+      <a class="topbar-btn topbar-link topbar-icon" href="https://github.com/h5i-dev/MiniLean4" aria-label="MiniLean4 on GitHub" title="MiniLean4 on GitHub"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <a class="topbar-btn topbar-link topbar-h5i" href="https://github.com/h5i-dev/h5i" title="h5i on GitHub">h5i</a>
+      <nav class="langs" aria-label="Language"><span class="lang current">English</span><a class="lang" href="ja/bibliography.html" hreflang="ja">日本語</a><a class="lang" href="zh/bibliography.html" hreflang="zh-Hans">中文</a></nav>
+      <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
+    </div>
+    <div class="layout">
+      <main id="content" class="content">
+        
+        <header class="chapter-head"><p class="chapter-label"></p><h1>Bibliography</h1></header><div class="lead">
+<p>The book cites a small number of sources. Each entry below says what the work contributes and where the book relies on it.</p>
+</div>
+<ul>
+<li>
+<p><strong>[Barendregt 1992]</strong> H. P. Barendregt. Lambda calculi with types. In <em>Handbook of Logic in Computer Science</em>, volume 2, Oxford University Press, 1992. The standard reference for Pure Type Systems: the bidirectional split of type checking into inference and checking (<a href="05-algorithm.html">Chapter 5</a>), and the metatheory of uniqueness of types, generation, confluence, and subject reduction used in <a href="14-properties.html">Chapter 14</a> and <a href="d-proof-consistency.html">Appendix D</a>.</p>
+</li>
+<li>
+<p><strong>[Carneiro 2019]</strong> M. Carneiro. <em>The Type Theory of Lean</em>. Master's thesis, Carnegie Mellon University, 2019. A precise account of Lean's actual type theory, including definitional proof irrelevance and the subtleties it introduces; cited in <a href="13-universes.html">Chapter 13</a> and <a href="14-properties.html">Chapter 14</a> for where Lean's full system goes beyond ours.</p>
+</li>
+<li>
+<p><strong>[Coquand and Huet 1988]</strong> T. Coquand and G. Huet. The calculus of constructions. <em>Information and Computation</em>, 76(2-3):95-120, 1988. The system at the heart of this book: dependent types with an impredicative universe of propositions. Its consistency result is what justifies the universe design of <a href="13-universes.html">Chapter 13</a>.</p>
+</li>
+<li>
+<p><strong>[de Bruijn 1972]</strong> N. G. de Bruijn. Lambda calculus notation with nameless dummies, a tool for automatic formula manipulation, with application to the Church-Rosser theorem. <em>Indagationes Mathematicae</em>, 34(5):381-392, 1972. The nameless representation of bound variables. It is one of the three remedies for variable capture in <a href="11-substitution-alpha.html">Chapter 11</a>, and the bridge between the two definitions of alpha-equivalence in <a href="b-proof-alpha.html">Appendix B</a>.</p>
+</li>
+<li>
+<p><strong>[Girard 1972]</strong> J.-Y. Girard. <em>Interpretation fonctionnelle et elimination des coupures de l'arithmetique d'ordre superieur</em>. PhD thesis, Universite Paris VII, 1972. Introduces reducibility candidates, the method behind strong normalization for impredicative systems (<a href="14-properties.html">Chapter 14</a>), and the paradox showing that a universe containing itself is inconsistent (<a href="13-universes.html">Chapter 13</a>).</p>
+</li>
+<li>
+<p><strong>[Hurkens 1995]</strong> A. J. C. Hurkens. A simplification of Girard's paradox. In <em>Typed Lambda Calculi and Applications (TLCA)</em>, LNCS 902, pages 266-278, Springer, 1995. The short closed term of type False under <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">y</mi><mi mathvariant="sans-serif">p</mi><mi mathvariant="sans-serif">e</mi></mrow><mo>:</mo><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">y</mi><mi mathvariant="sans-serif">p</mi><mi mathvariant="sans-serif">e</mi></mrow></mrow><annotation encoding="application/x-tex">\mathsf{Type} : \mathsf{Type}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathsf">Type</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathsf">Type</span></span></span></span></span> that <a href="c-hurkens.html">Appendix C</a> presents and that the modified kernel accepts.</p>
+</li>
+<li>
+<p><strong>[Luo 1990]</strong> Z. Luo. <em>An Extended Calculus of Constructions</em>. PhD thesis, University of Edinburgh, 1990. The Calculus of Constructions extended with a predicative hierarchy of universes above the impredicative one, which is the closest published system to the core of this book (<a href="14-properties.html">Chapter 14</a>).</p>
+</li>
+<li>
+<p><strong>[de Moura and Ullrich 2021]</strong> L. de Moura and S. Ullrich. The Lean 4 theorem prover and programming language. In <em>Automated Deduction (CADE 28)</em>, LNCS 12699, pages 625-635, Springer, 2021. The system this book imitates: its universes, its treatment of inductive types and recursors, and its architecture in which tactics are untrusted and only the kernel checks terms (<a href="10-tactics.html">Chapter 10</a>, <a href="13-universes.html">Chapter 13</a>).</p>
+</li>
+<li>
+<p><strong>[Werner 1994]</strong> B. Werner. <em>Une theorie des constructions inductives</em>. PhD thesis, Universite Paris VII, 1994. The metatheory of the Calculus of Inductive Constructions: strong normalization and consistency in the presence of inductive types, which is what the general recipe of <a href="08-inductive-recipe.html">Chapter 8</a> rests on (<a href="14-properties.html">Chapter 14</a>).</p>
+</li>
+</ul>
+        <div class="pager"><a class="pager-prev" href="f-notation-glossary.html"><span class="pager-dir">Previous</span><span class="pager-title">Notation and Glossary</span></a></div>
+      </main>
+      <aside class="margin">
+        
+      </aside>
+    </div>
+    <footer class="footer">
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+    </footer>
+  </div>
+</div>
+<script src="assets/book.js"></script>
+<script src="assets/playground.js"></script>
+<script src="assets/explorers.js"></script>
+</body>
+</html>

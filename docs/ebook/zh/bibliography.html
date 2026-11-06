@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>参考文献 | 从零实现交互式定理证明器</title>
+<meta name="description" content="一本免费的在线书，用 Rust 从零构建 Lean 4 风格的证明助手内核：依赖类型理论、命题即类型、归纳类型、策略与宇宙，内核可直接在浏览器中运行。适合学习形式化验证或想了解 Lean 4 如何检查证明的读者。">
+<meta name="author" content="Hideaki Takahashi">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="keywords" content="Lean 4, 证明助手, 形式化验证, 依赖类型理论, 定理证明器, 类型检查, Curry-Howard 对应, 归纳类型, 策略, Rust">
+<link rel="canonical" href="https://h5i-dev.github.io/MiniLean4/ebook/zh/bibliography.html">
+<link rel="alternate" hreflang="en" href="https://h5i-dev.github.io/MiniLean4/ebook/bibliography.html">
+<link rel="alternate" hreflang="ja" href="https://h5i-dev.github.io/MiniLean4/ebook/ja/bibliography.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://h5i-dev.github.io/MiniLean4/ebook/zh/bibliography.html">
+<link rel="alternate" hreflang="x-default" href="https://h5i-dev.github.io/MiniLean4/ebook/bibliography.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MiniLean4">
+<meta property="og:title" content="参考文献">
+<meta property="og:description" content="一本免费的在线书，用 Rust 从零构建 Lean 4 风格的证明助手内核：依赖类型理论、命题即类型、归纳类型、策略与宇宙，内核可直接在浏览器中运行。适合学习形式化验证或想了解 Lean 4 如何检查证明的读者。">
+<meta property="og:url" content="https://h5i-dev.github.io/MiniLean4/ebook/zh/bibliography.html">
+<meta property="og:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/zh.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="参考文献">
+<meta name="twitter:description" content="一本免费的在线书，用 Rust 从零构建 Lean 4 风格的证明助手内核：依赖类型理论、命题即类型、归纳类型、策略与宇宙，内核可直接在浏览器中运行。适合学习形式化验证或想了解 Lean 4 如何检查证明的读者。">
+<meta name="twitter:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/zh.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "参考文献", "description": "一本免费的在线书，用 Rust 从零构建 Lean 4 风格的证明助手内核：依赖类型理论、命题即类型、归纳类型、策略与宇宙，内核可直接在浏览器中运行。适合学习形式化验证或想了解 Lean 4 如何检查证明的读者。", "url": "https://h5i-dev.github.io/MiniLean4/ebook/zh/bibliography.html", "inLanguage": "zh-Hans", "author": {"@type": "Person", "name": "Hideaki Takahashi", "url": "https://github.com/Koukyosyumei"}, "isPartOf": {"@type": "Book", "name": "从零实现交互式定理证明器", "url": "https://h5i-dev.github.io/MiniLean4/ebook/zh/index.html"}, "keywords": "Lean 4, 证明助手, 形式化验证, 依赖类型理论, 定理证明器, 类型检查, Curry-Howard 对应, 归纳类型, 策略, Rust", "position": ""}</script>
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/mono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/book.css">
+<script>
+  (function () {
+    if (localStorage.getItem("minilean-theme") === "light") {
+      document.documentElement.classList.add("light");
+    }
+  })();
+  window.MINILEAN_WASM_URL = "../assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "目录", "close": "关闭", "theme_light": "浅色", "theme_dark": "深色"}, "js": {"run": "运行", "reset": "重置", "running": "运行中...", "update": "更新", "thinking": "计算中...", "edit script": "编辑脚本", "hide editor": "收起编辑器", "apply": "应用", "prev": "上一步", "next": "下一步", "show all": "全部显示", "one at a time": "逐步显示", "step": "步骤", "hide": "收起", "show": "展开", "syntax tree": "语法树", "typing derivation": "类型推导", "reduction": "归约", "binders and scope": "绑定子与作用域", "substitution": "替换", "proof explorer": "证明浏览器", "constructor tree": "构造子树", "the imax rule": "imax 规则", "term": "项", "context": "上下文", "replace": "替换的变量", "with": "替换为", "value": "值", "as calls": "按调用", "as proof tree": "按证明树", "click a node to see the subterm it stands for": "点击节点查看它所代表的子项", "Infer returns": "Infer 返回", "Infer fails": "Infer 失败：", "no head reduction applies": "头部没有可用的归约", "weak head normal form": "弱头范式", "normal form (Normalize continues inside)": "范式（Normalize 继续深入内部）", "this is also the normal form": "这同时也是范式", "bound": "绑定", "free": "自由", "same colour as its binder; hover to see the pair": "与其绑定子同色；悬停可高亮配对", "free variables": "自由变量", "no free variables: the term is closed": "没有自由变量：该项是闭项", "naive substitution": "朴素替换", "capture-avoiding substitution": "避免捕获的替换", "a free variable of the replacement has been captured: the meaning changed": "替换项中的自由变量被捕获，含义改变了", "no capture here": "这里没有捕获", "the binder was renamed first; the free variable stays free": "先重命名了绑定子，自由变量保持自由", "identical to the naive result": "与朴素替换结果相同", "script": "脚本", "goals after this command": "此命令之后的目标", "kernel verdict": "内核判定", "partial proof term": "部分证明项", "final proof term": "最终证明项", "QED. The kernel checked the complete term against the goal.": "QED。内核已将完整的项与目标核对。", "declaration added to the signature; no proof in progress": "声明已加入签名；没有进行中的证明", "no goals": "没有目标", "no term yet": "尚无项", "no holes remain": "没有剩余的洞", "hole, the highlighted one is the current goal": "个洞，高亮的是当前目标", "holes; the highlighted one is the current goal": "个洞，高亮的是当前目标", "line": "第", "the script is empty": "脚本为空", "recursor case": "递归子分支", "(recursive field)": "（递归字段）", "R stands for the recursor applied to the same motive and cases; each (R field) is the induction hypothesis for that child.": "R 表示作用于同一 motive 和各分支的递归子；每个 (R 字段) 是该子节点的归纳假设。", "A lives in": "A 所在的宇宙", "B lives in": "B 所在的宇宙", "(propositions)": "（命题）", "run the script to see what the kernel says.": "运行脚本，这里会显示内核的回应。", "beta: apply the function at the head": "β：应用头部的函数", "delta: unfold the definition at the head": "δ：展开头部的定义", "iota: the recursor sees a constructor": "ι：递归子遇到了构造子", "the major premise is computed first": "先计算大前提", "step limit": "步数上限", "The in-browser kernel could not be loaded": "无法加载浏览器内的内核", "imax_prop": "B 是命题，所以无论它量化什么，整个 Π 都是命题：imax({u}, 0) = 0。这就是非谓词性。", "imax_pred": "B 不是命题，所以 Π 落在两个宇宙中较大的那个：imax({u}, {v}) = max({u}, {v}) = {r}。这就是谓词性。"}};
+</script>
+</head>
+<body class="page-app">
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a class="logo" href="index.html">MiniLean4</a>
+      <p class="book-sub">从零实现交互式定理证明器</p>
+    </div>
+    <nav class="toc" aria-label="Table of contents">
+<a class="toc-cover" href="index.html">封面与目录</a>
+<h3 class="toc-part">命题逻辑的内核</h3><ol class="toc-list">
+<li class="past"><a href="01-propositions-as-types.html"><span class="toc-num">1</span><span class="toc-title">命题即类型</span></a></li>
+<li class="past"><a href="02-syntax.html"><span class="toc-num">2</span><span class="toc-title">项的语言</span></a></li>
+<li class="past"><a href="03-typing-rules.html"><span class="toc-num">3</span><span class="toc-title">类型规则</span></a></li>
+<li class="past"><a href="04-logic.html"><span class="toc-num">4</span><span class="toc-title">作为逻辑的类型规则</span></a></li>
+<li class="past"><a href="05-algorithm.html"><span class="toc-num">5</span><span class="toc-title">类型检查算法</span></a></li>
+<li class="past"><a href="06-worked-examples.html"><span class="toc-num">6</span><span class="toc-title">逐步示例</span></a></li>
+</ol>
+<h3 class="toc-part">扩展内核</h3><ol class="toc-list">
+<li class="past"><a href="07-inductive-nat.html"><span class="toc-num">7</span><span class="toc-title">归纳类型 I：自然数</span></a></li>
+<li class="past"><a href="08-inductive-recipe.html"><span class="toc-num">8</span><span class="toc-title">归纳类型 II：通用方法</span></a></li>
+<li class="past"><a href="09-equality.html"><span class="toc-num">9</span><span class="toc-title">相等也是归纳类型</span></a></li>
+<li class="past"><a href="10-tactics.html"><span class="toc-num">10</span><span class="toc-title">策略：交互式地构造证明项</span></a></li>
+</ol>
+<h3 class="toc-part">内部机制</h3><ol class="toc-list">
+<li class="past"><a href="11-substitution-alpha.html"><span class="toc-num">11</span><span class="toc-title">替换、捕获与 α 等价</span></a></li>
+<li class="past"><a href="12-reduction-conversion.html"><span class="toc-num">12</span><span class="toc-title">归约与转换</span></a></li>
+</ol>
+<h3 class="toc-part">基础</h3><ol class="toc-list">
+<li class="past"><a href="13-universes.html"><span class="toc-num">13</span><span class="toc-title">宇宙：为什么是 Sort u？</span></a></li>
+<li class="past"><a href="14-properties.html"><span class="toc-num">14</span><span class="toc-title">系统的性质</span></a></li>
+</ol>
+<h3 class="toc-part">附录</h3><ol class="toc-list">
+<li class="past"><a href="a-proof-pat.html"><span class="toc-num">A</span><span class="toc-title">“证明即项”的证明</span></a></li>
+<li class="past"><a href="b-proof-alpha.html"><span class="toc-num">B</span><span class="toc-title">α 等价算法的正确性</span></a></li>
+<li class="past"><a href="c-hurkens.html"><span class="toc-num">C</span><span class="toc-title">Hurkens 悖论</span></a></li>
+<li class="past"><a href="d-proof-consistency.html"><span class="toc-num">D</span><span class="toc-title">一致性的证明</span></a></li>
+<li class="past"><a href="e-leanmini-reference.html"><span class="toc-num">E</span><span class="toc-title">leanmini 语言</span></a></li>
+<li class="past"><a href="f-notation-glossary.html"><span class="toc-num">F</span><span class="toc-title">记号与术语表</span></a></li>
+<li class="current"><a href="bibliography.html"><span class="toc-num"></span><span class="toc-title">参考文献</span></a></li>
+</ol>
+</nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">目录</button>
+      <div class="topbar-spacer"></div>
+      <a class="topbar-btn topbar-link topbar-icon" href="https://github.com/h5i-dev/MiniLean4" aria-label="MiniLean4 on GitHub" title="MiniLean4 on GitHub"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <a class="topbar-btn topbar-link topbar-h5i" href="https://github.com/h5i-dev/h5i" title="h5i on GitHub">h5i</a>
+      <nav class="langs" aria-label="Language"><a class="lang" href="../bibliography.html" hreflang="en">English</a><a class="lang" href="../ja/bibliography.html" hreflang="ja">日本語</a><span class="lang current">中文</span></nav>
+      <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">浅色</button>
+    </div>
+    <div class="layout">
+      <main id="content" class="content">
+        <div class="notice" role="note">本中文版由作者借助 AI 翻译而成。作者并非中文母语者，译文未经人工逐句校对，可能存在错误。如发现问题，请在 <a href="https://github.com/h5i-dev/MiniLean4/issues">GitHub 上提交 issue</a>。</div>
+        <header class="chapter-head"><p class="chapter-label"></p><h1>参考文献</h1></header><div class="lead">
+<p>本书引用的文献不多。下面每一条都说明该著作的贡献，以及本书在何处依赖它。</p>
+</div>
+<ul>
+<li>
+<p><strong>[Barendregt 1992]</strong> H. P. Barendregt. Lambda calculi with types. In <em>Handbook of Logic in Computer Science</em>, volume 2, Oxford University Press, 1992. 纯类型系统的标准参考文献：把类型检查双向拆分为推断与检查（<a href="05-algorithm.html">第 5 章</a>），以及<a href="14-properties.html">第 14 章</a>和<a href="d-proof-consistency.html">附录 D</a>用到的元理论，即类型唯一性、生成引理、合流性和类型保持性。</p>
+</li>
+<li>
+<p><strong>[Carneiro 2019]</strong> M. Carneiro. <em>The Type Theory of Lean</em>. Master's thesis, Carnegie Mellon University, 2019. 对 Lean 实际类型理论的精确刻画，包括定义性证明无关性及其带来的微妙之处；<a href="13-universes.html">第 13 章</a>和<a href="14-properties.html">第 14 章</a>在说明 Lean 的完整系统超出本书系统之处时引用了它。</p>
+</li>
+<li>
+<p><strong>[Coquand and Huet 1988]</strong> T. Coquand and G. Huet. The calculus of constructions. <em>Information and Computation</em>, 76(2-3):95-120, 1988. 本书核心所在的系统：带有一个非谓词命题宇宙的依赖类型，它的一致性结果为<a href="13-universes.html">第 13 章</a>的宇宙设计提供了依据。</p>
+</li>
+<li>
+<p><strong>[de Bruijn 1972]</strong> N. G. de Bruijn. Lambda calculus notation with nameless dummies, a tool for automatic formula manipulation, with application to the Church-Rosser theorem. <em>Indagationes Mathematicae</em>, 34(5):381-392, 1972. 约束变量的无名表示，它是<a href="11-substitution-alpha.html">第 11 章</a>中应对变量捕获的三种办法之一，也是<a href="b-proof-alpha.html">附录 B</a>中连接 α 等价两种定义的桥梁。</p>
+</li>
+<li>
+<p><strong>[Girard 1972]</strong> J.-Y. Girard. <em>Interpretation fonctionnelle et elimination des coupures de l'arithmetique d'ordre superieur</em>. PhD thesis, Universite Paris VII, 1972. 引入可归约性候选，即非谓词系统强规范化背后的方法（<a href="14-properties.html">第 14 章</a>），以及表明包含自身的宇宙不一致的悖论（<a href="13-universes.html">第 13 章</a>）。</p>
+</li>
+<li>
+<p><strong>[Hurkens 1995]</strong> A. J. C. Hurkens. A simplification of Girard's paradox. In <em>Typed Lambda Calculi and Applications (TLCA)</em>, LNCS 902, pages 266-278, Springer, 1995. 在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">y</mi><mi mathvariant="sans-serif">p</mi><mi mathvariant="sans-serif">e</mi></mrow><mo>:</mo><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">y</mi><mi mathvariant="sans-serif">p</mi><mi mathvariant="sans-serif">e</mi></mrow></mrow><annotation encoding="application/x-tex">\mathsf{Type} : \mathsf{Type}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathsf">Type</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathsf">Type</span></span></span></span></span> 之下类型为 False 的那个简短封闭项；<a href="c-hurkens.html">附录 C</a> 展示了它，经修改的内核会接受它。</p>
+</li>
+<li>
+<p><strong>[Luo 1990]</strong> Z. Luo. <em>An Extended Calculus of Constructions</em>. PhD thesis, University of Edinburgh, 1990. 在非谓词宇宙之上扩展了一层谓词宇宙层级的构造演算，是已发表的系统中最接近本书核心的一个（<a href="14-properties.html">第 14 章</a>）。</p>
+</li>
+<li>
+<p><strong>[de Moura and Ullrich 2021]</strong> L. de Moura and S. Ullrich. The Lean 4 theorem prover and programming language. In <em>Automated Deduction (CADE 28)</em>, LNCS 12699, pages 625-635, Springer, 2021. 本书所模仿的系统：它的宇宙、它对归纳类型和递归子的处理，以及策略不可信、只有内核检查项的架构（<a href="10-tactics.html">第 10 章</a>、<a href="13-universes.html">第 13 章</a>）。</p>
+</li>
+<li>
+<p><strong>[Werner 1994]</strong> B. Werner. <em>Une theorie des constructions inductives</em>. PhD thesis, Universite Paris VII, 1994. 归纳构造演算的元理论：存在归纳类型时的强规范化和一致性，<a href="08-inductive-recipe.html">第 8 章</a>的通用方法正建立在它之上（<a href="14-properties.html">第 14 章</a>）。</p>
+</li>
+</ul>
+        <div class="pager"><a class="pager-prev" href="f-notation-glossary.html"><span class="pager-dir">上一章</span><span class="pager-title">记号与术语表</span></a></div>
+      </main>
+      <aside class="margin">
+        
+      </aside>
+    </div>
+    <footer class="footer">
+      <p>MiniLean4 是一个教学内核。代码、示例和本书的源文件都在<a href="https://github.com/h5i-dev/MiniLean4">仓库</a>中。<br>每个公式都对照 Rust 实现核对过；每个可运行的示例都由编译为 WebAssembly 的内核本身检查。</p>
+    </footer>
+  </div>
+</div>
+<script src="../assets/book.js"></script>
+<script src="../assets/playground.js"></script>
+<script src="../assets/explorers.js"></script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>対話的定理証明器をゼロから実装する | MiniLean4</title>
+<meta name="description" content="Lean 4 風の証明支援系カーネルを Rust でゼロから作る無料のオンライン書籍。依存型理論、命題と型、帰納型、タクティク、宇宙を扱い、カーネルはブラウザ内で動く。形式検証や Lean 4 の証明検査のしくみを学びたい人向け。">
+<meta name="author" content="Hideaki Takahashi">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="keywords" content="Lean 4, 証明支援系, 形式検証, 依存型理論, 定理証明器, 型検査, Curry-Howard 対応, 帰納型, タクティク, Rust">
+<link rel="canonical" href="https://h5i-dev.github.io/MiniLean4/ebook/ja/index.html">
+<link rel="alternate" hreflang="en" href="https://h5i-dev.github.io/MiniLean4/ebook/index.html">
+<link rel="alternate" hreflang="ja" href="https://h5i-dev.github.io/MiniLean4/ebook/ja/index.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://h5i-dev.github.io/MiniLean4/ebook/zh/index.html">
+<link rel="alternate" hreflang="x-default" href="https://h5i-dev.github.io/MiniLean4/ebook/index.html">
+<meta property="og:type" content="book">
+<meta property="og:site_name" content="MiniLean4">
+<meta property="og:title" content="対話的定理証明器をゼロから実装する">
+<meta property="og:description" content="Lean 4 風の証明支援系カーネルを Rust でゼロから作る無料のオンライン書籍。依存型理論、命題と型、帰納型、タクティク、宇宙を扱い、カーネルはブラウザ内で動く。形式検証や Lean 4 の証明検査のしくみを学びたい人向け。">
+<meta property="og:url" content="https://h5i-dev.github.io/MiniLean4/ebook/ja/index.html">
+<meta property="og:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/ja.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="対話的定理証明器をゼロから実装する">
+<meta name="twitter:description" content="Lean 4 風の証明支援系カーネルを Rust でゼロから作る無料のオンライン書籍。依存型理論、命題と型、帰納型、タクティク、宇宙を扱い、カーネルはブラウザ内で動く。形式検証や Lean 4 の証明検査のしくみを学びたい人向け。">
+<meta name="twitter:image" content="https://h5i-dev.github.io/MiniLean4/ebook/assets/og/ja.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Book", "name": "対話的定理証明器をゼロから実装する", "url": "https://h5i-dev.github.io/MiniLean4/ebook/ja/index.html", "author": {"@type": "Person", "name": "Hideaki Takahashi", "url": "https://github.com/Koukyosyumei"}, "inLanguage": "ja", "isAccessibleForFree": true, "license": "https://github.com/h5i-dev/MiniLean4/blob/main/LICENSE", "about": ["type theory", "theorem proving", "Lean 4", "dependent types", "Rust"], "keywords": "Lean 4, 証明支援系, 形式検証, 依存型理論, 定理証明器, 型検査, Curry-Howard 対応, 帰納型, タクティク, Rust", "description": "Lean 4 風の証明支援系カーネルを Rust でゼロから作る無料のオンライン書籍。依存型理論、命題と型、帰納型、タクティク、宇宙を扱い、カーネルはブラウザ内で動く。形式検証や Lean 4 の証明検査のしくみを学びたい人向け。"}</script>
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/mono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/book.css">
+<script>
+  (function () {
+    if (localStorage.getItem("minilean-theme") === "light") {
+      document.documentElement.classList.add("light");
+    }
+  })();
+  window.MINILEAN_WASM_URL = "../assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "目次", "close": "閉じる", "theme_light": "ライト", "theme_dark": "ダーク"}, "js": {"run": "実行", "reset": "リセット", "running": "実行中...", "update": "更新", "thinking": "計算中...", "edit script": "スクリプトを編集", "hide editor": "エディタを閉じる", "apply": "適用", "prev": "前へ", "next": "次へ", "show all": "すべて表示", "one at a time": "1 つずつ", "step": "ステップ", "hide": "隠す", "show": "表示", "syntax tree": "構文木", "typing derivation": "型付け導出", "reduction": "簡約", "binders and scope": "束縛子とスコープ", "substitution": "代入", "proof explorer": "証明エクスプローラ", "constructor tree": "構成子の木", "the imax rule": "imax 規則", "term": "項", "context": "文脈", "replace": "置換する変数", "with": "置き換え先", "value": "値", "as calls": "呼び出しとして", "as proof tree": "証明木として", "click a node to see the subterm it stands for": "ノードをクリックすると、それが表す部分項を表示します", "Infer returns": "Infer の結果:", "Infer fails": "Infer は失敗:", "no head reduction applies": "頭部で適用できる簡約はありません", "weak head normal form": "弱頭正規形", "normal form (Normalize continues inside)": "正規形（Normalize は内部まで進む）", "this is also the normal form": "これは正規形でもあります", "bound": "束縛", "free": "自由", "same colour as its binder; hover to see the pair": "束縛子と同じ色。カーソルを乗せると対が光ります", "free variables": "自由変数", "no free variables: the term is closed": "自由変数なし: この項は閉じています", "naive substitution": "素朴な代入", "capture-avoiding substitution": "捕獲回避代入", "a free variable of the replacement has been captured: the meaning changed": "置き換え先の自由変数が捕獲され、意味が変わりました", "no capture here": "ここでは捕獲は起きません", "the binder was renamed first; the free variable stays free": "先に束縛子を改名したので、自由変数は自由のままです", "identical to the naive result": "素朴な代入と同じ結果です", "script": "スクリプト", "goals after this command": "このコマンド後のゴール", "kernel verdict": "カーネルの判定", "partial proof term": "部分的な証明項", "final proof term": "最終的な証明項", "QED. The kernel checked the complete term against the goal.": "QED。カーネルが完成した項をゴールと照合しました。", "declaration added to the signature; no proof in progress": "宣言をシグネチャに追加しました。進行中の証明はありません", "no goals": "ゴールなし", "no term yet": "まだ項はありません", "no holes remain": "ホールは残っていません", "hole, the highlighted one is the current goal": "個のホール。強調されているのが現在のゴールです", "holes; the highlighted one is the current goal": "個のホール。強調されているのが現在のゴールです", "line": "行", "the script is empty": "スクリプトが空です", "recursor case": "再帰子のケース", "(recursive field)": "（再帰的フィールド）", "R stands for the recursor applied to the same motive and cases; each (R field) is the induction hypothesis for that child.": "R は同じ motive とケースに適用した再帰子を表します。各 (R フィールド) がその子に対する帰納法の仮定です。", "A lives in": "A の宇宙", "B lives in": "B の宇宙", "(propositions)": "（命題）", "run the script to see what the kernel says.": "実行すると、カーネルの応答がここに表示されます。", "beta: apply the function at the head": "β: 頭部の関数を適用", "delta: unfold the definition at the head": "δ: 頭部の定義を展開", "iota: the recursor sees a constructor": "ι: 再帰子が構成子を見つけた", "the major premise is computed first": "先に大前提を計算", "step limit": "ステップ上限", "The in-browser kernel could not be loaded": "ブラウザ内のカーネルを読み込めませんでした", "imax_prop": "B は命題なので、何を量化していても Π 全体が命題になる: imax({u}, 0) = 0。これが非述語性である。", "imax_pred": "B は命題ではないので、Π は 2 つの宇宙の大きいほうに入る: imax({u}, {v}) = max({u}, {v}) = {r}。これが述語性である。"}};
+</script>
+</head>
+<body class="page-cover">
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a class="logo" href="index.html">MiniLean4</a>
+      <p class="book-sub">対話的定理証明器をゼロから実装する</p>
+    </div>
+    <nav class="toc" aria-label="Table of contents">
+<a class="toc-cover" href="index.html">表紙と目次</a>
+<h3 class="toc-part">命題論理のためのカーネル</h3><ol class="toc-list">
+<li><a href="01-propositions-as-types.html"><span class="toc-num">1</span><span class="toc-title">命題は型である</span></a></li>
+<li><a href="02-syntax.html"><span class="toc-num">2</span><span class="toc-title">項の言語</span></a></li>
+<li><a href="03-typing-rules.html"><span class="toc-num">3</span><span class="toc-title">型付け規則</span></a></li>
+<li><a href="04-logic.html"><span class="toc-num">4</span><span class="toc-title">論理としての型付け規則</span></a></li>
+<li><a href="05-algorithm.html"><span class="toc-num">5</span><span class="toc-title">型検査アルゴリズム</span></a></li>
+<li><a href="06-worked-examples.html"><span class="toc-num">6</span><span class="toc-title">実例で追う</span></a></li>
+</ol>
+<h3 class="toc-part">カーネルを育てる</h3><ol class="toc-list">
+<li><a href="07-inductive-nat.html"><span class="toc-num">7</span><span class="toc-title">帰納型 I: 自然数</span></a></li>
+<li><a href="08-inductive-recipe.html"><span class="toc-num">8</span><span class="toc-title">帰納型 II: 一般的な手順</span></a></li>
+<li><a href="09-equality.html"><span class="toc-num">9</span><span class="toc-title">等式も帰納型である</span></a></li>
+<li><a href="10-tactics.html"><span class="toc-num">10</span><span class="toc-title">タクティク: 対話的に証明項を組み立てる</span></a></li>
+</ol>
+<h3 class="toc-part">内部のしくみ</h3><ol class="toc-list">
+<li><a href="11-substitution-alpha.html"><span class="toc-num">11</span><span class="toc-title">代入、捕獲、α 同値</span></a></li>
+<li><a href="12-reduction-conversion.html"><span class="toc-num">12</span><span class="toc-title">簡約と変換</span></a></li>
+</ol>
+<h3 class="toc-part">基礎</h3><ol class="toc-list">
+<li><a href="13-universes.html"><span class="toc-num">13</span><span class="toc-title">宇宙: なぜ Sort u なのか</span></a></li>
+<li><a href="14-properties.html"><span class="toc-num">14</span><span class="toc-title">体系の性質</span></a></li>
+</ol>
+<h3 class="toc-part">付録</h3><ol class="toc-list">
+<li><a href="a-proof-pat.html"><span class="toc-num">A</span><span class="toc-title">証明が項になることの証明</span></a></li>
+<li><a href="b-proof-alpha.html"><span class="toc-num">B</span><span class="toc-title">α 同値アルゴリズムの正しさ</span></a></li>
+<li><a href="c-hurkens.html"><span class="toc-num">C</span><span class="toc-title">Hurkens のパラドックス</span></a></li>
+<li><a href="d-proof-consistency.html"><span class="toc-num">D</span><span class="toc-title">整合性の証明</span></a></li>
+<li><a href="e-leanmini-reference.html"><span class="toc-num">E</span><span class="toc-title">leanmini 言語</span></a></li>
+<li><a href="f-notation-glossary.html"><span class="toc-num">F</span><span class="toc-title">記法と用語集</span></a></li>
+<li><a href="bibliography.html"><span class="toc-num"></span><span class="toc-title">参考文献</span></a></li>
+</ol>
+</nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">目次</button>
+      <div class="topbar-spacer"></div>
+      <a class="topbar-btn topbar-link topbar-icon" href="https://github.com/h5i-dev/MiniLean4" aria-label="MiniLean4 on GitHub" title="MiniLean4 on GitHub"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <a class="topbar-btn topbar-link topbar-h5i" href="https://github.com/h5i-dev/h5i" title="h5i on GitHub">h5i</a>
+      <nav class="langs" aria-label="Language"><a class="lang" href="../index.html" hreflang="en">English</a><span class="lang current">日本語</span><a class="lang" href="../zh/index.html" hreflang="zh-Hans">中文</a></nav>
+      <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">ライト</button>
+    </div>
+    <div class="layout">
+      <main id="content" class="content">
+        
+        <header class="hero">
+<div class="hero-head">
+<h1 class="logo" id="minilean4">MiniLean4</h1>
+</div>
+<div class="hero-text">
+<p class="hero-title">対話的定理証明器をゼロから実装する</p>
+<p class="byline">Hideaki Takahashi</p>
+<div class="lead">
+<p>Lean 4 風の証明カーネルをゼロから作る。5 種類の項と 8 つの型付け規則から始め、帰納型、タクティク言語、整合性を支える宇宙の階層へと進む。各要素に対応する Rust コードは短く、半日もあれば読み通せる。</p>
+</div>
+<p class="punch">証明はプログラムである。カーネルがそれを検査する。それ以外は何も信頼しない。</p>
+</div>
+<div class="hero-term">
+<div class="playground" data-file="examples/identity.leanmini">
+<pre># 命題上の多相的な恒等関数: すべての P について P -&gt; P。
+goal forall (P : Sort 0), P -&gt; P
+intro P
+intro p
+exact p
+qed</pre>
+</div>
+<p class="hero-caption">これは WebAssembly にコンパイルした本物のカーネルが、本書最初の定理を検査しているところである。スクリプトを書き換えて、もう一度実行してみてほしい。</p>
+</div>
+</header>
+<h2 id="_1">本書とは</h2>
+<p>Lean、Coq、Agda といった対話的定理証明器の中核には、項が与えられた型を持つかを判定する小さな<em>カーネル</em>（kernel）がある。タクティクや記法、自動化などはカーネルに渡す項を作るものであり、カーネルが正しければ、ほかの部分にバグがあって定理の証明に失敗することはあっても、偽の定理を受理することはない。</p>
+<p>MiniLean4 は、教育用の規模に縮めた証明支援系（proof assistant）のカーネルである。Lean 4、Coq、Agda が形式検証（formal verification）に使っているのと同じ種類の依存型理論を、数ファイルの Rust に収まるところまで削ぎ落としたものだ。Lean 4 が証明をどう検査するのか、Curry-Howard 対応が実際に何をもたらすのか、形式検証ツールの信頼がどこから来るのかを知りたいなら、その仕組みを何も隠さずに見せるのが本書である。</p>
+<p>本書では、カーネルの仕組みを具体的に示す。各章で一つの概念を説明し、正確に定式化したうえで、それを実装する Rust コードを紹介する。カーネル、タクティク、パーサを合わせても実装は三千行に満たず、依存ライブラリもなく、本書はそのすべてを扱う。</p>
+<p>本書だけで読み進められるように書いてあり、再帰関数と基本的な集合の記法が読めればよく、型理論や Lean の予備知識は必要ない。Lean を知っている読者には、見覚えのある話も多いだろう。</p>
+<h2 id="_2">読み方</h2>
+<div class="contents"><h3 class="contents-part">命題論理のためのカーネル</h3><ol class="contents-list"><li><a href="01-propositions-as-types.html"><span class="contents-num">1</span><span class="contents-title">命題は型である</span></a><span class="contents-desc">証明を検査することが、プログラムの型検査と同じ仕事である理由。</span></li><li><a href="02-syntax.html"><span class="contents-num">2</span><span class="contents-title">項の言語</span></a><span class="contents-desc">5 種類の項と、それを表す Rust の enum。</span></li><li><a href="03-typing-rules.html"><span class="contents-num">3</span><span class="contents-title">型付け規則</span></a><span class="contents-desc">文脈、判断、そして型の付く項を定める 8 つの規則。</span></li><li><a href="04-logic.html"><span class="contents-num">4</span><span class="contents-title">論理としての型付け規則</span></a><span class="contents-desc">自然演繹、論理式から型への翻訳、整合性の意味。</span></li><li><a href="05-algorithm.html"><span class="contents-num">5</span><span class="contents-title">型検査アルゴリズム</span></a><span class="contents-desc">規則を Infer と Check に変え、typecheck.rs と一行ずつ突き合わせる。</span></li><li><a href="06-worked-examples.html"><span class="contents-num">6</span><span class="contents-title">実例で追う</span></a><span class="contents-desc">正しい証明、誤った証明、変換を検査器が処理する手順の追跡。</span></li></ol><h3 class="contents-part">カーネルを育てる</h3><ol class="contents-list"><li><a href="07-inductive-nat.html"><span class="contents-num">7</span><span class="contents-title">帰納型 I: 自然数</span></a><span class="contents-desc">定数、定義、そして再帰と帰納法の両方を与える再帰子。</span></li><li><a href="08-inductive-recipe.html"><span class="contents-num">8</span><span class="contents-title">帰納型 II: 一般的な手順</span></a><span class="contents-desc">木、リスト、ベクトル、そして任意の再帰子を生成する手続き。</span></li><li><a href="09-equality.html"><span class="contents-num">9</span><span class="contents-title">等式も帰納型である</span></a><span class="contents-desc">Eq、輸送、定義的等価と命題的等価、そして 0 + n = n の証明。</span></li><li><a href="10-tactics.html"><span class="contents-num">10</span><span class="contents-title">タクティク: 対話的に証明項を組み立てる</span></a><span class="contents-desc">ゴール、ホール、そして intro、apply、induction、rw が項を作る方法。</span></li></ol><h3 class="contents-part">内部のしくみ</h3><ol class="contents-list"><li><a href="11-substitution-alpha.html"><span class="contents-num">11</span><span class="contents-title">代入、捕獲、α 同値</span></a><span class="contents-desc">カーネルのバグが潜む操作と、substitution.rs がそれを避ける方法。</span></li><li><a href="12-reduction-conversion.html"><span class="contents-num">12</span><span class="contents-title">簡約と変換</span></a><span class="contents-desc">β、δ、ι、データとしての計算規則、弱頭正規形。</span></li></ol><h3 class="contents-part">基礎</h3><ol class="contents-list"><li><a href="13-universes.html"><span class="contents-num">13</span><span class="contents-title">宇宙: なぜ Sort u なのか</span></a><span class="contents-desc">Type : Type は矛盾する。非述語的な最下層をもつ階層は矛盾しない。</span></li><li><a href="14-properties.html"><span class="contents-num">14</span><span class="contents-title">体系の性質</span></a><span class="contents-desc">型の一意性、型保存性、強正規化、整合性。</span></li></ol><h3 class="contents-part">付録</h3><ol class="contents-list"><li><a href="a-proof-pat.html"><span class="contents-num">A</span><span class="contents-title">証明が項になることの証明</span></a><span class="contents-desc">翻訳定理の完全な証明。</span></li><li><a href="b-proof-alpha.html"><span class="contents-num">B</span><span class="contents-title">α 同値アルゴリズムの正しさ</span></a><span class="contents-desc">どちらの定義も de Bruijn 形を計算している。</span></li><li><a href="c-hurkens.html"><span class="contents-num">C</span><span class="contents-title">Hurkens のパラドックス</span></a><span class="contents-desc">Type : Type のもとでの False 型の閉項。</span></li><li><a href="d-proof-consistency.html"><span class="contents-num">D</span><span class="contents-title">整合性の証明</span></a><span class="contents-desc">forall P, P を住まわせる閉項は存在しない。</span></li><li><a href="e-leanmini-reference.html"><span class="contents-num">E</span><span class="contents-title">leanmini 言語</span></a><span class="contents-desc">スクリプト言語の構文、コマンド、タクティク。</span></li><li><a href="f-notation-glossary.html"><span class="contents-num">F</span><span class="contents-title">記法と用語集</span></a><span class="contents-desc">本書で使うすべての記号と用語。</span></li><li><a href="bibliography.html"><span class="contents-num"></span><span class="contents-title">参考文献</span></a></li></ol></div>
+
+<p><strong>第 I 部</strong>では依存型理論の型検査器を作り、それがある論理の証明検査器になっていることを示す。<strong>第 II 部</strong>では帰納型（自然数、木、リスト、ベクトル、等式）と、証明項を組み立てるタクティク言語を加える。<strong>第 III 部</strong>では第 I 部と第 II 部で詳しく扱わなかった代入、α 同値、簡約の内部を調べるが、カーネルのバグが潜みやすいのはここである。<strong>第 IV 部</strong>では宇宙の階層がこの形をとる理由を説明し、メタ理論を述べる。付録には完全な証明、宇宙の設計を正当化するパラドックス、そしてスクリプト言語のリファレンスを収めた。</p>
+<p>本書を通じて、4 種類の対話的な要素が登場する。</p>
+<ul>
+<li><strong>プレイグラウンド</strong>はカーネルを実行する。スクリプトを編集し、実行ボタンを押して、出力を読む。</li>
+<li><strong>エクスプローラ</strong>はカーネル自身から見た項の姿を示す。構文木、規則ごとの型付け導出、一歩ずつの簡約、各変数がどの束縛子に属するか、そしてタクティクを適用するたびの証明状態である。エクスプローラはすべてライブで動き、項を変えればカーネルが計算し直す。</li>
+<li><strong>ステッパー</strong>はアルゴリズムを一歩ずつ進め、各ステップ後の状態を示す。</li>
+<li><strong>呼び出し木</strong>は、型検査器がある項に対して行う再帰呼び出しの正確な列を、各呼び出しが対応する型付け規則とともに示す。</li>
+</ul>
+<p><em>コードでは</em>と記したコラムは、直前に定義したものを実装している Rust の関数を指し示す。演習には解答が付いており、必要になるまで折りたたまれている。</p>
+<h2 id="_3">自分でコードを動かす</h2>
+<p>リポジトリには、カーネル、コマンドラインの実行器、本書で使う例題スクリプトが含まれている。</p>
+<div class="codeblock" data-lang="text"><pre><code class="language-text">cargo run -- examples/identity.leanmini
+cargo run -- examples/nat-reflexivity.leanmini
+cargo run -- examples/zero-add.leanmini
+cargo run -- examples/generic-list.leanmini
+cargo run -- examples/generic-vec.leanmini
+cargo test
+</code></pre></div>
+<p>引数なしで <code>cargo run</code> を実行すると対話セッションが始まり、同じコマンドを一行ずつ受け付ける。言語の説明は<a href="e-leanmini-reference.html">付録 E</a> にある。</p>
+<p>ソースは本書の流れに沿って構成してある。</p>
+<table>
+<thead>
+<tr>
+<th>ファイル</th>
+<th>内容</th>
+<th>章</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/term.rs</code></td>
+<td>項の表現</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>src/typecheck.rs</code></td>
+<td>型推論と型検査</td>
+<td>5, 6</td>
+</tr>
+<tr>
+<td><code>src/substitution.rs</code></td>
+<td>自由変数、代入、α 同値</td>
+<td>11</td>
+</tr>
+<tr>
+<td><code>src/reduction.rs</code></td>
+<td>弱頭正規形、正規化、定義的等価</td>
+<td>12</td>
+</tr>
+<tr>
+<td><code>src/declaration.rs</code></td>
+<td>シグネチャ: 定数、定義、帰納型のメタデータ</td>
+<td>7, 8</td>
+</tr>
+<tr>
+<td><code>src/inductive/</code></td>
+<td>帰納的宣言の検査と再帰子の生成</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>src/proof.rs</code></td>
+<td>ゴール、証明状態、タクティク</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>src/syntax.rs</code></td>
+<td>スクリプト言語のパーサ</td>
+<td>付録 E</td>
+</tr>
+<tr>
+<td><code>src/main.rs</code></td>
+<td>コマンドラインの実行器</td>
+<td>付録 E</td>
+</tr>
+</tbody>
+</table>
+        
+      </main>
+      <aside class="margin">
+        
+      </aside>
+    </div>
+    <footer class="footer">
+      <p>MiniLean4 は教育用のカーネルです。コード、例、この本のソースは<a href="https://github.com/h5i-dev/MiniLean4">リポジトリ</a>にあります。<br>すべての数式は Rust の実装と照合し、実行できる例はすべて WebAssembly にコンパイルしたカーネル自身が検査しています。</p>
+    </footer>
+  </div>
+</div>
+<script src="../assets/book.js"></script>
+<script src="../assets/playground.js"></script>
+<script src="../assets/explorers.js"></script>
+</body>
+</html>

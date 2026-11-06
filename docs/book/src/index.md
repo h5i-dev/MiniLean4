@@ -44,7 +44,7 @@ The book is self-contained. You need to be comfortable reading a recursive funct
 
 **Part I** builds a type checker for a dependent type theory and shows that it is a proof checker for a logic. **Part II** adds inductive types (natural numbers, trees, lists, vectors, and equality) and a tactic language that writes proof terms for you. **Part III** opens the black boxes that Parts I and II relied on: substitution, alpha-equivalence, and reduction, where kernel bugs hide. **Part IV** explains why universes are structured as they are, and states the metatheory. The appendices contain the full proofs, the paradox that justifies the universe design, and a reference for the script language.
 
-Throughout the book you will meet three kinds of interactive element.
+Throughout the book you will meet four kinds of interactive element.
 
 - **Playgrounds** run the kernel. Edit the script, press run, and read the transcript.
 - **Explorers** show the kernel's own view of a term: its syntax tree, its typing derivation rule by rule, its reduction one step at a time, which binder each variable belongs to, and the proof state after every tactic. Every explorer is live: change the term and the kernel recomputes.

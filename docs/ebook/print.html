@@ -14,6 +14,8 @@
       document.documentElement.classList.add("light");
     }
   })();
+  window.MINILEAN_WASM_URL = "assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "contents", "close": "close", "theme_light": "light", "theme_dark": "dark"}, "js": {}};
 </script>
 </head>
 <body class="page-print">
@@ -64,10 +66,12 @@
     <div class="topbar">
       <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
       <div class="topbar-spacer"></div>
+      <nav class="langs" aria-label="Language"><span class="lang current">English</span><a class="lang" href="ja/print.html" hreflang="ja">日本語</a><a class="lang" href="zh/print.html" hreflang="zh-Hans">中文</a></nav>
       <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
     </div>
     <div class="layout">
       <main id="content" class="content">
+        
         <header class="print-cover"><h1>Implementing an Interactive Theorem Prover from Scratch</h1><p>A guided tour of MiniLean4, a small Lean 4-style proof kernel written in Rust.</p><p>Hideaki Takahashi</p></header><section class="print-chapter" id="01-propositions-as-types"><header class="chapter-head"><p class="chapter-label">Chapter 1</p><h1>Propositions as Types</h1></header><div class="lead">
 <p>A theorem prover has to decide whether a proof is correct. A proof written in English cannot be checked by a computer, so we need a representation of proofs that a program can inspect. This chapter introduces the idea that makes everything else possible: a proof is a program, a proposition is its type, and checking a proof is type checking.</p>
 </div>
@@ -3773,8 +3777,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
       </aside>
     </div>
     <footer class="footer">
-      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
-      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
     </footer>
   </div>
 </div>

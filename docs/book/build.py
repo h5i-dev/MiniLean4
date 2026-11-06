@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Builds the MiniLean4 ebook.
+"""Builds the MiniLean4 ebook in every language that has sources.
 
-Sources:   docs/book/src/*.md   (Markdown with embedded HTML widgets and $math$)
+Sources:   docs/book/src/*.md (English), docs/book/src-ja/*.md, docs/book/src-zh/*.md
 Template:  docs/book/template.html
 Assets:    docs/book/assets/    (CSS, JS, fonts, KaTeX, kernel wasm)
-Output:    docs/ebook/          (one HTML page per chapter, index, print view)
+Output:    docs/ebook/          (English), docs/ebook/ja/, docs/ebook/zh/
 
 Math is pre-rendered with KaTeX through Node (tools/render-math.mjs), so the
-output pages need no JavaScript to display formulas.
+output pages need no JavaScript to display formulas. Chapter order, titles,
+and interface strings per language live in locales.py.
 
-Usage:  python3 docs/book/build.py [--check]
+Usage:  python3 docs/book/build.py [--check] [--only en|ja|zh]
 """
 
 import hashlib
@@ -23,82 +24,44 @@ from pathlib import Path
 
 import markdown
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from locales import LOCALES, ORDER  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent
-SRC = ROOT / "src"
-OUT = ROOT.parent / "ebook"
+OUT_ROOT = ROOT.parent / "ebook"
 ASSETS = ROOT / "assets"
 TOOLS = ROOT / "tools"
 TEMPLATE = (ROOT / "template.html").read_text(encoding="utf-8")
 CACHE_FILE = ROOT / ".mathcache.json"
 
+
 # ---------------------------------------------------------------------------
-# Table of contents. (kind, slug, title, one-line description)
+# Table of contents per locale
 # ---------------------------------------------------------------------------
 
-TOC = [
-    ("part", "Part I", "A Kernel for Propositional Logic"),
-    ("ch", "01-propositions-as-types", "Propositions as Types",
-     "Why checking a proof is the same job as type checking a program."),
-    ("ch", "02-syntax", "The Language of Terms",
-     "Five kinds of terms, and the Rust enum that represents them."),
-    ("ch", "03-typing-rules", "Typing Rules",
-     "Contexts, judgments, and the eight rules that define well-typed terms."),
-    ("ch", "04-logic", "The Typing Rules as a Logic",
-     "Natural deduction, the translation of formulas to types, and what consistency means."),
-    ("ch", "05-algorithm", "A Type Checking Algorithm",
-     "Turning the rules into Infer and Check, line by line against typecheck.rs."),
-    ("ch", "06-worked-examples", "Worked Examples",
-     "Step-by-step traces of the checker on right proofs, wrong proofs, and conversions."),
-    ("part", "Part II", "Growing the Kernel"),
-    ("ch", "07-inductive-nat", "Inductive Types I: Natural Numbers",
-     "Constants, definitions, and the recursor that gives both recursion and induction."),
-    ("ch", "08-inductive-recipe", "Inductive Types II: The General Recipe",
-     "Trees, lists, vectors, and the procedure that generates any recursor."),
-    ("ch", "09-equality", "Equality Is an Inductive Type Too",
-     "Eq, transport, definitional versus propositional equality, and the proof of 0 + n = n."),
-    ("ch", "10-tactics", "Tactics: Building Proof Terms Interactively",
-     "Goals, holes, and how intro, apply, induction, and rw construct terms."),
-    ("part", "Part III", "Under the Hood"),
-    ("ch", "11-substitution-alpha", "Substitution, Capture, and Alpha-Equivalence",
-     "The operations where kernel bugs hide, and how substitution.rs avoids them."),
-    ("ch", "12-reduction-conversion", "Reduction and Conversion",
-     "Beta, delta, iota; computation rules as data; weak head normal form."),
-    ("part", "Part IV", "Foundations"),
-    ("ch", "13-universes", "Universes: Why Sort u?",
-     "Type-in-Type is inconsistent; a hierarchy with an impredicative bottom is not."),
-    ("ch", "14-properties", "Properties of the System",
-     "Uniqueness, subject reduction, strong normalization, consistency."),
-    ("part", "Appendices", ""),
-    ("app", "a-proof-pat", "Proof that Proofs Are Terms", "The full proof of the translation theorem."),
-    ("app", "b-proof-alpha", "Correctness of Alpha-Equivalence", "Both definitions compute de Bruijn forms."),
-    ("app", "c-hurkens", "Hurkens' Paradox", "A closed term of type False under Type : Type."),
-    ("app", "d-proof-consistency", "Proof of Consistency", "No closed term inhabits forall P, P."),
-    ("app", "e-leanmini-reference", "The leanmini Language", "Syntax, commands, and tactics of the script language."),
-    ("app", "f-notation-glossary", "Notation and Glossary", "Every symbol and term used in the book."),
-    ("app", "bibliography", "Bibliography", ""),
-]
-
-
-def numbered_entries():
-    """Yields dicts for every chapter/appendix with its label and neighbours."""
+def numbered_entries(loc):
+    """Chapter/appendix entries for a locale, with labels and neighbours."""
+    L = LOCALES[loc]
     entries = []
     chapter = 0
     appendix = 0
     part = None
-    for item in TOC:
-        if item[0] == "part":
-            part = item[2] or item[1]
+    for kind, slug in ORDER:
+        if kind == "part":
+            part = L["parts"][slug]
             continue
-        kind, slug, title, desc = item
+        title, desc = L["chapters"][slug]
         if kind == "ch":
             chapter += 1
-            label = f"Chapter {chapter}"
+            label = L["ui"]["chapter"].format(n=chapter)
             short = str(chapter)
         else:
             appendix += 1
             letter = chr(ord("A") + appendix - 1)
-            label = f"Appendix {letter}" if slug != "bibliography" else ""
-            short = letter if slug != "bibliography" else ""
+            if slug == "bibliography":
+                label, short = "", ""
+            else:
+                label, short = L["ui"]["appendix"].format(n=letter), letter
         entries.append({
             "kind": kind, "slug": slug, "title": title, "desc": desc,
             "label": label, "short": short, "part": part, "file": f"{slug}.html",
@@ -109,15 +72,10 @@ def numbered_entries():
     return entries
 
 
-ENTRIES = numbered_entries()
-BY_SLUG = {e["slug"]: e for e in ENTRIES}
-
 # ---------------------------------------------------------------------------
 # Math extraction and pre-rendering
 # ---------------------------------------------------------------------------
 
-# Fenced code, inline code, display math, inline math. Order matters: code is
-# matched first so that dollars inside code are never treated as math.
 TOKEN_RE = re.compile(
     r"(```.*?```|`[^`\n]*`|\$\$.*?\$\$|\$(?!\s)(?:\\.|[^$\\\n])+?(?<!\s)\$)",
     re.S,
@@ -148,27 +106,23 @@ def load_cache():
     return {}
 
 
+def math_key(it):
+    return hashlib.sha1(f"{int(it['display'])}:{it['tex']}".encode()).hexdigest()
+
+
 def render_math(items, cache):
-    todo = []
-    keys = []
-    for it in items:
-        key = hashlib.sha1(f"{int(it['display'])}:{it['tex']}".encode()).hexdigest()
-        keys.append(key)
-        if key not in cache:
-            todo.append(it)
+    todo = [it for it in items if math_key(it) not in cache]
     if todo:
         proc = subprocess.run(
             ["node", str(TOOLS / "render-math.mjs")],
             input=json.dumps(todo), capture_output=True, text=True, check=True,
         )
-        results = json.loads(proc.stdout)
-        for it, res in zip(todo, results):
-            key = hashlib.sha1(f"{int(it['display'])}:{it['tex']}".encode()).hexdigest()
+        for it, res in zip(todo, json.loads(proc.stdout)):
             if res["error"]:
                 print(f"  KaTeX error: {res['error']}\n    in: {it['tex'][:120]}", file=sys.stderr)
                 res["html"] = f'<code class="math-error">{html.escape(it["tex"])}</code>'
-            cache[key] = res["html"]
-    return [cache[k] for k in keys]
+            cache[math_key(it)] = res["html"]
+    return [cache[math_key(it)] for it in items]
 
 
 def insert_math(body, rendered, items):
@@ -291,160 +245,213 @@ def render_markdown(text, cache):
     return body, md.toc_tokens
 
 
-def sidebar_html(current_slug):
-    parts = []
-    parts.append('<nav class="toc" aria-label="Table of contents">')
-    parts.append('<a class="toc-cover" href="index.html">Cover and contents</a>')
-    current_part = None
-    current_index = next((i for i, e in enumerate(ENTRIES) if e["slug"] == current_slug), None)
-    for i, e in enumerate(ENTRIES):
-        if e["part"] != current_part:
-            if current_part is not None:
-                parts.append("</ol>")
-            current_part = e["part"]
-            parts.append(f'<h3 class="toc-part">{html.escape(current_part)}</h3><ol class="toc-list">')
-        if e["slug"] == current_slug:
-            cls = ' class="current"'
-        elif current_index is not None and i < current_index:
-            cls = ' class="past"'
-        else:
-            cls = ""
-        num = f'<span class="toc-num">{e["short"]}</span>' if e["short"] else '<span class="toc-num"></span>'
-        parts.append(f'<li{cls}><a href="{e["file"]}">{num}<span class="toc-title">{html.escape(e["title"])}</span></a></li>')
-    parts.append("</ol>")
-    parts.append('<a class="toc-print" href="print.html">Single-page version</a>')
-    parts.append("</nav>")
-    return "\n".join(parts)
-
-
-def on_this_page(toc_tokens):
-    items = [t for t in toc_tokens if t["level"] == 2]
-    if not items:
-        return ""
-    lis = "".join(f'<li><a href="#{t["id"]}">{t["name"]}</a></li>' for t in items)
-    return f'<nav class="onpage" aria-label="On this page"><h4>On this page</h4><ol>{lis}</ol></nav>'
-
-
-def pager_html(entry):
-    prev_html = next_html = ""
-    if entry["prev"]:
-        p = entry["prev"]
-        prev_html = (f'<a class="pager-prev" href="{p["file"]}"><span class="pager-dir">Previous</span>'
-                     f'<span class="pager-title">{html.escape(p["title"])}</span></a>')
-    if entry["next"]:
-        n = entry["next"]
-        next_html = (f'<a class="pager-next" href="{n["file"]}"><span class="pager-dir">Next</span>'
-                     f'<span class="pager-title">{html.escape(n["title"])}</span></a>')
-    return f'<div class="pager">{prev_html}{next_html}</div>'
-
-
-def fill(template, **kv):
-    out = template
-    for k, v in kv.items():
-        out = out.replace("{{" + k + "}}", v)
-    return out
-
-
-def build_page(entry, body, toc_tokens):
-    heading = (f'<header class="chapter-head">'
-               f'<p class="chapter-label">{html.escape(entry["label"])}</p>'
-               f'<h1>{html.escape(entry["title"])}</h1></header>')
-    return fill(
-        TEMPLATE,
-        title=f'{entry["title"]} | Implementing an Interactive Theorem Prover from Scratch',
-        body_class=f'page-{entry["kind"]}',
-        sidebar=sidebar_html(entry["slug"]),
-        onpage=on_this_page(toc_tokens),
-        content=heading + body,
-        pager=pager_html(entry),
-    )
-
-
-def build_index(body, toc_tokens):
-    cards = []
-    current_part = None
-    for e in ENTRIES:
-        if e["part"] != current_part:
-            if current_part is not None:
-                cards.append("</ol>")
-            current_part = e["part"]
-            cards.append(f'<h3 class="contents-part">{html.escape(current_part)}</h3><ol class="contents-list">')
-        num = f'<span class="contents-num">{e["short"]}</span>' if e["short"] else '<span class="contents-num"></span>'
-        desc = f'<span class="contents-desc">{html.escape(e["desc"])}</span>' if e["desc"] else ""
-        cards.append(f'<li><a href="{e["file"]}">{num}<span class="contents-title">{html.escape(e["title"])}</span></a>{desc}</li>')
-    cards.append("</ol>")
-    body = body.replace("<p>CONTENTS_GO_HERE</p>", '<div class="contents">' + "".join(cards) + "</div>")
-    return fill(
-        TEMPLATE,
-        title="Implementing an Interactive Theorem Prover from Scratch",
-        body_class="page-cover",
-        sidebar=sidebar_html(None),
-        onpage="",
-        content=body,
-        pager="",
-    )
-
-
-def build_print(pages):
-    sections = []
-    for entry, body in pages:
-        sections.append(f'<section class="print-chapter" id="{entry["slug"]}">'
-                        f'<header class="chapter-head"><p class="chapter-label">{html.escape(entry["label"])}</p>'
-                        f'<h1>{html.escape(entry["title"])}</h1></header>{body}</section>')
-    cover = ('<header class="print-cover"><h1>Implementing an Interactive Theorem Prover from Scratch</h1>'
-             '<p>A guided tour of MiniLean4, a small Lean 4-style proof kernel written in Rust.</p>'
-             '<p>Hideaki Takahashi</p></header>')
-    return fill(
-        TEMPLATE,
-        title="Implementing an Interactive Theorem Prover from Scratch (single page)",
-        body_class="page-print",
-        sidebar=sidebar_html(None),
-        onpage="",
-        content=cover + "".join(sections),
-        pager="",
-    )
-
-
 def rewrite_links(body):
     """Chapter cross-references are written as [text](03-typing-rules.md#anchor)."""
     return re.sub(r'href="([0-9a-z\-]+)\.md(#[^"]*)?"', lambda m: f'href="{m.group(1)}.html{m.group(2) or ""}"', body)
 
 
+class Site:
+    """Everything needed to render one locale."""
+
+    def __init__(self, loc):
+        self.loc = loc
+        self.L = LOCALES[loc]
+        self.ui = self.L["ui"]
+        self.src = ROOT / self.L["src"]
+        self.out = OUT_ROOT / self.L["out"] if self.L["out"] else OUT_ROOT
+        self.root = "../" if self.L["out"] else ""
+        self.entries = numbered_entries(loc)
+
+    def sidebar_html(self, current_slug):
+        parts = ['<nav class="toc" aria-label="Table of contents">',
+                 f'<a class="toc-cover" href="index.html">{html.escape(self.ui["cover"])}</a>']
+        current_part = None
+        current_index = next((i for i, e in enumerate(self.entries) if e["slug"] == current_slug), None)
+        for i, e in enumerate(self.entries):
+            if e["part"] != current_part:
+                if current_part is not None:
+                    parts.append("</ol>")
+                current_part = e["part"]
+                parts.append(f'<h3 class="toc-part">{html.escape(current_part)}</h3><ol class="toc-list">')
+            if e["slug"] == current_slug:
+                cls = ' class="current"'
+            elif current_index is not None and i < current_index:
+                cls = ' class="past"'
+            else:
+                cls = ""
+            num = f'<span class="toc-num">{e["short"]}</span>'
+            parts.append(f'<li{cls}><a href="{e["file"]}">{num}<span class="toc-title">{html.escape(e["title"])}</span></a></li>')
+        parts.append("</ol>")
+        parts.append(f'<a class="toc-print" href="print.html">{html.escape(self.ui["print"])}</a>')
+        parts.append("</nav>")
+        return "\n".join(parts)
+
+    def on_this_page(self, toc_tokens):
+        items = [t for t in toc_tokens if t["level"] == 2]
+        if not items:
+            return ""
+        lis = "".join(f'<li><a href="#{t["id"]}">{t["name"]}</a></li>' for t in items)
+        return f'<nav class="onpage" aria-label="{html.escape(self.ui["onpage"])}"><h4>{html.escape(self.ui["onpage"])}</h4><ol>{lis}</ol></nav>'
+
+    def pager_html(self, entry):
+        prev_html = next_html = ""
+        if entry["prev"]:
+            p = entry["prev"]
+            prev_html = (f'<a class="pager-prev" href="{p["file"]}"><span class="pager-dir">{html.escape(self.ui["prev"])}</span>'
+                         f'<span class="pager-title">{html.escape(p["title"])}</span></a>')
+        if entry["next"]:
+            n = entry["next"]
+            next_html = (f'<a class="pager-next" href="{n["file"]}"><span class="pager-dir">{html.escape(self.ui["next"])}</span>'
+                         f'<span class="pager-title">{html.escape(n["title"])}</span></a>')
+        return f'<div class="pager">{prev_html}{next_html}</div>'
+
+    def langswitch(self, page):
+        """Links to the same page in every locale that has it."""
+        links = []
+        for other, L in LOCALES.items():
+            target = OUT_ROOT / L["out"] / page if L["out"] else OUT_ROOT / page
+            if not (ROOT / L["src"]).exists():
+                continue
+            if other == self.loc:
+                links.append(f'<span class="lang current">{html.escape(L["name"])}</span>')
+            else:
+                href = (self.root + (L["out"] + "/" if L["out"] else "")) + page
+                links.append(f'<a class="lang" href="{href}" hreflang="{L["html_lang"]}">{html.escape(L["name"])}</a>')
+            _ = target
+        return '<nav class="langs" aria-label="Language">' + "".join(links) + "</nav>"
+
+    def fill(self, page, **kv):
+        out = TEMPLATE
+        values = {
+            "root": self.root,
+            "lang": self.L["html_lang"],
+            "subtitle": html.escape(self.L["subtitle"]),
+            "description": html.escape(self.L["description"]),
+            "ui_contents": html.escape(self.ui["contents"]),
+            "ui_theme": html.escape(self.ui["theme_light"]),
+            "footer": self.ui["footer"],
+            "langswitch": self.langswitch(page),
+            "notice": (f'<div class="notice" role="note">{self.L["notice"]}</div>' if self.L.get("notice") else ""),
+            "i18n": json.dumps({"ui": {"contents": self.ui["contents"], "close": self.ui["close"],
+                                       "theme_light": self.ui["theme_light"], "theme_dark": self.ui["theme_dark"]},
+                                "js": self.L["js"]}, ensure_ascii=False),
+        }
+        values.update(kv)
+        for k, v in values.items():
+            out = out.replace("{{" + k + "}}", v)
+        return out
+
+    def build_page(self, entry, body, toc_tokens):
+        heading = (f'<header class="chapter-head">'
+                   f'<p class="chapter-label">{html.escape(entry["label"])}</p>'
+                   f'<h1>{html.escape(entry["title"])}</h1></header>')
+        return self.fill(
+            entry["file"],
+            title=f'{entry["title"]} | {self.L["title"]}',
+            body_class=f'page-{entry["kind"]}',
+            sidebar=self.sidebar_html(entry["slug"]),
+            onpage=self.on_this_page(toc_tokens),
+            content=heading + body,
+            pager=self.pager_html(entry),
+        )
+
+    def build_index(self, body, toc_tokens):
+        cards = []
+        current_part = None
+        for e in self.entries:
+            if e["part"] != current_part:
+                if current_part is not None:
+                    cards.append("</ol>")
+                current_part = e["part"]
+                cards.append(f'<h3 class="contents-part">{html.escape(current_part)}</h3><ol class="contents-list">')
+            num = f'<span class="contents-num">{e["short"]}</span>'
+            desc = f'<span class="contents-desc">{html.escape(e["desc"])}</span>' if e["desc"] else ""
+            cards.append(f'<li><a href="{e["file"]}">{num}<span class="contents-title">{html.escape(e["title"])}</span></a>{desc}</li>')
+        cards.append("</ol>")
+        body = body.replace("<p>CONTENTS_GO_HERE</p>", '<div class="contents">' + "".join(cards) + "</div>")
+        return self.fill(
+            "index.html",
+            title=self.L["title"],
+            body_class="page-cover",
+            sidebar=self.sidebar_html(None),
+            onpage="",
+            content=body,
+            pager="",
+        )
+
+    def build_print(self, pages):
+        sections = []
+        for entry, body in pages:
+            sections.append(f'<section class="print-chapter" id="{entry["slug"]}">'
+                            f'<header class="chapter-head"><p class="chapter-label">{html.escape(entry["label"])}</p>'
+                            f'<h1>{html.escape(entry["title"])}</h1></header>{body}</section>')
+        cover = (f'<header class="print-cover"><h1>{html.escape(self.L["title"])}</h1>'
+                 f'<p>{html.escape(self.ui["print_lead"])}</p>'
+                 f'<p>{html.escape(self.ui["author"])}</p></header>')
+        return self.fill(
+            "print.html",
+            title=f'{self.L["title"]} {self.ui["single_page_title"]}',
+            body_class="page-print",
+            sidebar=self.sidebar_html(None),
+            onpage="",
+            content=cover + "".join(sections),
+            pager="",
+        )
+
+    def build(self, cache, check_only):
+        if not self.src.exists():
+            return []
+        print(f"[{self.loc}] -> {self.out.relative_to(ROOT.parent)}")
+        self.out.mkdir(parents=True, exist_ok=True)
+        pages = []
+        missing = []
+        for entry in self.entries:
+            src = self.src / f'{entry["slug"]}.md'
+            if not src.exists():
+                missing.append(src.name)
+                continue
+            body, toc_tokens = render_markdown(src.read_text(encoding="utf-8"), cache)
+            body = rewrite_links(body)
+            pages.append((entry, body))
+            if not check_only:
+                (self.out / entry["file"]).write_text(self.build_page(entry, body, toc_tokens), encoding="utf-8")
+        index_src = self.src / "index.md"
+        if index_src.exists():
+            body, toc_tokens = render_markdown(index_src.read_text(encoding="utf-8"), cache)
+            body = rewrite_links(body)
+            if not check_only:
+                (self.out / "index.html").write_text(self.build_index(body, toc_tokens), encoding="utf-8")
+        else:
+            missing.append("index.md")
+        if not check_only:
+            (self.out / "print.html").write_text(self.build_print(pages), encoding="utf-8")
+        print(f"  {len(pages)} chapters" + (f", missing: {', '.join(missing)}" if missing else ""))
+        return missing
+
+
 def main():
     check_only = "--check" in sys.argv
+    only = None
+    if "--only" in sys.argv:
+        only = sys.argv[sys.argv.index("--only") + 1]
     cache = load_cache()
-    OUT.mkdir(parents=True, exist_ok=True)
-    pages = []
-    missing = []
-    for entry in ENTRIES:
-        src = SRC / f'{entry["slug"]}.md'
-        if not src.exists():
-            missing.append(src.name)
+    OUT_ROOT.mkdir(parents=True, exist_ok=True)
+    missing = {}
+    for loc in LOCALES:
+        if only and loc != only:
             continue
-        text = src.read_text(encoding="utf-8")
-        body, toc_tokens = render_markdown(text, cache)
-        body = rewrite_links(body)
-        pages.append((entry, body))
-        if not check_only:
-            (OUT / entry["file"]).write_text(build_page(entry, body, toc_tokens), encoding="utf-8")
-        print(f"  {entry['file']}  ({len(body) // 1024} KB)")
-    index_src = SRC / "index.md"
-    if index_src.exists():
-        body, toc_tokens = render_markdown(index_src.read_text(encoding="utf-8"), cache)
-        body = rewrite_links(body)
-        if not check_only:
-            (OUT / "index.html").write_text(build_index(body, toc_tokens), encoding="utf-8")
-        print("  index.html")
+        m = Site(loc).build(cache, check_only)
+        if m:
+            missing[loc] = m
     if not check_only:
-        (OUT / "print.html").write_text(build_print(pages), encoding="utf-8")
-        print("  print.html")
-        if (OUT / "assets").exists():
-            shutil.rmtree(OUT / "assets")
-        shutil.copytree(ASSETS, OUT / "assets")
+        if (OUT_ROOT / "assets").exists():
+            shutil.rmtree(OUT_ROOT / "assets")
+        shutil.copytree(ASSETS, OUT_ROOT / "assets")
         print("  assets/")
     CACHE_FILE.write_text(json.dumps(cache), encoding="utf-8")
     if missing:
-        print("Missing sources: " + ", ".join(missing), file=sys.stderr)
+        for loc, m in missing.items():
+            print(f"Missing sources [{loc}]: " + ", ".join(m), file=sys.stderr)
         sys.exit(1)
 
 

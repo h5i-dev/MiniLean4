@@ -14,6 +14,8 @@
       document.documentElement.classList.add("light");
     }
   })();
+  window.MINILEAN_WASM_URL = "assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "contents", "close": "close", "theme_light": "light", "theme_dark": "dark"}, "js": {}};
 </script>
 </head>
 <body class="page-app">
@@ -64,10 +66,12 @@
     <div class="topbar">
       <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
       <div class="topbar-spacer"></div>
+      <nav class="langs" aria-label="Language"><span class="lang current">English</span><a class="lang" href="ja/f-notation-glossary.html" hreflang="ja">日本語</a><a class="lang" href="zh/f-notation-glossary.html" hreflang="zh-Hans">中文</a></nav>
       <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
     </div>
     <div class="layout">
       <main id="content" class="content">
+        
         <header class="chapter-head"><p class="chapter-label">Appendix F</p><h1>Notation and Glossary</h1></header><div class="lead">
 <p>Every symbol, judgment, and technical term used in the book, with the chapter that introduces it. Use this appendix as a reference while reading, or as a checklist of what the book covers.</p>
 </div>
@@ -452,8 +456,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
       </aside>
     </div>
     <footer class="footer">
-      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
-      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
     </footer>
   </div>
 </div>

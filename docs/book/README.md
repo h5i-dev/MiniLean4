@@ -7,7 +7,11 @@ Theorem Prover from Scratch*. The built site lives in `../ebook/`.
 
 | Path | Contents |
 |---|---|
-| `src/*.md` | One Markdown file per chapter and appendix, plus `index.md` (the cover). |
+| `src/*.md` | One Markdown file per chapter and appendix, plus `index.md` (the cover), in English. |
+| `src-ja/*.md`, `src-zh/*.md` | The Japanese and Simplified Chinese translations, same file names. |
+| `locales.py` | Chapter order, titles, part names, and interface strings per language. |
+| `i18n/` | The translation guide, the two glossaries. |
+| `tools/check-translation.py` | Verifies that a translated file keeps the structure (HTML, math, code, scripts) of its English source. |
 | `build.py` | Builds `../ebook/` from `src/`, `template.html`, and `assets/`. |
 | `template.html` | The page template (sidebar, topbar, content, footer). |
 | `assets/book.css`, `assets/book.js` | Styling and the interactive widgets (steppers, trace trees, theme). |
@@ -24,7 +28,8 @@ only if the kernel changed, a Rust toolchain with the `wasm32-unknown-unknown`
 target.
 
 ```text
-python3 docs/book/build.py            # rebuild docs/ebook/ (math is pre-rendered)
+python3 docs/book/build.py            # rebuild docs/ebook/, docs/ebook/ja/, docs/ebook/zh/ (math is pre-rendered)
+python3 docs/book/build.py --only ja  # one language
 docs/book/playground/build.sh         # rebuild assets/minilean.wasm after kernel changes
 node docs/book/playground/test.mjs    # run every examples/*.leanmini through the wasm kernel
 ```
@@ -48,3 +53,17 @@ playgrounds fetch the `.wasm` file, which browsers refuse to do from `file://`.
   and recomputed by the kernel; the request format is documented at the top of `playground/src/explore.rs`.
 - Cross-references are written as `[Chapter 3](03-typing-rules.md#anchor)`; the build rewrites them to `.html`.
 - The order of chapters and their descriptions are the `TOC` list at the top of `build.py`.
+
+## Translating
+
+Edit the English source first, then port the change to `src-ja/` and `src-zh/`.
+The rules (what may change, what must stay byte-identical) are in
+`i18n/TRANSLATION-GUIDE.md`, and the glossaries fix the terminology. Check every
+translated file with
+
+```text
+python3 docs/book/tools/check-translation.py docs/book/src/FILE.md docs/book/src-ja/FILE.md
+```
+
+The build produces a language switcher in the top bar for every language whose
+source directory exists.

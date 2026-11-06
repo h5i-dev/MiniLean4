@@ -4,12 +4,17 @@
 (function () {
   "use strict";
 
+  var I18N = (window.MINILEAN_I18N && window.MINILEAN_I18N.js) || {};
+  var UI = (window.MINILEAN_I18N && window.MINILEAN_I18N.ui) || {};
+  function t(key) { return I18N[key] || key; }
+  window.MiniLeanT = t;
+
   // ----- Theme -----
   var themeBtn = document.getElementById("theme-toggle");
   function applyThemeLabel() {
     if (!themeBtn) return;
     var light = document.documentElement.classList.contains("light");
-    themeBtn.textContent = light ? "dark" : "light";
+    themeBtn.textContent = light ? (UI.theme_dark || "dark") : (UI.theme_light || "light");
   }
   if (themeBtn) {
     themeBtn.addEventListener("click", function () {
@@ -46,7 +51,7 @@
     navBtn.addEventListener("click", function () {
       var open = document.body.classList.toggle("nav-open");
       navBtn.setAttribute("aria-expanded", open ? "true" : "false");
-      navBtn.textContent = open ? "close" : "contents";
+      navBtn.textContent = open ? (UI.close || "close") : (UI.contents || "contents");
     });
     document.addEventListener("click", function (e) {
       if (!document.body.classList.contains("nav-open")) return;
@@ -54,7 +59,7 @@
       if (sidebar && !sidebar.contains(e.target) && e.target !== navBtn) {
         document.body.classList.remove("nav-open");
         navBtn.setAttribute("aria-expanded", "false");
-        navBtn.textContent = "contents";
+        navBtn.textContent = UI.contents || "contents";
       }
     });
   }
@@ -87,11 +92,11 @@
     var title = document.createElement("span");
     title.className = "stepper-title";
     title.textContent = box.getAttribute("data-title") || "Step through";
-    var prev = makeButton("prev");
+    var prev = makeButton(t("prev"));
     var count = document.createElement("span");
     count.className = "stepper-count";
-    var next = makeButton("next");
-    var all = makeButton("show all");
+    var next = makeButton(t("next"));
+    var all = makeButton(t("show all"));
     bar.appendChild(title);
     bar.appendChild(prev);
     bar.appendChild(count);
@@ -106,11 +111,11 @@
         else if (i === index) s.removeAttribute("hidden");
         else s.setAttribute("hidden", "");
       });
-      count.textContent = "step " + (index + 1) + " / " + steps.length;
+      count.textContent = t("step") + " " + (index + 1) + " / " + steps.length;
       prev.disabled = showAll || index === 0;
       next.disabled = showAll || index === steps.length - 1;
       all.classList.toggle("active", showAll);
-      all.textContent = showAll ? "one at a time" : "show all";
+      all.textContent = showAll ? t("one at a time") : t("show all");
     }
     prev.addEventListener("click", function () { if (index > 0) { index--; render(); } });
     next.addEventListener("click", function () { if (index < steps.length - 1) { index++; render(); } });
@@ -134,13 +139,13 @@
       btn.type = "button";
       btn.className = "trace-toggle";
       btn.setAttribute("aria-expanded", "true");
-      btn.textContent = "hide " + count;
+      btn.textContent = t("hide") + " " + count;
       // Insert after the first text/inline content, before the nested list.
       li.insertBefore(btn, child);
       btn.addEventListener("click", function () {
         var collapsed = li.classList.toggle("collapsed");
         btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
-        btn.textContent = collapsed ? "show " + count : "hide " + count;
+        btn.textContent = (collapsed ? t("show") : t("hide")) + " " + count;
       });
     });
   });

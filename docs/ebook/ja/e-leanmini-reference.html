@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>leanmini 言語 | 対話的定理証明器をゼロから実装する</title>
+<meta name="description" content="Rust で書かれた小さな Lean 4 風の証明カーネル MiniLean4 を案内する本。命題と型、帰納型、タクティク、宇宙。">
+<meta name="color-scheme" content="dark light">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/book.css">
+<script>
+  (function () {
+    if (localStorage.getItem("minilean-theme") === "light") {
+      document.documentElement.classList.add("light");
+    }
+  })();
+  window.MINILEAN_WASM_URL = "../assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "目次", "close": "閉じる", "theme_light": "ライト", "theme_dark": "ダーク"}, "js": {"run": "実行", "reset": "リセット", "running": "実行中...", "update": "更新", "thinking": "計算中...", "edit script": "スクリプトを編集", "hide editor": "エディタを閉じる", "apply": "適用", "prev": "前へ", "next": "次へ", "show all": "すべて表示", "one at a time": "1 つずつ", "step": "ステップ", "hide": "隠す", "show": "表示", "syntax tree": "構文木", "typing derivation": "型付け導出", "reduction": "簡約", "binders and scope": "束縛子とスコープ", "substitution": "代入", "proof explorer": "証明エクスプローラ", "constructor tree": "構成子の木", "the imax rule": "imax 規則", "term": "項", "context": "文脈", "replace": "置換する変数", "with": "置き換え先", "value": "値", "as calls": "呼び出しとして", "as proof tree": "証明木として", "click a node to see the subterm it stands for": "ノードをクリックすると、それが表す部分項を表示します", "Infer returns": "Infer の結果:", "Infer fails": "Infer は失敗:", "no head reduction applies": "頭部で適用できる簡約はありません", "weak head normal form": "弱頭正規形", "normal form (Normalize continues inside)": "正規形（Normalize は内部まで進む）", "this is also the normal form": "これは正規形でもあります", "bound": "束縛", "free": "自由", "same colour as its binder; hover to see the pair": "束縛子と同じ色。カーソルを乗せると対が光ります", "free variables": "自由変数", "no free variables: the term is closed": "自由変数なし: この項は閉じています", "naive substitution": "素朴な代入", "capture-avoiding substitution": "捕獲回避代入", "a free variable of the replacement has been captured: the meaning changed": "置き換え先の自由変数が捕獲され、意味が変わりました", "no capture here": "ここでは捕獲は起きません", "the binder was renamed first; the free variable stays free": "先に束縛子を改名したので、自由変数は自由のままです", "identical to the naive result": "素朴な代入と同じ結果です", "script": "スクリプト", "goals after this command": "このコマンド後のゴール", "kernel verdict": "カーネルの判定", "partial proof term": "部分的な証明項", "final proof term": "最終的な証明項", "QED. The kernel checked the complete term against the goal.": "QED。カーネルが完成した項をゴールと照合しました。", "declaration added to the signature; no proof in progress": "宣言をシグネチャに追加しました。進行中の証明はありません", "no goals": "ゴールなし", "no term yet": "まだ項はありません", "no holes remain": "ホールは残っていません", "hole, the highlighted one is the current goal": "個のホール。強調されているのが現在のゴールです", "holes; the highlighted one is the current goal": "個のホール。強調されているのが現在のゴールです", "line": "行", "the script is empty": "スクリプトが空です", "recursor case": "再帰子のケース", "(recursive field)": "（再帰的フィールド）", "R stands for the recursor applied to the same motive and cases; each (R field) is the induction hypothesis for that child.": "R は同じ動機とケースに適用した再帰子を表します。各 (R フィールド) がその子に対する帰納法の仮定です。", "A lives in": "A の宇宙", "B lives in": "B の宇宙", "(propositions)": "（命題）", "run the script to see what the kernel says.": "実行すると、カーネルの応答がここに表示されます。", "beta: apply the function at the head": "β: 頭部の関数を適用", "delta: unfold the definition at the head": "δ: 頭部の定義を展開", "iota: the recursor sees a constructor": "ι: 再帰子が構成子を見つけた", "the major premise is computed first": "先に大前提を計算", "step limit": "ステップ上限", "The in-browser kernel could not be loaded": "ブラウザ内のカーネルを読み込めませんでした", "imax_prop": "B は命題なので、何を量化していても Π 全体が命題になる: imax({u}, 0) = 0。これが非述語性である。", "imax_pred": "B は命題ではないので、Π は 2 つの宇宙の大きいほうに入る: imax({u}, {v}) = max({u}, {v}) = {r}。これが述語性である。"}};
+</script>
+</head>
+<body class="page-app">
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a class="logo" href="index.html">MiniLean4</a>
+      <p class="book-sub">対話的定理証明器をゼロから実装する</p>
+    </div>
+    <nav class="toc" aria-label="Table of contents">
+<a class="toc-cover" href="index.html">表紙と目次</a>
+<h3 class="toc-part">命題論理のためのカーネル</h3><ol class="toc-list">
+<li class="past"><a href="01-propositions-as-types.html"><span class="toc-num">1</span><span class="toc-title">命題は型である</span></a></li>
+<li class="past"><a href="02-syntax.html"><span class="toc-num">2</span><span class="toc-title">項の言語</span></a></li>
+<li class="past"><a href="03-typing-rules.html"><span class="toc-num">3</span><span class="toc-title">型付け規則</span></a></li>
+<li class="past"><a href="04-logic.html"><span class="toc-num">4</span><span class="toc-title">論理としての型付け規則</span></a></li>
+<li class="past"><a href="05-algorithm.html"><span class="toc-num">5</span><span class="toc-title">型検査アルゴリズム</span></a></li>
+<li class="past"><a href="06-worked-examples.html"><span class="toc-num">6</span><span class="toc-title">実例で追う</span></a></li>
+</ol>
+<h3 class="toc-part">カーネルを育てる</h3><ol class="toc-list">
+<li class="past"><a href="07-inductive-nat.html"><span class="toc-num">7</span><span class="toc-title">帰納型 I: 自然数</span></a></li>
+<li class="past"><a href="08-inductive-recipe.html"><span class="toc-num">8</span><span class="toc-title">帰納型 II: 一般的な手順</span></a></li>
+<li class="past"><a href="09-equality.html"><span class="toc-num">9</span><span class="toc-title">等式も帰納型である</span></a></li>
+<li class="past"><a href="10-tactics.html"><span class="toc-num">10</span><span class="toc-title">タクティク: 対話的に証明項を組み立てる</span></a></li>
+</ol>
+<h3 class="toc-part">内部のしくみ</h3><ol class="toc-list">
+<li class="past"><a href="11-substitution-alpha.html"><span class="toc-num">11</span><span class="toc-title">代入、捕獲、α 同値</span></a></li>
+<li class="past"><a href="12-reduction-conversion.html"><span class="toc-num">12</span><span class="toc-title">簡約と変換</span></a></li>
+</ol>
+<h3 class="toc-part">基礎</h3><ol class="toc-list">
+<li class="past"><a href="13-universes.html"><span class="toc-num">13</span><span class="toc-title">宇宙: なぜ Sort u なのか</span></a></li>
+<li class="past"><a href="14-properties.html"><span class="toc-num">14</span><span class="toc-title">体系の性質</span></a></li>
+</ol>
+<h3 class="toc-part">付録</h3><ol class="toc-list">
+<li class="past"><a href="a-proof-pat.html"><span class="toc-num">A</span><span class="toc-title">証明は項であることの証明</span></a></li>
+<li class="past"><a href="b-proof-alpha.html"><span class="toc-num">B</span><span class="toc-title">α 同値アルゴリズムの正しさ</span></a></li>
+<li class="past"><a href="c-hurkens.html"><span class="toc-num">C</span><span class="toc-title">Hurkens のパラドックス</span></a></li>
+<li class="past"><a href="d-proof-consistency.html"><span class="toc-num">D</span><span class="toc-title">整合性の証明</span></a></li>
+<li class="current"><a href="e-leanmini-reference.html"><span class="toc-num">E</span><span class="toc-title">leanmini 言語</span></a></li>
+<li><a href="f-notation-glossary.html"><span class="toc-num">F</span><span class="toc-title">記法と用語集</span></a></li>
+<li><a href="bibliography.html"><span class="toc-num"></span><span class="toc-title">参考文献</span></a></li>
+</ol>
+<a class="toc-print" href="print.html">1 ページ版</a>
+</nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">目次</button>
+      <div class="topbar-spacer"></div>
+      <nav class="langs" aria-label="Language"><a class="lang" href="../e-leanmini-reference.html" hreflang="en">English</a><span class="lang current">日本語</span><a class="lang" href="../zh/e-leanmini-reference.html" hreflang="zh-Hans">中文</a></nav>
+      <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">ライト</button>
+    </div>
+    <div class="layout">
+      <main id="content" class="content">
+        
+        <header class="chapter-head"><p class="chapter-label">付録 E</p><h1>leanmini 言語</h1></header><div class="lead">
+<p>本書のスクリプトは leanmini という小さな言語で書かれている。<code>src/syntax.rs</code> のパーサと <code>src/main.rs</code> のコマンドループが読む言語である。意図的に明示的な言語で、すべての束縛子は型を伴い、すべての引数は書き下され、何も推論されない。この付録はコードから一行ずつ導いた完全なリファレンスであり、リポジトリのすべての例題スクリプトを実行可能な形で収録している。</p>
+</div>
+<h2 id="_1">スクリプトの実行</h2>
+<p>ランナーは <code>src/main.rs</code> からビルドされるバイナリ <code>mini-lean</code> である。</p>
+<div class="codeblock" data-lang="text"><pre><code class="language-text">cargo run -- examples/identity.leanmini    # run a script file
+cargo run                                  # interactive session on stdin
+cargo test                                 # the kernel&#x27;s own test suite
+</code></pre></div>
+<p>スクリプトは行の並びである。ランナーは上から下へ処理し、最初のエラーで止まって、メッセージを表示し、ステータス 1 で終了する。空行と <code>#</code> で始まる行はコメントで、読み飛ばされる。</p>
+<div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini"><span class="c"># これはコメントである。</span>
+<span class="k">goal</span> <span class="k">forall</span> (P : <span class="k">Sort</span> 0), P -&gt; P
+</code></pre></div>
+<p>ファイル引数がなければ、ランナーは利用できるコマンドの一覧を表示したあと、同じコマンドを標準入力から 1 行ずつ読む。エラーは接頭辞 <code>error:</code> 付きで報告され、セッションは続く。コマンド <code>quit</code>（または <code>exit</code>）で終了する。二つのモードで異なるコマンドが一つある。ファイルでは <code>inductive</code> ブロックはヘッダ行とそれに続く <code>|</code> 行からなるが、対話モードでは <code>end</code> だけの行でブロックを閉じる。</p>
+<aside class="note">
+<p>コマンドラインのランナーは項を Rust の <code>Debug</code> 形式で表示する。たとえば <code>App(Const("Nat.succ"), Const("Nat.zero"))</code> のようになる。カーネルにプリティプリンタがないからである。本書のプレイグラウンドは同じカーネルを WebAssembly にコンパイルして動かし、その上に項を leanmini の構文で書き戻す小さなプリティプリンタを載せている。また各コマンドを出力の前にエコーするので、記録だけを読んでも内容がわかる。</p>
+</aside>
+<h2 id="_2">項</h2>
+<p>項は次のいずれかの形で書く。<code>A</code>、<code>B</code>、<code>t</code> は項を、<code>x</code> は名前を表す。</p>
+<table>
+<thead>
+<tr>
+<th>構文</th>
+<th>意味</th>
+<th>本書での記法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Sort 0</code>、<code>Sort 1</code>、...</td>
+<td>宇宙。数字は必須</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="sans-serif">S</mi><mi mathvariant="sans-serif">o</mi><mi mathvariant="sans-serif">r</mi><mi mathvariant="sans-serif">t</mi></mrow><mtext> </mtext><mi>u</mi></mrow><annotation encoding="application/x-tex">\Sort{u}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathsf">Sort</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">u</span></span></span></span></span></td>
+</tr>
+<tr>
+<td><code>x</code></td>
+<td>変数または定数。スコープで決まる</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> または <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></td>
+</tr>
+<tr>
+<td><code>forall (x : A), B</code></td>
+<td>依存関数型</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Π</mi><mo stretchy="false">(</mo><mi>x</mi><mo lspace="0em" rspace="0em">:</mo><mi>A</mi><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi><mtext> </mtext><mi>B</mi></mrow><annotation encoding="application/x-tex">\tPi{x}{A}{B}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Π</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord"><span class="mrel">:</span></span><span class="mord mathnormal">A</span><span class="mclose">)</span><span class="mord">.</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span></td>
+</tr>
+<tr>
+<td><code>A -&gt; B</code></td>
+<td>非依存の関数型</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>→</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">A \to B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span></td>
+</tr>
+<tr>
+<td><code>fun (x : A) =&gt; t</code></td>
+<td>関数</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false">(</mo><mi>x</mi><mo lspace="0em" rspace="0em">:</mo><mi>A</mi><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi><mtext> </mtext><mi>t</mi></mrow><annotation encoding="application/x-tex">\tLam{x}{A}{t}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">λ</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord"><span class="mrel">:</span></span><span class="mord mathnormal">A</span><span class="mclose">)</span><span class="mord">.</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span></span></span></span></td>
+</tr>
+<tr>
+<td><code>f a</code></td>
+<td>適用</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mtext>  </mtext><mi>a</mi></mrow><annotation encoding="application/x-tex">f\;a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">a</span></span></span></span></td>
+</tr>
+<tr>
+<td><code>(t)</code></td>
+<td>グループ化</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>適用は左結合で、最も強く結合する。<code>f a b</code> は <code>(f a) b</code> である。矢印は右結合で、<code>A -&gt; B -&gt; C</code> は <code>A -&gt; (B -&gt; C)</code> である。<code>forall</code> や <code>fun</code> は可能な限り右まで伸び、矢印の右辺も同様なので、<code>A -&gt; forall (x : B), C</code> に括弧は要らない。<em>引数</em>として使う <code>forall</code> や <code>fun</code> は括弧で囲まなければならない。<code>Nat.rec1 (fun (_n : Nat) =&gt; Nat) m</code> のようにである。矢印 <code>A -&gt; B</code> は <code>forall (_ : A), B</code> と読まれる。名前 <code>_</code> はこの用途のために予約されており、帰納型の宣言で束縛子として使うことはできない。</p>
+<p>トークナイザは空白と、文字 <code>(</code>、<code>)</code>、<code>,</code>、<code>:</code>、および 2 文字の記号 <code>-&gt;</code> と <code>=&gt;</code> で分割する。名前は英字、数字、<code>_</code>、<code>'</code>、<code>.</code> の並びなので、<code>Nat.succ</code>、<code>List.rec1</code>、<code>x'</code> はそれぞれ一つの名前である。Unicode 文字が三つ、別名として受け付けられる。<code>-&gt;</code> の代わりの <code>→</code>、<code>fun</code> の代わりの <code>λ</code>、<code>forall</code> の代わりの <code>∀</code> である。それ以外の文字は <code>unexpected character: ...</code> で拒否される。</p>
+<p>名前は項の構文解析時に解決され、それより後ではない。</p>
+<ul>
+<li>外側の <code>fun</code> や <code>forall</code> で束縛された名前、または現在のゴールの文脈にある名前は<strong>局所変数</strong>である。</li>
+<li>そうでなければ、カーネルに宣言された名前（<code>inductive</code>、<code>def</code>、<code>axiom</code>、<code>recursor</code> によるもの、または組み込み）は<strong>定数</strong>である。</li>
+<li>どちらでもなければ構文解析は <code>unknown identifier: x</code> で失敗する。構成子の綴りを間違えたときや、まだ導入していない仮定を使ったときにもこのエラーが出る。</li>
+</ul>
+<p>局所変数は同名の定数をシャドーイングする。パーサは型を推測しない。<code>Sort</code> の後には必ず数字が続き、束縛子は型付きで <code>(x : A)</code> と書かなければならない。</p>
+<h2 id="_3">宣言</h2>
+<h3 id="_4">帰納型</h3>
+<div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini"><span class="k">inductive</span> List (A : <span class="k">Sort</span> 1) : <span class="k">Sort</span> 1 <span class="k">where</span>
+  | nil
+  | cons (head : A) (tail : List A)
+</code></pre></div>
+<p>ヘッダは <code>inductive Name (p : P) ... (index i : J) ... : Sort u where</code> の形をとる。括弧で囲まれた各束縛子は<strong>パラメータ</strong>であり、<code>index</code> という語で始まるものは<strong>添字</strong>である。パラメータは添字より前になければならない（<code>parameters must precede indices</code>）。コロンの後の宇宙はリテラルの <code>Sort u</code> でなければならず（<code>inductive result must be Sort u</code>）、行は <code>where</code> で終わらなければならない。</p>
+<p>続く各行は <code>|</code> で始まり、構成子を一つ宣言する。<code>| ctor (field : T) ... [: Name params indices]</code> の形である。フィールドの型はパラメータ、先行するフィールド、そして <code>Name</code> 自身に言及してよい。省略可能なコロンの後の結果型は、<code>Name</code> にパラメータを順序どおり変更なしに適用し（<code>constructor parameters must be uniform</code>）、その後に添字ごとに一つの添字項を続けたものでなければならない。型に添字があれば、すべての構成子が結果型を明示しなければならない（<code>indexed constructor requires explicit result type</code>）。添字がなければ結果型は省略できる。構成子のフィールドに <code>index</code> キーワードは使えない。</p>
+<div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini"><span class="k">inductive</span> Vec (A : <span class="k">Sort</span> 1) (<span class="k">index</span> n : Nat) : <span class="k">Sort</span> 1 <span class="k">where</span>
+  | nil : Vec A <span class="n">Nat.zero</span>
+  | cons (n : Nat) (head : A) (tail : Vec A n) : Vec A (<span class="n">Nat.succ</span> n)
+</code></pre></div>
+<p>構成子は修飾名で登録される。上の宣言は <code>Vec.nil</code> と <code>Vec.cons</code> を追加し、<code>List</code> の構成子は <code>List.nil</code> と <code>List.cons</code> である。スクリプトでは修飾形を使わなければならない。</p>
+<p>宣言を受理する際には <a href="08-inductive-recipe.html">第 8 章</a> の四つの条件が検査される。<code>Name</code> の型が型であること、各構成子の型が型であって <code>Name</code> にパラメータを適用したもので終わること、<code>Name</code> に言及するすべてのフィールドが正格な正値性を満たすこと、そして <code>u</code> が 1 以上のとき <code>Sort u</code> より上の宇宙に属するフィールドがないことである。失敗時のメッセージには <code>non-strictly-positive / unsupported recursive field</code>、<code>field f lives in Sort w, exceeding inductive universe Sort u</code>、<code>inductive occurrence inside result index</code> がある。<code>_</code> や <code>__</code> で始まる束縛子名は拒否される（<code>reserved binder name</code>）。カーネルが自分の生成する束縛子にそのような名前を使うからである。</p>
+<p>成功するとランナーは <code>inductive Name registered</code> と表示し、カーネルは型構成子、構成子、再帰子 <code>Name.rec0</code>、そして大消去が許される場合は <code>Name.rec1</code> を追加する。命題（<code>Sort 0</code>）が <code>Name.rec1</code> を得るのは、<a href="08-inductive-recipe.html">第 8 章</a> で説明するように部分単集合である場合に限る。</p>
+<aside class="warning">
+<p>スクリプトファイルでは、<code>inductive</code> ブロックの構成子行はヘッダの直後に、間にコメント行を挟まずに続けなければならない。ランナーは <code>|</code> で始まる行と空行を集めるので、<code>#</code> の行があるとブロックはそこで閉じてしまい、その後の最初の構成子行は <code>start with 'goal &lt;type&gt;'</code>（証明の途中なら <code>unknown command: ...</code>）として報告される。</p>
+</aside>
+<h3 id="_5">定義と公理</h3>
+<div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini"><span class="k">def</span> add : Nat -&gt; Nat -&gt; Nat := <span class="k">fun</span> (m : Nat) =&gt; <span class="k">fun</span> (n : Nat) =&gt; <span class="n">Nat.rec1</span> (<span class="k">fun</span> (_n : Nat) =&gt; Nat) m (<span class="k">fun</span> (k : Nat) =&gt; <span class="k">fun</span> (r : Nat) =&gt; <span class="n">Nat.succ</span> r) n
+<span class="k">axiom</span> em : <span class="k">forall</span> (P : <span class="k">Sort</span> 0), P -&gt; P
+</code></pre></div>
+<p><code>def name : T := t</code> は、<code>T</code> が型であることと、空の文脈で <code>t : T</code> であることを検査し、<code>name</code> を本体 <code>t</code> 付きで追加する。カーネルは簡約の際にこれを展開する（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi></mrow><annotation encoding="application/x-tex">\delta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span></span></span></span> 簡約、<a href="12-reduction-conversion.html">第 12 章</a>）。ランナーは <code>defined name</code> と表示する。定義は 1 行に収めなければならず、最初の <code>:=</code> が型と本体を分ける。</p>
+<p><code>axiom name : T</code> は、<code>T</code> が型であることを検査したうえで、本体なしの <code>name : T</code> を追加する。<code>added axiom name</code> と表示する。公理は決して展開されない。この方法で偽の命題を仮定することを妨げるものは何もない。カーネルが検査するのは型が整形式であることであって、それが真であることではない。</p>
+<p>名前は新しいものでなければならない。再宣言は <code>duplicate declaration: name</code> で失敗し、既存の帰納型の名前空間 <code>Name.rec...</code> の中には何も宣言できない。</p>
+<h3 id="_6">追加の再帰子</h3>
+<div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini"><span class="k">recursor</span> Nat 2
+</code></pre></div>
+<p><code>recursor I v</code> は、消去宇宙 <code>v</code> 向けの <code>I.recv</code> がまだなければ生成し、<code>generated I.recv</code> と表示する。レベル 0 と 1 は <code>inductive</code> が自動的に生成する。動機が <code>Sort 2</code> 以上の型を返す必要があるときにこのコマンドを使う。大消去を許さない命題に対しては失敗する（<code>I is not a subsingleton proposition; cannot eliminate into Sort v</code>）。</p>
+<h2 id="_7">標準カーネル</h2>
+<p>すべてのセッションは <code>Nat</code> と <code>Eq</code> が宣言済みの状態で始まる。次の宣言を実行したのと同じである。生成される束縛子名は <code>__</code> で始まるが、ここでは読みやすさのために <code>M</code> と <code>m</code> で示す。束縛変数の名前を変えても型は変わらない。</p>
+<div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini">Nat      : <span class="k">Sort</span> 1
+<span class="n">Nat.zero</span> : Nat
+<span class="n">Nat.succ</span> : Nat -&gt; Nat
+<span class="n">Nat.rec0</span> : <span class="k">forall</span> (M : Nat -&gt; <span class="k">Sort</span> 0), M <span class="n">Nat.zero</span> -&gt; (<span class="k">forall</span> (n : Nat), M n -&gt; M (<span class="n">Nat.succ</span> n)) -&gt; <span class="k">forall</span> (x : Nat), M x
+<span class="n">Nat.rec1</span> : <span class="k">forall</span> (M : Nat -&gt; <span class="k">Sort</span> 1), M <span class="n">Nat.zero</span> -&gt; (<span class="k">forall</span> (n : Nat), M n -&gt; M (<span class="n">Nat.succ</span> n)) -&gt; <span class="k">forall</span> (x : Nat), M x
+
+Eq       : <span class="k">forall</span> (A : <span class="k">Sort</span> 1), A -&gt; A -&gt; <span class="k">Sort</span> 0
+<span class="n">Eq.refl</span>  : <span class="k">forall</span> (A : <span class="k">Sort</span> 1), <span class="k">forall</span> (a : A), Eq A a a
+<span class="n">Eq.rec0</span>  : <span class="k">forall</span> (A : <span class="k">Sort</span> 1), <span class="k">forall</span> (a : A), <span class="k">forall</span> (M : <span class="k">forall</span> (b : A), Eq A a b -&gt; <span class="k">Sort</span> 0), M a (<span class="n">Eq.refl</span> A a) -&gt; <span class="k">forall</span> (b : A), <span class="k">forall</span> (h : Eq A a b), M b h
+<span class="n">Eq.rec1</span>  : <span class="k">forall</span> (A : <span class="k">Sort</span> 1), <span class="k">forall</span> (a : A), <span class="k">forall</span> (M : <span class="k">forall</span> (b : A), Eq A a b -&gt; <span class="k">Sort</span> 1), M a (<span class="n">Eq.refl</span> A a) -&gt; <span class="k">forall</span> (b : A), <span class="k">forall</span> (h : Eq A a b), M b h
+</code></pre></div>
+<p><code>Nat.rec1</code> は型への再帰、<code>Nat.rec0</code> は命題への帰納法である（<a href="07-inductive-nat.html">第 7 章</a>）。<code>Eq</code> は型引数 <code>A</code> を明示的にとるので、<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="sans-serif">N</mi><mi mathvariant="sans-serif">a</mi><mi mathvariant="sans-serif">t</mi></mrow><annotation encoding="application/x-tex">\Nat</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathsf">Nat</span></span></span></span></span> における等式 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a = b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> は <code>Eq Nat a b</code> と書き、反射性によるその証明は <code>Eq.refl Nat a</code> である（<a href="09-equality.html">第 9 章</a>）。<code>Eq</code> は <code>A : Sort 1</code> で宣言されているので、等式が使えるのは <code>Nat</code> や <code>List Nat</code> のような <code>Sort 1</code> の型に対してであり、命題に対しては使えない。</p>
+<p>一般に、帰納型 <code>I</code> の <code>Sort v</code> への再帰子は <code>I.recv</code> という名前をもつ。<code>List.rec0</code>、<code>List.rec1</code>、<code>Vec.rec1</code> などである。引数の順序は、パラメータ、動機、構成子ごとに一つの小前提（宣言順）、添字、最後に大前提である（<a href="08-inductive-recipe.html">第 8 章</a>）。</p>
+<h2 id="_8">証明</h2>
+<h3 id="_9">ゴールを始める</h3>
+<div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini"><span class="k">goal</span> <span class="k">forall</span> (n : Nat), Eq Nat n n
+</code></pre></div>
+<p><code>goal T</code> は <code>T</code> が空の文脈で型であることを検査し、唯一のゴール <code>?0 : T</code> をもつ証明を始める。コマンドラインのランナーでは何も表示しない（プレイグラウンドはゴールを表示する）。<code>goal</code> より前に与えたタクティクは <code>start with 'goal &lt;type&gt;'</code> で失敗する。新しい <code>goal</code> を始めると、未完の証明は破棄される。</p>
+<p>タクティクを実行するたびに、ランナーは残っているゴールを表示する。各ゴールは、番号、仮定、そしてターンスタイルの後のターゲットからなる。</p>
+<div class="codeblock" data-lang="text"><pre><code class="language-text">?3:
+  n : Nat
+  k : Nat
+  ih : Eq Nat (add Nat.zero k) k
+  ⊢ Eq Nat (add Nat.zero (Nat.succ k)) (Nat.succ k)
+</code></pre></div>
+<p>ゴールがなくなると <code>No goals. Run 'qed' to kernel-check.</code> と表示する。コマンド <code>show</code> は何も変えずにゴールを表示する。</p>
+<p>タクティクは常に最初のゴールに作用する。タクティクに与える項はそのゴールの文脈で構文解析されるので、仮定の名前がスコープに入っている。各タクティクが部分的な証明項に何をするかは <a href="10-tactics.html">第 10 章</a> で説明する。この節はインターフェースを述べる。</p>
+<h3 id="_10">タクティク</h3>
+<p><strong><code>intro x</code></strong> は、ターゲットが <code>forall</code> または矢印に簡約されることを要求する。<code>A</code> を定義域として <code>x : A</code> を文脈に加え、本体を新しいターゲットにする。名前は文脈にまだないものでなければならない（<code>binder name already in context</code>）。ターゲットの形が合わなければメッセージは <code>intro expects a Pi/arrow goal</code> である。</p>
+<p><strong><code>exact t</code></strong> は、<code>t</code> をターゲットに対して検査したうえで、<code>t</code> でゴールを閉じる。不一致はカーネルが <code>type mismatch: actual ..., expected ...</code> として報告する。</p>
+<p><strong><code>apply f</code></strong> は <code>f</code> の型を推論し、結果がターゲットと定義的に等しくなるまで非依存の矢印を剥がしていく。剥がした各定義域が順に新しいゴールになる。<code>f</code> の型が最初からターゲットに一致すれば、<code>apply f</code> は <code>exact f</code> と同じように振る舞う。依存束縛子は <code>dependent apply requires elaboration/unification</code> で拒否され、結果がどこまで剥がしても一致しなければ <code>apply result does not match the goal</code> となる。</p>
+<p><strong><code>change T</code></strong> はターゲットを <code>T</code> に置き換える。<code>T</code> はターゲットと定義的に等しい型でなければならない（<code>change expects definitionally equal target</code>）。計算の後にしか現れない部分項を <code>rw</code> の前に露出させるために使う。</p>
+<p><strong><code>rfl</code></strong> は、ターゲットが <code>Eq A a b</code> に簡約され（<code>rfl expects Eq A lhs rhs</code>）、<code>a</code> と <code>b</code> が定義的に等しいこと（<code>rfl: sides are not definitionally equal</code>）を要求し、<code>Eq.refl A a</code> でゴールを閉じる。</p>
+<p><strong><code>rw h</code></strong> は、<code>h</code> の型が <code>Eq A a b</code> に簡約されることを要求する（<code>rw expects proof of equality</code>）。ターゲット中の <code>a</code> の出現をすべて <code>b</code> に置き換え、書き換えたターゲットを新しいゴールとして残す。出現は束縛変数の名前の違いを除いて構文的に探される。計算した後でなければ等しくならない項は見つからず、<code>rw: no syntactic occurrence of lhs in goal; use change first</code> となる。Lean の <code>rw</code> と違い、その後に <code>rfl</code> を試さないので、<code>Eq A x x</code> の形のゴールは明示的に閉じなければならない。<code>a</code> を抽象化した結果が型の付かない動機になる場合は、証明状態が変わる前にカーネルの型エラーが報告される。</p>
+<p><strong><code>induction x</code></strong> は、<code>x</code> が添字のない帰納型に簡約される型をもつ仮定であること、そして <code>x</code> より後の仮定が <code>x</code> に言及しないこと（<code>induction: revert dependent hypotheses first</code>）を要求する。構成子ごとに一つのゴールを宣言順に作る。各ゴールの文脈には、構成子のフィールドが宣言された名前で加わり、再帰的フィールドごとに <code>ih</code> という名前の帰納法の仮定が一つ加わる（<code>ih</code> が使用済みならプライムを付け足す）。<code>Nat.succ</code> のフィールド <code>n</code> は、<code>n</code> がすでに使われていれば <code>k</code> に改名される。下の例のゴールに <code>k</code> と <code>ih</code> が現れるのはそのためである。使われる再帰子は <code>I.recv</code> で、<code>v</code> はターゲットの宇宙である。その再帰子が存在しなければメッセージは <code>no elimination recursor at target universe</code> となる。添字付きの族には対応していない（<code>indexed induction requires motive/index elaboration (not implemented)</code>）。</p>
+<p><strong><code>qed</code></strong> はゴールが残っていれば失敗する（<code>N goals remain</code>）。そうでなければタクティクのステップから証明項を組み立て、元のゴールに対して検査するためカーネルに送り、<code>QED. Kernel checked proof:</code> に続けて項を表示し、証明を終える。この最後の検査が、体系の健全性が依存する唯一のステップである。</p>
+<p>それ以外の行は <code>unknown command: ...</code> となる。</p>
+<h3 id="_11">カーネルからのエラー</h3>
+<p>タクティク層ではなくカーネルから来るメッセージもあり、どのコマンドの下でも現れうる。</p>
+<table>
+<thead>
+<tr>
+<th>メッセージ</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unbound local: x</code></td>
+<td>変数が束縛子の外で使われた。パーサからは生じず、誤って組み立てた項からのみ生じる。</td>
+</tr>
+<tr>
+<td><code>unknown constant: c</code></td>
+<td>定数が削除されたか、宣言されていない。</td>
+</tr>
+<tr>
+<td><code>application of non-function: ...</code></td>
+<td>適用の関数位置が <code>forall</code> 型をもたない。</td>
+</tr>
+<tr>
+<td><code>expected a type, got ...</code></td>
+<td>束縛子の注釈、ゴール、または宣言された型が型でない。</td>
+</tr>
+<tr>
+<td><code>type mismatch: actual ..., expected ...</code></td>
+<td>推論された型が要求された型と定義的に等しくない。</td>
+</tr>
+<tr>
+<td><code>universe overflow</code></td>
+<td>宇宙レベルが 64 ビットに収まらない。</td>
+</tr>
+<tr>
+<td><code>reduction fuel exhausted</code></td>
+<td>一回の簡約が 20,000 ステップを超えた。大きな数の加算のような非常に大きな計算で起こる。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_12">例題スクリプト</h2>
+<p><code>examples/</code> ディレクトリのすべてのスクリプトをプレイグラウンドとして以下に示す。どれもカーネルで検査済みである。編集して実行を押し、何が変わるかを見てほしい。</p>
+<h3 id="identityleanmini">identity.leanmini</h3>
+<div class="playground" data-file="examples/identity.leanmini"><pre># 命題上の多相的な恒等関数。すべての P について P -&gt; P が成り立つ。
+goal forall (P : Sort 0), P -&gt; P
+intro P
+intro p
+exact p
+qed</pre></div>
+
+<h3 id="nat-reflexivityleanmini">nat-reflexivity.leanmini</h3>
+<div class="playground" data-file="examples/nat-reflexivity.leanmini"><pre># すべての自然数は自分自身と等しい。Nat についての帰納法で証明する。
+# 両辺が構文的に同じなので、各ケースは rfl で閉じる。
+goal forall (n : Nat), Eq Nat n n
+intro n
+induction n
+rfl
+rfl
+qed</pre></div>
+
+<h3 id="zero-addleanmini">zero-add.leanmini</h3>
+<div class="playground" data-file="examples/zero-add.leanmini"><pre># 第二引数についての再帰による加算:
+#   add m zero     = m
+#   add m (succ k) = succ (add m k)
+def add : Nat -&gt; Nat -&gt; Nat := fun (m : Nat) =&gt; fun (n : Nat) =&gt; Nat.rec1 (fun (_n : Nat) =&gt; Nat) m (fun (k : Nat) =&gt; fun (r : Nat) =&gt; Nat.succ r) n
+
+# add zero n = n は定義的には成り立たないので、n についての帰納法が要る。
+goal forall (n : Nat), Eq Nat (add Nat.zero n) n
+intro n
+induction n
+# 基底ケース: add zero zero は zero に簡約される。
+rfl
+# 帰納ステップ: add zero (succ k) を succ (add zero k) に展開し、ih を使う。
+change Eq Nat (Nat.succ (add Nat.zero k)) (Nat.succ k)
+rw ih
+rfl
+qed</pre></div>
+
+<h3 id="generic-listleanmini">generic-list.leanmini</h3>
+<div class="playground" data-file="examples/generic-list.leanmini"><pre># ユーザが宣言する多相的なリスト。宣言すると List.rec0、List.rec1、... が生成される。
+inductive List (A : Sort 1) : Sort 1 where
+  | nil
+  | cons (head : A) (tail : List A)
+
+# induction は Nat に限らず、添字のない帰納型ならどれにでも使える。
+goal forall (xs : List Nat), Eq (List Nat) xs xs
+intro xs
+induction xs
+rfl
+rfl
+qed</pre></div>
+
+<h3 id="generic-vecleanmini">generic-vec.leanmini</h3>
+<div class="playground" data-file="examples/generic-vec.leanmini"><pre># 長さで添字付けられたベクトル。添字 n は構成子ごとに変わるので、
+# ヘッダで `index` キーワードを使って宣言する。
+inductive Vec (A : Sort 1) (index n : Nat) : Sort 1 where
+  | nil : Vec A Nat.zero
+  | cons (n : Nat) (head : A) (tail : Vec A n) : Vec A (Nat.succ n)
+
+# 構成子はパラメータ A を明示的にとる。
+def one : Vec Nat (Nat.succ Nat.zero) := Vec.cons Nat Nat.zero Nat.zero (Vec.nil Nat)
+
+# タクティク `induction` はまだ添字付きの族に対応していないが、
+# カーネルは Vec を直接使う項をそのまま検査できる。
+goal Eq (Vec Nat (Nat.succ Nat.zero)) one (Vec.cons Nat Nat.zero Nat.zero (Vec.nil Nat))
+rfl
+qed</pre></div>
+
+<h2 id="lean-4">Lean 4 と比べて欠けているもの</h2>
+<p>leanmini はカーネルを理解するための道具であって、証明支援系ではない。次の表は、Lean のフロントエンドがやってくれるがこの言語にはないものを並べたものである。</p>
+<table>
+<thead>
+<tr>
+<th>Lean 4</th>
+<th>leanmini</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>暗黙の引数。エラボレータが補う</td>
+<td>すべての引数が明示的。<code>a = b</code> ではなく <code>Eq Nat a b</code></td>
+</tr>
+<tr>
+<td>メタ変数を解く単一化</td>
+<td>なし。項がすべてを確定させるときにだけタクティクが働く</td>
+</tr>
+<tr>
+<td>宇宙多相（レベル変数をもつ <code>Sort u</code>）</td>
+<td>すべてのレベルが数字。レベルごとに一つの再帰子</td>
+</tr>
+<tr>
+<td>相互帰納型と入れ子帰納型</td>
+<td>一度に一つの帰納型。フィールドとしての <code>List Tree</code> は拒否される</td>
+</tr>
+<tr>
+<td>定義的な証明無関係性</td>
+<td>命題の証明もほかの項と同様に比較される</td>
+</tr>
+<tr>
+<td>添字付きの族に対する <code>induction</code>、仮定の revert 付き</td>
+<td>添字のない型のみ。依存する仮定は手で revert しなければならない（それを行うタクティクはない）</td>
+</tr>
+<tr>
+<td>依存引数をもつ <code>apply</code></td>
+<td>非依存の矢印のみ</td>
+</tr>
+<tr>
+<td>インスタンスを考慮した <code>rw</code>、その後の <code>rfl</code></td>
+<td>構文的な一致のみ。自動の <code>rfl</code> はない</td>
+</tr>
+<tr>
+<td><code>simp</code>、<code>omega</code>、その他の自動化</td>
+<td>なし</td>
+</tr>
+<tr>
+<td>記法、数値リテラル、名前付きの結果をもつ <code>theorem</code></td>
+<td><code>Nat.succ (Nat.succ Nat.zero)</code>。完成した証明は名前で保存されない</td>
+</tr>
+</tbody>
+</table>
+<p>最後の行には実際的な帰結がある。<code>qed</code> は証明項を表示して捨てる。結果を再利用するには、項を書き下した <code>def</code> として、あるいは <code>axiom</code> として述べ直す。</p>
+<aside class="lean">
+<p>右の列にあるものはすべて、項がカーネルに届く前に Lean のエラボレータとタクティクの枠組みが行う仕事である。Lean のカーネルも我々のものと同じく、完全な項しか見ない。上の制限はこのリポジトリのフロントエンドの制限であって、型理論の制限ではない。</p>
+</aside>
+<div class="summary-box">
+<p>覚えておくこと</p>
+<ul>
+<li>leanmini スクリプトはコマンドの列である。<code>inductive</code>、<code>def</code>、<code>axiom</code>、<code>recursor</code>、<code>goal</code>、そしてタクティク <code>intro</code>、<code>exact</code>、<code>apply</code>、<code>change</code>、<code>rw</code>、<code>rfl</code>、<code>induction</code> があり、<code>qed</code> で閉じる。</li>
+<li>項は完全に明示的である。<code>Sort u</code>、<code>forall (x : A), B</code>、<code>fun (x : A) =&gt; t</code>、<code>A -&gt; B</code>、そして左結合の適用。</li>
+<li>構成子と再帰子は修飾名をもつ。<code>List.cons</code>、<code>List.rec1</code>。<code>Nat</code> と <code>Eq</code> は宣言済みである。</li>
+<li>フロントエンドは意図的に最小限である。健全性にとって重要なのは、カーネルが行う最後の <code>qed</code> の検査だけである。</li>
+</ul>
+</div>
+        <div class="pager"><a class="pager-prev" href="d-proof-consistency.html"><span class="pager-dir">前の章</span><span class="pager-title">整合性の証明</span></a><a class="pager-next" href="f-notation-glossary.html"><span class="pager-dir">次の章</span><span class="pager-title">記法と用語集</span></a></div>
+      </main>
+      <aside class="margin">
+        <nav class="onpage" aria-label="このページの内容"><h4>このページの内容</h4><ol><li><a href="#_1">スクリプトの実行</a></li><li><a href="#_2">項</a></li><li><a href="#_3">宣言</a></li><li><a href="#_7">標準カーネル</a></li><li><a href="#_8">証明</a></li><li><a href="#_12">例題スクリプト</a></li><li><a href="#lean-4">Lean 4 と比べて欠けているもの</a></li></ol></nav>
+      </aside>
+    </div>
+    <footer class="footer">
+      <p>MiniLean4 は教育用のカーネルです。コード、例、この本のソースは<a href="https://github.com/h5i-dev/MiniLean4">リポジトリ</a>にあります。<br>すべての数式は Rust の実装と照合し、実行できる例はすべて WebAssembly にコンパイルしたカーネル自身が検査しています。</p>
+    </footer>
+  </div>
+</div>
+<script src="../assets/book.js"></script>
+<script src="../assets/playground.js"></script>
+<script src="../assets/explorers.js"></script>
+</body>
+</html>

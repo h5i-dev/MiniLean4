@@ -14,6 +14,8 @@
       document.documentElement.classList.add("light");
     }
   })();
+  window.MINILEAN_WASM_URL = "assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "contents", "close": "close", "theme_light": "light", "theme_dark": "dark"}, "js": {}};
 </script>
 </head>
 <body class="page-app">
@@ -64,10 +66,12 @@
     <div class="topbar">
       <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
       <div class="topbar-spacer"></div>
+      <nav class="langs" aria-label="Language"><span class="lang current">English</span><a class="lang" href="ja/e-leanmini-reference.html" hreflang="ja">日本語</a><a class="lang" href="zh/e-leanmini-reference.html" hreflang="zh-Hans">中文</a></nav>
       <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
     </div>
     <div class="layout">
       <main id="content" class="content">
+        
         <header class="chapter-head"><p class="chapter-label">Appendix E</p><h1>The leanmini Language</h1></header><div class="lead">
 <p>The scripts in this book are written in a small language called leanmini, read by the parser in <code>src/syntax.rs</code> and the command loop in <code>src/main.rs</code>. It is deliberately explicit: every binder carries its type, every argument is written out, and nothing is inferred. This appendix is the complete reference, derived line by line from the code, together with every example script of the repository in a runnable form.</p>
 </div>
@@ -390,8 +394,7 @@ qed</pre></div>
       </aside>
     </div>
     <footer class="footer">
-      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
-      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
     </footer>
   </div>
 </div>

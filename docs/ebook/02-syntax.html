@@ -14,6 +14,8 @@
       document.documentElement.classList.add("light");
     }
   })();
+  window.MINILEAN_WASM_URL = "assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "contents", "close": "close", "theme_light": "light", "theme_dark": "dark"}, "js": {}};
 </script>
 </head>
 <body class="page-ch">
@@ -64,10 +66,12 @@
     <div class="topbar">
       <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
       <div class="topbar-spacer"></div>
+      <nav class="langs" aria-label="Language"><span class="lang current">English</span><a class="lang" href="ja/02-syntax.html" hreflang="ja">日本語</a><a class="lang" href="zh/02-syntax.html" hreflang="zh-Hans">中文</a></nav>
       <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
     </div>
     <div class="layout">
       <main id="content" class="content">
+        
         <header class="chapter-head"><p class="chapter-label">Chapter 2</p><h1>The Language of Terms</h1></header><div class="lead">
 <p>Before a kernel can check anything, it needs a precise language of terms. Ours has five kinds of term, and that is enough to express propositional logic with quantification over propositions. This chapter fixes the grammar, the notational conventions used for the rest of the book, and the Rust type that represents terms.</p>
 </div>
@@ -249,8 +253,7 @@ A proof is <span class="katex"><span class="katex-mathml"><math xmlns="http://ww
       </aside>
     </div>
     <footer class="footer">
-      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
-      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
     </footer>
   </div>
 </div>

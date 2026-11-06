@@ -14,6 +14,8 @@
       document.documentElement.classList.add("light");
     }
   })();
+  window.MINILEAN_WASM_URL = "assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "contents", "close": "close", "theme_light": "light", "theme_dark": "dark"}, "js": {}};
 </script>
 </head>
 <body class="page-app">
@@ -64,10 +66,12 @@
     <div class="topbar">
       <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
       <div class="topbar-spacer"></div>
+      <nav class="langs" aria-label="Language"><span class="lang current">English</span><a class="lang" href="ja/c-hurkens.html" hreflang="ja">日本語</a><a class="lang" href="zh/c-hurkens.html" hreflang="zh-Hans">中文</a></nav>
       <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
     </div>
     <div class="layout">
       <main id="content" class="content">
+        
         <header class="chapter-head"><p class="chapter-label">Appendix C</p><h1>Hurkens&#x27; Paradox</h1></header><div class="lead">
 <p><a href="13-universes.html">Chapter 13</a> claimed that a single universe containing itself makes the type theory inconsistent: there is a closed term of type <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Π</mi><mo stretchy="false">(</mo><mi>p</mi><mo lspace="0em" rspace="0em">:</mo><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">y</mi><mi mathvariant="sans-serif">p</mi><mi mathvariant="sans-serif">e</mi></mrow><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi><mtext> </mtext><mi>p</mi></mrow><annotation encoding="application/x-tex">\tPi{p}{\mathsf{Type}}{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Π</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mord"><span class="mrel">:</span></span><span class="mord"><span class="mord mathsf">Type</span></span><span class="mclose">)</span><span class="mord">.</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span></span></span></span>, a proof of everything. This appendix gives that term in full, explains the idea behind it, and shows exactly where the rule <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">y</mi><mi mathvariant="sans-serif">p</mi><mi mathvariant="sans-serif">e</mi></mrow><mo>:</mo><mrow><mi mathvariant="sans-serif">T</mi><mi mathvariant="sans-serif">y</mi><mi mathvariant="sans-serif">p</mi><mi mathvariant="sans-serif">e</mi></mrow></mrow><annotation encoding="application/x-tex">\mathsf{Type} : \mathsf{Type}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathsf">Type</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathsf">Type</span></span></span></span></span> is used, so that you can see why the universe hierarchy blocks it.</p>
 </div>
@@ -158,8 +162,7 @@ t_{\mathrm{H}} &amp;=&amp; (\lambda (h_0 : \tPi{p}{\wp U}{(\tPi{x}{U}{\sigma\;x\
       </aside>
     </div>
     <footer class="footer">
-      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
-      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
     </footer>
   </div>
 </div>

@@ -14,6 +14,12 @@
   'use strict';
 
   var HUES = 6;
+  var I18N = (window.MINILEAN_I18N && window.MINILEAN_I18N.js) || {};
+  var DEFAULTS = {
+    imax_prop: 'B is a proposition, so the whole \u03a0 is a proposition no matter what it quantifies over: imax({u}, 0) = 0. This is impredicativity.',
+    imax_pred: 'B is not a proposition, so the \u03a0 lives in the larger of the two universes: imax({u}, {v}) = max({u}, {v}) = {r}. This is predicativity.'
+  };
+  function t(key) { return I18N[key] || DEFAULTS[key] || key; }
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -42,7 +48,7 @@
     var group = null; // consecutive marked tokens share one highlight box
     tokens.forEach(function (t) {
       var s = el('span', 'tk tk-' + t.k, t.t);
-      if ((t.k === 'binder' || t.k === 'bound') && t.id >= 0) {
+      if ((t.k === 'binder' || t.k === t('bound')) && t.id >= 0) {
         s.classList.add('tk-b' + (t.id % HUES));
         s.setAttribute('data-bind', String(t.id));
       }
@@ -95,7 +101,7 @@
       form.appendChild(label);
       fields[spec.name] = input;
     });
-    var go = el('button', 'ex-go', 'update');
+    var go = el('button', 'ex-go', t('update'));
     go.type = 'submit';
     form.appendChild(go);
     box.appendChild(form);
@@ -107,7 +113,7 @@
     return {
       fields: fields, body: body, form: form, status: status,
       error: function (msg) { err.hidden = !msg; err.textContent = msg || ''; },
-      busy: function (on) { status.textContent = on ? 'thinking...' : ''; }
+      busy: function (on) { status.textContent = on ? t('thinking') : ''; }
     };
   }
 
@@ -119,7 +125,7 @@
   }
 
   function failLoad(ui, err) {
-    ui.error('The in-browser kernel could not be loaded (' + err.message + '). Serve the book over HTTP to use the explorers.');
+    ui.error(t('The in-browser kernel could not be loaded') + ' (' + err.message + ').');
   }
 
   // ----- ast -----
@@ -141,7 +147,7 @@
 
   function setupAst(box) {
     var prelude = childText(box, 'prelude');
-    var ui = frame(box, 'syntax tree', [{ name: 'term', label: 'term', value: attr(box, 'term', ''), wide: true }]);
+    var ui = frame(box, t('syntax tree'), [{ name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true }]);
     var picked = el('div', 'ex-picked');
     function run() {
       ui.busy(true);
@@ -155,7 +161,7 @@
         var tree = el('ul', 'ast');
         tree.appendChild(astNode(j.ast));
         ui.body.appendChild(tree);
-        picked.textContent = 'click a node to see the subterm it stands for';
+        picked.textContent = t('click a node to see the subterm it stands for');
         ui.body.appendChild(picked);
         tree.addEventListener('click', function (e) {
           var head = e.target.closest('.ast-head');
@@ -225,9 +231,9 @@
 
   function setupDerive(box) {
     var prelude = childText(box, 'prelude');
-    var inputs = [{ name: 'term', label: 'term', value: attr(box, 'term', ''), wide: true }];
-    inputs.push({ name: 'ctx', label: 'context', value: attr(box, 'ctx', '') });
-    var ui = frame(box, 'typing derivation', inputs);
+    var inputs = [{ name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true }];
+    inputs.push({ name: 'ctx', label: t('context'), value: attr(box, 'ctx', '') });
+    var ui = frame(box, t('typing derivation'), inputs);
     var asTree = attr(box, 'view', 'list') === 'tree';
     function run() {
       ui.busy(true);
@@ -237,8 +243,8 @@
         ui.error('');
         ui.body.innerHTML = '';
         var modes = el('div', 'ex-modes');
-        var bList = el('button', 'stepper-btn' + (asTree ? '' : ' active'), 'as calls');
-        var bTree = el('button', 'stepper-btn' + (asTree ? ' active' : ''), 'as proof tree');
+        var bList = el('button', 'stepper-btn' + (asTree ? '' : ' active'), t('as calls'));
+        var bTree = el('button', 'stepper-btn' + (asTree ? ' active' : ''), t('as proof tree'));
         bList.type = bTree.type = 'button';
         modes.appendChild(bList); modes.appendChild(bTree);
         ui.body.appendChild(modes);
@@ -263,8 +269,8 @@
         paint();
         var verdict = el('div', 'ex-verdict' + (j.derivation.ok ? ' ok' : ' bad'));
         verdict.textContent = j.derivation.ok
-          ? 'Infer returns ' + j.derivation.result
-          : 'Infer fails: ' + j.derivation.result;
+          ? t('Infer returns') + ' ' + j.derivation.result
+          : t('Infer fails') + ' ' + j.derivation.result;
         ui.body.appendChild(verdict);
       }).catch(function (e) { ui.busy(false); failLoad(ui, e); });
     }
@@ -275,13 +281,13 @@
   // ----- reduce -----
 
   var KIND_LABEL = { beta: 'β', delta: 'δ', iota: 'ι', major: 'whnf', limit: '…' };
-  var KIND_TEXT = { beta: 'beta: apply the function at the head', delta: 'delta: unfold the definition at the head', iota: 'iota: the recursor sees a constructor', major: 'the major premise is computed first', limit: 'step limit' };
+  var KIND_TEXT = { beta: t('beta: apply the function at the head'), delta: t('delta: unfold the definition at the head'), iota: t('iota: the recursor sees a constructor'), major: t('the major premise is computed first'), limit: t('step limit') };
 
   function setupReduce(box) {
     var prelude = childText(box, 'prelude');
-    var ui = frame(box, 'reduction', [
-      { name: 'term', label: 'term', value: attr(box, 'term', ''), wide: true },
-      { name: 'ctx', label: 'context', value: attr(box, 'ctx', '') }
+    var ui = frame(box, t('reduction'), [
+      { name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true },
+      { name: 'ctx', label: t('context'), value: attr(box, 'ctx', '') }
     ]);
     function run() {
       ui.busy(true);
@@ -291,7 +297,7 @@
         ui.error('');
         ui.body.innerHTML = '';
         var list = el('ol', 'rd-steps');
-        if (!j.steps.length) list.appendChild(el('li', 'rd-none', 'no head reduction applies'));
+        if (!j.steps.length) list.appendChild(el('li', 'rd-none', t('no head reduction applies')));
         j.steps.forEach(function (s, i) {
           var li = el('li', 'rd-step rd-' + s.kind);
           var head = el('div', 'rd-head');
@@ -309,17 +315,17 @@
         ui.body.appendChild(list);
         var res = el('div', 'rd-result');
         var w = el('div', 'rd-line');
-        w.appendChild(el('span', 'rd-label', 'weak head normal form'));
+        w.appendChild(el('span', 'rd-label', t('weak head normal form')));
         w.appendChild(renderTokens(el('span', ''), j.whnf));
         res.appendChild(w);
         if (j.stuck) res.appendChild(el('div', 'rd-stuck', j.stuck));
         if (!j.whnfIsNormal) {
           var n = el('div', 'rd-line');
-          n.appendChild(el('span', 'rd-label', 'normal form (Normalize continues inside)'));
+          n.appendChild(el('span', 'rd-label', t('normal form (Normalize continues inside)')));
           n.appendChild(renderTokens(el('span', ''), j.normal));
           res.appendChild(n);
         } else {
-          res.appendChild(el('div', 'rd-line rd-dim', 'this is also the normal form'));
+          res.appendChild(el('div', 'rd-line rd-dim', t('this is also the normal form')));
         }
         ui.body.appendChild(res);
       }).catch(function (e) { ui.busy(false); failLoad(ui, e); });
@@ -331,7 +337,7 @@
   // ----- scope -----
 
   function setupScope(box) {
-    var ui = frame(box, 'binders and scope', [{ name: 'term', label: 'term', value: attr(box, 'term', ''), wide: true }]);
+    var ui = frame(box, t('binders and scope'), [{ name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true }]);
     function run() {
       ui.busy(true);
       request('scope', [ui.fields.term.value]).then(function (j) {
@@ -341,10 +347,10 @@
         ui.body.innerHTML = '';
         ui.body.appendChild(renderTokens(el('div', 'ex-term big'), j.tokens));
         var legend = el('div', 'sc-legend');
-        legend.appendChild(el('span', 'sc-key tk tk-bound tk-b0', 'bound'));
-        legend.appendChild(el('span', '', 'same colour as its binder; hover to see the pair'));
-        legend.appendChild(el('span', 'sc-key tk tk-free', 'free'));
-        legend.appendChild(el('span', '', j.free.length ? 'free variables: ' + j.free.join(', ') : 'no free variables: the term is closed'));
+        legend.appendChild(el('span', 'sc-key tk tk-bound tk-b0', t('bound')));
+        legend.appendChild(el('span', '', t('same colour as its binder; hover to see the pair')));
+        legend.appendChild(el('span', 'sc-key tk tk-free', t('free')));
+        legend.appendChild(el('span', '', j.free.length ? t('free variables') + ': ' + j.free.join(', ') : t('no free variables: the term is closed')));
         ui.body.appendChild(legend);
       }).catch(function (e) { ui.busy(false); failLoad(ui, e); });
     }
@@ -355,14 +361,14 @@
   // ----- subst -----
 
   function setupSubst(box) {
-    var ui = frame(box, 'substitution', [
-      { name: 'term', label: 'term', value: attr(box, 'term', ''), wide: true },
-      { name: 'var', label: 'replace', value: attr(box, 'var', 'x') },
-      { name: 'with', label: 'with', value: attr(box, 'with', '') }
+    var ui = frame(box, t('substitution'), [
+      { name: t('term'), label: t('term'), value: attr(box, t('term'), ''), wide: true },
+      { name: 'var', label: t('replace'), value: attr(box, 'var', 'x') },
+      { name: t('with'), label: t('with'), value: attr(box, t('with'), '') }
     ]);
     function run() {
       ui.busy(true);
-      request('subst', [ui.fields.term.value, ui.fields['var'].value, ui.fields['with'].value]).then(function (j) {
+      request('subst', [ui.fields.term.value, ui.fields['var'].value, ui.fields[t('with')].value]).then(function (j) {
         ui.busy(false);
         if (j.error) { ui.error(j.error); return; }
         ui.error('');
@@ -377,13 +383,13 @@
         ui.body.appendChild(top);
         var cols = el('div', 'sb-cols');
         var a = el('div', 'sb-col' + (j.captured ? ' bad' : ''));
-        a.appendChild(el('div', 'sb-h', 'naive substitution'));
+        a.appendChild(el('div', 'sb-h', t('naive substitution')));
         a.appendChild(renderTokens(el('div', 'ex-term'), j.naive));
-        a.appendChild(el('div', 'sb-note', j.captured ? 'a free variable of the replacement has been captured: the meaning changed' : 'no capture here'));
+        a.appendChild(el('div', 'sb-note', j.captured ? t('a free variable of the replacement has been captured: the meaning changed') : t('no capture here')));
         var b = el('div', 'sb-col ok');
-        b.appendChild(el('div', 'sb-h', 'capture-avoiding substitution'));
+        b.appendChild(el('div', 'sb-h', t('capture-avoiding substitution')));
         b.appendChild(renderTokens(el('div', 'ex-term'), j.safe));
-        b.appendChild(el('div', 'sb-note', j.captured ? 'the binder was renamed first; the free variable stays free' : 'identical to the naive result'));
+        b.appendChild(el('div', 'sb-note', j.captured ? t('the binder was renamed first; the free variable stays free') : t('identical to the naive result')));
         cols.appendChild(a); cols.appendChild(b);
         ui.body.appendChild(cols);
         ui.body.appendChild(el('div', 'ex-verdict' + (j.captured ? ' bad' : ''), j.note));
@@ -397,7 +403,7 @@
 
   function goalsView(goals, current) {
     var wrap = el('div', 'goals');
-    if (!goals.length) { wrap.appendChild(el('div', 'goal-none', 'no goals')); return wrap; }
+    if (!goals.length) { wrap.appendChild(el('div', 'goal-none', t('no goals'))); return wrap; }
     goals.forEach(function (g) {
       var box = el('div', 'goal' + (g.id === current ? ' current' : ''));
       box.appendChild(el('div', 'goal-id', '?' + g.id));
@@ -409,13 +415,13 @@
   }
 
   function setupProof(box) {
-    var script = childText(box, 'script');
+    var script = childText(box, t('script'));
     box.innerHTML = '';
     var bar = el('div', 'ex-bar');
-    bar.appendChild(el('span', 'ex-title', attr(box, 'title', 'proof explorer')));
+    bar.appendChild(el('span', 'ex-title', attr(box, 'title', t('proof explorer'))));
     var status = el('span', 'ex-status', '');
     bar.appendChild(status);
-    var edit = el('button', 'stepper-btn', 'edit script');
+    var edit = el('button', 'stepper-btn', t('edit script'));
     edit.type = 'button';
     bar.appendChild(edit);
     box.appendChild(bar);
@@ -426,7 +432,7 @@
     ta.value = script;
     ta.spellcheck = false;
     ta.rows = Math.max(4, script.split('\n').length + 1);
-    var apply = el('button', 'playground-run', 'apply');
+    var apply = el('button', 'playground-run', t('apply'));
     apply.type = 'button';
     editor.appendChild(ta);
     editor.appendChild(apply);
@@ -439,9 +445,9 @@
     panels.appendChild(pScript); panels.appendChild(pGoals); panels.appendChild(pTerm);
     box.appendChild(panels);
     var nav = el('div', 'stepper-bar pf-nav');
-    var prev = el('button', 'stepper-btn', 'prev'); prev.type = 'button';
+    var prev = el('button', 'stepper-btn', t('prev')); prev.type = 'button';
     var count = el('span', 'stepper-count', '');
-    var next = el('button', 'stepper-btn', 'next'); next.type = 'button';
+    var next = el('button', 'stepper-btn', t('next')); next.type = 'button';
     var note = el('span', 'pf-note', '');
     nav.appendChild(prev); nav.appendChild(count); nav.appendChild(next); nav.appendChild(note);
     box.appendChild(nav);
@@ -453,7 +459,7 @@
     function paint() {
       var s = steps[index];
       pScript.innerHTML = '';
-      pScript.appendChild(el('div', 'pf-h', 'script'));
+      pScript.appendChild(el('div', 'pf-h', t('script')));
       steps.forEach(function (st, i) {
         var line = el('div', 'pf-line' + (i === index ? ' on' : '') + (i < index ? ' done' : '') + (st.error ? ' bad' : ''));
         line.innerHTML = window.MiniLean.highlight ? window.MiniLean.highlight(st.command) : '';
@@ -462,44 +468,44 @@
         pScript.appendChild(line);
       });
       pGoals.innerHTML = '';
-      pGoals.appendChild(el('div', 'pf-h', s.kind === 'qed' ? 'kernel verdict' : 'goals after this command'));
+      pGoals.appendChild(el('div', 'pf-h', s.kind === 'qed' ? t('kernel verdict') : t('goals after this command')));
       if (s.error) {
         pGoals.appendChild(el('div', 'pf-error', s.error));
       } else if (s.kind === 'qed') {
-        pGoals.appendChild(el('div', 'pf-qed', 'QED. The kernel checked the complete term against the goal.'));
+        pGoals.appendChild(el('div', 'pf-qed', t('QED. The kernel checked the complete term against the goal.')));
       } else if (s.kind === 'setup') {
-        pGoals.appendChild(el('div', 'goal-none', 'declaration added to the signature; no proof in progress'));
+        pGoals.appendChild(el('div', 'goal-none', t('declaration added to the signature; no proof in progress')));
       } else {
         pGoals.appendChild(goalsView(s.goals, s.current));
       }
       pTerm.innerHTML = '';
-      pTerm.appendChild(el('div', 'pf-h', s.kind === 'qed' ? 'final proof term' : 'partial proof term'));
+      pTerm.appendChild(el('div', 'pf-h', s.kind === 'qed' ? t('final proof term') : t('partial proof term')));
       if (s.kind === 'qed' && s.checked) {
         pTerm.appendChild(el('div', 'ex-term pf-checked', s.checked));
       } else if (s.term && s.term.length) {
         pTerm.appendChild(renderTokens(el('div', 'ex-term'), s.term, { currentHole: s.current }));
         var holes = s.goals.length;
-        pTerm.appendChild(el('div', 'pf-sub', holes === 0 ? 'no holes remain' : holes + (holes === 1 ? ' hole, the highlighted one is the current goal' : ' holes; the highlighted one is the current goal')));
+        pTerm.appendChild(el('div', 'pf-sub', holes === 0 ? t('no holes remain') : holes + ' ' + (holes === 1 ? t('hole, the highlighted one is the current goal') : t('holes; the highlighted one is the current goal'))));
       } else {
-        pTerm.appendChild(el('div', 'goal-none', 'no term yet'));
+        pTerm.appendChild(el('div', 'goal-none', t('no term yet')));
       }
-      count.textContent = 'step ' + (index + 1) + ' / ' + steps.length;
+      count.textContent = t('step') + ' ' + (index + 1) + ' / ' + steps.length;
       prev.disabled = index === 0;
       next.disabled = index === steps.length - 1;
-      note.textContent = s.kind === 'tactic' ? 'line ' + s.line : '';
+      note.textContent = s.kind === 'tactic' ? t('line') + ' ' + s.line : '';
     }
 
     function run() {
-      status.textContent = 'thinking...';
+      status.textContent = t('thinking...');
       request('trace', [], ta.value).then(function (j) {
         status.textContent = '';
         if (j.error) { err.hidden = false; err.textContent = j.error; return; }
         err.hidden = true;
         steps = j.steps;
-        if (!steps.length) { err.hidden = false; err.textContent = 'the script is empty'; return; }
+        if (!steps.length) { err.hidden = false; err.textContent = t('the script is empty'); return; }
         index = Math.min(index, steps.length - 1);
         paint();
-      }).catch(function (e) { status.textContent = ''; err.hidden = false; err.textContent = 'The in-browser kernel could not be loaded (' + e.message + ').'; });
+      }).catch(function (e) { status.textContent = ''; err.hidden = false; err.textContent = t('The in-browser kernel could not be loaded') + ' (' + e.message + ').'; });
     }
     prev.addEventListener('click', function () { if (index > 0) { index--; paint(); } });
     next.addEventListener('click', function () { if (index < steps.length - 1) { index++; paint(); } });
@@ -509,7 +515,7 @@
       if (e.key === 'ArrowRight') { next.click(); e.preventDefault(); }
       if (e.key === 'ArrowLeft') { prev.click(); e.preventDefault(); }
     });
-    edit.addEventListener('click', function () { editor.hidden = !editor.hidden; edit.textContent = editor.hidden ? 'edit script' : 'hide editor'; });
+    edit.addEventListener('click', function () { editor.hidden = !editor.hidden; edit.textContent = editor.hidden ? t('edit script') : t('hide editor'); });
     apply.addEventListener('click', function () { index = 0; run(); });
     ta.addEventListener('keydown', function (e) { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); index = 0; run(); } });
     run();
@@ -532,20 +538,20 @@
       var kids = el('div', 'ct-children');
       rec.forEach(function (f) {
         var slot = el('div', 'ct-slot');
-        slot.appendChild(el('div', 'ct-slot-label', f.name + ' (recursive field)'));
+        slot.appendChild(el('div', 'ct-slot-label', f.name + ' ' + t('(recursive field)')));
         slot.appendChild(ctreeNode(f.child));
         kids.appendChild(slot);
       });
       node.appendChild(kids);
     }
-    var c = el('div', 'ct-case', 'recursor case: ' + n.case);
+    var c = el('div', 'ct-case', t('recursor case') + ': ' + n.case);
     node.appendChild(c);
     return node;
   }
 
   function setupCtree(box) {
     var prelude = childText(box, 'prelude');
-    var ui = frame(box, 'constructor tree', [{ name: 'term', label: 'value', value: attr(box, 'term', ''), wide: true }]);
+    var ui = frame(box, t('constructor tree'), [{ name: t('term'), label: t('value'), value: attr(box, t('term'), ''), wide: true }]);
     function run() {
       ui.busy(true);
       request('ctree', [ui.fields.term.value], prelude).then(function (j) {
@@ -557,7 +563,7 @@
         var tree = el('div', 'ct-tree');
         tree.appendChild(ctreeNode(j.tree));
         ui.body.appendChild(tree);
-        ui.body.appendChild(el('div', 'ex-hint', 'R stands for the recursor applied to the same motive and cases; each (R field) is the induction hypothesis for that child.'));
+        ui.body.appendChild(el('div', 'ex-hint', t('R stands for the recursor applied to the same motive and cases; each (R field) is the induction hypothesis for that child.')));
       }).catch(function (e) { ui.busy(false); failLoad(ui, e); });
     }
     ui.form.addEventListener('submit', function (e) { e.preventDefault(); run(); });
@@ -569,7 +575,7 @@
   function setupUniverses(box) {
     box.innerHTML = '';
     var bar = el('div', 'ex-bar');
-    bar.appendChild(el('span', 'ex-title', 'the imax rule'));
+    bar.appendChild(el('span', 'ex-title', t('the imax rule')));
     box.appendChild(bar);
     var body = el('div', 'ex-body un-body');
     box.appendChild(body);
@@ -584,8 +590,8 @@
       controls.appendChild(label);
       return s;
     }
-    var su = sel('A lives in', 1);
-    var sv = sel('B lives in', 0);
+    var su = sel(t('A lives in'), 1);
+    var sv = sel(t('B lives in'), 0);
     body.appendChild(controls);
     var ladder = el('div', 'un-ladder');
     body.appendChild(ladder);
@@ -597,7 +603,7 @@
       ladder.innerHTML = '';
       for (var i = 4; i >= 0; i--) {
         var rung = el('div', 'un-rung' + (i === r ? ' result' : '') + (i === u ? ' u' : '') + (i === v ? ' v' : ''));
-        rung.appendChild(el('span', 'un-name', 'Sort ' + i + (i === 0 ? '  (propositions)' : '')));
+        rung.appendChild(el('span', 'un-name', 'Sort ' + i + (i === 0 ? '  ' + t('(propositions)') : '')));
         var tags = el('span', 'un-tags');
         if (i === u) tags.appendChild(el('span', 'un-tag', 'A'));
         if (i === v) tags.appendChild(el('span', 'un-tag', 'B'));
@@ -606,8 +612,8 @@
         ladder.appendChild(rung);
       }
       var why = v === 0
-        ? 'B is a proposition, so the whole Π is a proposition no matter what it quantifies over: imax(' + u + ', 0) = 0. This is impredicativity.'
-        : 'B is not a proposition, so the Π lives in the larger of the two universes: imax(' + u + ', ' + v + ') = max(' + u + ', ' + v + ') = ' + r + '. This is predicativity.';
+        ? t('imax_prop').replace('{u}', u)
+        : t('imax_pred').replace(/\{u\}/g, u).replace(/\{v\}/g, v).replace('{r}', r);
       verdict.textContent = why;
     }
     su.addEventListener('change', paint);

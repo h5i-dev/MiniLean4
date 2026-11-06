@@ -5,6 +5,9 @@
 (function () {
   'use strict';
 
+  var I18N = (window.MINILEAN_I18N && window.MINILEAN_I18N.js) || {};
+  function t(key) { return I18N[key] || key; }
+
   var wasmPromise = null;
 
   function loadWasm() {
@@ -117,12 +120,12 @@
     var run = document.createElement('button');
     run.className = 'playground-run';
     run.type = 'button';
-    run.textContent = 'run';
+    run.textContent = t('run');
     run.title = 'Run (Ctrl+Enter)';
     var reset = document.createElement('button');
     reset.className = 'playground-reset';
     reset.type = 'button';
-    reset.textContent = 'reset';
+    reset.textContent = t('reset');
     bar.appendChild(run);
     bar.appendChild(reset);
 
@@ -156,7 +159,7 @@
 
     function execute() {
       run.disabled = true;
-      show('running...', false);
+      show(t('running'), false);
       loadWasm()
         .then(function (exports) {
           var text = runScript(exports, editor.value);
@@ -164,7 +167,7 @@
         })
         .catch(function (err) {
           show(
-            'The in-browser kernel could not be loaded (' + err.message + ').\n' +
+            t('The in-browser kernel could not be loaded') + ' (' + err.message + ').\n' +
             'Run this script from the command line instead:\n\n' +
             '  cargo run -- ' + fallback,
             true

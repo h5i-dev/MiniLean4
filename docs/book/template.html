@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{title}}</title>
-<meta name="description" content="A guided tour of MiniLean4, a small Lean 4-style proof kernel in Rust: propositions as types, inductive types, tactics, and universes.">
+<meta name="description" content="{{description}}">
 <meta name="color-scheme" content="dark light">
-<link rel="stylesheet" href="assets/katex/katex.min.css">
-<link rel="stylesheet" href="assets/book.css">
+<link rel="stylesheet" href="{{root}}assets/katex/katex.min.css">
+<link rel="stylesheet" href="{{root}}assets/book.css">
 <script>
   (function () {
     if (localStorage.getItem("minilean-theme") === "light") {
       document.documentElement.classList.add("light");
     }
   })();
+  window.MINILEAN_WASM_URL = "{{root}}assets/minilean.wasm";
+  window.MINILEAN_I18N = {{i18n}};
 </script>
 </head>
 <body class="{{body_class}}">
@@ -22,18 +24,20 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head">
       <a class="logo" href="index.html">MiniLean4</a>
-      <p class="book-sub">Implementing an Interactive Theorem Prover from Scratch</p>
+      <p class="book-sub">{{subtitle}}</p>
     </div>
     {{sidebar}}
   </aside>
   <div class="main">
     <div class="topbar">
-      <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
+      <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">{{ui_contents}}</button>
       <div class="topbar-spacer"></div>
-      <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
+      {{langswitch}}
+      <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">{{ui_theme}}</button>
     </div>
     <div class="layout">
       <main id="content" class="content">
+        {{notice}}
         {{content}}
         {{pager}}
       </main>
@@ -42,13 +46,12 @@
       </aside>
     </div>
     <footer class="footer">
-      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
-      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+      <p>{{footer}}</p>
     </footer>
   </div>
 </div>
-<script src="assets/book.js"></script>
-<script src="assets/playground.js"></script>
-<script src="assets/explorers.js"></script>
+<script src="{{root}}assets/book.js"></script>
+<script src="{{root}}assets/playground.js"></script>
+<script src="{{root}}assets/explorers.js"></script>
 </body>
 </html>

@@ -14,6 +14,8 @@
       document.documentElement.classList.add("light");
     }
   })();
+  window.MINILEAN_WASM_URL = "assets/minilean.wasm";
+  window.MINILEAN_I18N = {"ui": {"contents": "contents", "close": "close", "theme_light": "light", "theme_dark": "dark"}, "js": {}};
 </script>
 </head>
 <body class="page-app">
@@ -64,10 +66,12 @@
     <div class="topbar">
       <button class="topbar-btn" id="nav-toggle" aria-label="Open table of contents" aria-controls="sidebar" aria-expanded="false">contents</button>
       <div class="topbar-spacer"></div>
+      <nav class="langs" aria-label="Language"><span class="lang current">English</span><a class="lang" href="ja/d-proof-consistency.html" hreflang="ja">日本語</a><a class="lang" href="zh/d-proof-consistency.html" hreflang="zh-Hans">中文</a></nav>
       <button class="topbar-btn" id="theme-toggle" aria-label="Switch color theme">light</button>
     </div>
     <div class="layout">
       <main id="content" class="content">
+        
         <header class="chapter-head"><p class="chapter-label">Appendix D</p><h1>Proof of Consistency</h1></header><div class="lead">
 <p><a href="14-properties.html">Chapter 14</a> states that the core system is consistent: no closed term has type <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Π</mi><mo stretchy="false">(</mo><mi>P</mi><mo lspace="0em" rspace="0em">:</mo><mrow><mi mathvariant="sans-serif">S</mi><mi mathvariant="sans-serif">o</mi><mi mathvariant="sans-serif">r</mi><mi mathvariant="sans-serif">t</mi></mrow><mtext> </mtext><mn>0</mn><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi><mtext> </mtext><mi>P</mi></mrow><annotation encoding="application/x-tex">\tPi{P}{\Sort{0}}{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Π</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord"><span class="mrel">:</span></span><span class="mord"><span class="mord mathsf">Sort</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord">0</span></span><span class="mclose">)</span><span class="mord">.</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span></span></span></span> (Theorem 14.5). This appendix gives the full proof, including the standard facts about typing and conversion that the argument uses. It concerns the core system: the rules of Figure 3.1 with the universes of <a href="13-universes.html">Chapter 13</a>, without the constants of Part II.</p>
 </div>
@@ -144,8 +148,7 @@
       </aside>
     </div>
     <footer class="footer">
-      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the
-      <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
+      <p>MiniLean4 is a teaching kernel. the code, the examples, and this book's sources live in the <a href="https://github.com/h5i-dev/MiniLean4">repository</a>.<br>every formula was checked against the rust implementation. every runnable example is checked by the kernel itself, compiled to webassembly.</p>
     </footer>
   </div>
 </div>

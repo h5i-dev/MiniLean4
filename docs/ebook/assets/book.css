@@ -182,6 +182,8 @@ a:focus-visible, button:focus-visible, textarea:focus-visible, summary:focus-vis
 .topbar-btn:hover, .stepper-btn:hover:not(:disabled), .playground-reset:hover { border-color: var(--accent); }
 .topbar-btn:active, .stepper-btn:active, .playground-reset:active { transform: scale(.96); }
 #nav-toggle { display: none; }
+.topbar-link { display: inline-flex; align-items: center; gap: .4rem; margin-right: .5rem; border-bottom: 1px solid var(--border); }
+.topbar-link:hover { color: var(--accent); border-color: var(--accent); }
 
 .layout {
   display: flex;

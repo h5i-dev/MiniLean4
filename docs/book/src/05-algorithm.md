@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-The typing rules say which judgments hold; they do not say how to find out. This chapter turns them into an algorithm. The standard trick is to split the work into two mutually recursive functions, one that computes the type of a term and one that compares a computed type with an expected one, and to use definitional equality only in the second. The result is a few dozen lines of Rust.
+The typing rules say which judgments hold, but not how to decide whether they hold. This chapter turns those rules into an algorithm by splitting the work between two mutually recursive functions: one computes the type of a term, while the other compares that type with the expected one using definitional equality. The result is a few dozen lines of Rust.
 
 </div>
 
@@ -79,7 +79,7 @@ The algorithm has the following properties.
 
 <aside class="intuition" markdown="1">
 
-The division into $\Infer$ and $\Check$ is sometimes called *bidirectional* type checking. The intuition is that information flows in two directions. Inference flows *up* from the leaves: a variable knows its type, an application computes its type from its parts. Checking flows *down* from an expectation: the user says "this term should have this type", and the comparison happens at the root. In our kernel, every term can be inferred, so checking is just inference plus one comparison; in richer systems some terms can only be checked, not inferred.
+The division into $\Infer$ and $\Check$ is sometimes called *bidirectional* type checking because information flows in two directions. Inference flows *up* from the leaves: a variable already has a type, and an application gets its type from its parts. Checking flows *down* from an expected type supplied by the user, which is compared with the inferred type at the root. In our kernel every term has an inferable type, so checking adds just one comparison; richer systems also have terms that can only be checked against an expected type.
 
 </aside>
 

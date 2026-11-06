@@ -25,7 +25,7 @@ m_{\mathsf{branch}} &:& \tPi{l}{\mathsf{Tree}}{\tPi{r}{\mathsf{Tree}}{M\;l \to M
 \end{array}
 $$
 
-递归子接受动机、三个情形和一棵树：
+递归子接受 motive、三个情形和一棵树：
 
 $$
 \mathsf{Tree.rec}_v : \tPi{M}{\mathsf{Tree} \to \Sort{v}}{\;
@@ -102,7 +102,7 @@ $$
 \mathsf{cons} : \tPi{A}{\Sort{1}}{A \to \mathsf{List}\;A \to \mathsf{List}\;A}.
 $$
 
-构造子把 $A$ 作为显式的第一个参数。例如，单元素列表 $[5]$ 是 $\mathsf{cons}\;\Nat\;5\;(\mathsf{nil}\;\Nat)$。在同一个列表内，$A$ 从不改变：$\mathsf{cons}\;A\;a\;\mathit{as}$ 的尾部仍是一个 $\mathsf{List}\;A$。在每个构造子和每个递归参数中都保持不变的类型参数称为**参数**（parameter）。由于它从不改变，递归子可以在动机之前一次性接受它，并把它视为固定的：
+构造子把 $A$ 作为显式的第一个参数。例如，单元素列表 $[5]$ 是 $\mathsf{cons}\;\Nat\;5\;(\mathsf{nil}\;\Nat)$。在同一个列表内，$A$ 从不改变：$\mathsf{cons}\;A\;a\;\mathit{as}$ 的尾部仍是一个 $\mathsf{List}\;A$。在每个构造子和每个递归参数中都保持不变的类型参数称为**参数**（parameter）。由于它从不改变，递归子可以在 motive 之前一次性接受它，并把它视为固定的：
 
 $$
 \begin{array}{l}
@@ -154,7 +154,7 @@ $$
 \mathsf{vcons} : \tPi{A}{\Sort{1}}{\tPi{n}{\Nat}{A \to \mathsf{Vec}\;A\;n \to \mathsf{Vec}\;A\;(\suc\;n)}}.
 $$
 
-由于索引会变化，递归子不能预先固定它。取而代之的是，动机把它作为参数接受，$M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$，而 $\mathsf{vcons}$ 的情形是
+由于索引会变化，递归子不能预先固定它。取而代之的是，motive 把它作为参数接受，$M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$，而 $\mathsf{vcons}$ 的情形是
 
 $$
 \tPi{n}{\Nat}{\tPi{a}{A}{\tPi{\mathit{xs}}{\mathsf{Vec}\;A\;n}{M\;n\;\mathit{xs} \to M\;(\suc\;n)\;(\mathsf{vcons}\;A\;n\;a\;\mathit{xs})}}}.
@@ -226,7 +226,7 @@ I.\mathsf{rec}_v :
 \tPi{\vec{\imath}}{\vec{J}}{\tPi{x}{I\;\vec{p}\;\vec{\imath}}{M\;\vec{\imath}\;x}}}}}}.
 $$
 
-参数在最前面并保持固定，如同列表的情形；动机接受索引和元素，如同向量的情形。小前提 $C_j$ 要求构造子 $c_j$ 的情形：给定它的字段，以及每个递归字段的一个归纳假设，构造出 $c_j$ 应用于这些字段时的 $M$：
+参数在最前面并保持固定，如同列表的情形；motive 接受索引和元素，如同向量的情形。小前提 $C_j$ 要求构造子 $c_j$ 的情形：给定它的字段，以及每个递归字段的一个归纳假设，构造出 $c_j$ 应用于这些字段时的 $M$：
 
 $$
 \begin{array}{l}
@@ -260,7 +260,7 @@ $$
 
 - `src/inductive/mod.rs` 中的 `Kernel::add_inductive` 依次运行四个接受条件（`check_inductive_type` 是条件 1，`check_constructor_fields` 检查字段都是类型并执行条件 4，`check_constructor_result` 是条件 2），全部通过后注册类型构造器和构造子，并记录一个 `InductiveInfo`。失败时签名保持不变。
 - `src/inductive/positivity.rs` 是条件 3。`check_recursive_field` 剥去字段类型开头的各个 $\Pi$，拒绝任何定义域提及 $I$ 的情况，并要求目标是 $I$ 恰好应用于参数变量，后跟不提及 $I$ 的索引项。它返回一个 `RecursiveFieldInfo`，记录 $\vec{y} : \vec{B}$ 和 $\vec{s}$，这正是递归子生成器所需的全部信息。
-- `src/inductive/recursor.rs` 按上面的公式构造递归子类型。`recursor_type` 组装 telescope $\vec{p}$、动机、各小前提、索引和大前提；`minor_premise_type` 构造每个 $C_j$；`induction_hypothesis_type` 构造每个 $H_{j,k}$。生成的绑定子名字（`__motive`、`__minor_j`、`__ih_j_k`、`__major`）以两个下划线开头，用户声明不得使用这种名字，因此它们永远不会与字段冲突。
+- `src/inductive/recursor.rs` 按上面的公式构造递归子类型。`recursor_type` 组装 telescope $\vec{p}$、motive、各小前提、索引和大前提；`minor_premise_type` 构造每个 $C_j$；`induction_hypothesis_type` 构造每个 $H_{j,k}$。生成的绑定子名字（`__motive`、`__minor_j`、`__ih_j_k`、`__major`）以两个下划线开头，用户声明不得使用这种名字，因此它们永远不会与字段冲突。
 - `mod.rs` 中的 `allows_large_elimination` 实现子单元测试。`add_inductive` 总是注册 `I.rec0`，在允许大消去时还注册 `I.rec1`；`register_recursor` 按需生成更高的层级。
 
 ι 规则不会生成为项。`whnf` 直接依据存储的 `InductiveInfo` 应用它们，[第 12 章](12-reduction-conversion.md)会解释这一点。
@@ -329,7 +329,7 @@ $\mathsf{Bool.rec}_v : \tPi{M}{\mathsf{Bool} \to \Sort{v}}{M\;\mathsf{true} \to 
 
 要点回顾
 
-- 一个声明给出带参数和索引的类型构造器，以及带字段的构造子。参数自始至终固定；索引可变，并成为动机的参数。
+- 一个声明给出带参数和索引的类型构造器，以及带字段的构造子。参数自始至终固定；索引可变，并成为 motive 的参数。
 - 递归子对每个构造子有一个小前提，其中每个递归字段对应一个归纳假设；每个构造子对应一条 ι 规则。
 - 接受一个声明需要良构性、统一的参数、严格正性和宇宙上界。正性是保证递归终止、逻辑一致的关键。
 - 命题只能消去到 $\Sort{0}$，除非它是子单元。

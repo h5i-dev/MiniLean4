@@ -106,7 +106,7 @@ axiom em : forall (P : Sort 0), P -> P
 recursor Nat 2
 ```
 
-`recursor I v` は、消去宇宙 `v` 向けの `I.recv` がまだなければ生成し、`generated I.recv` と表示する。レベル 0 と 1 は `inductive` が自動的に生成する。動機が `Sort 2` 以上の型を返す必要があるときにこのコマンドを使う。大消去を許さない命題に対しては失敗する（`I is not a subsingleton proposition; cannot eliminate into Sort v`）。
+`recursor I v` は、消去宇宙 `v` 向けの `I.recv` がまだなければ生成し、`generated I.recv` と表示する。レベル 0 と 1 は `inductive` が自動的に生成する。motive が `Sort 2` 以上の型を返す必要があるときにこのコマンドを使う。大消去を許さない命題に対しては失敗する（`I is not a subsingleton proposition; cannot eliminate into Sort v`）。
 
 ## 標準カーネル
 
@@ -127,7 +127,7 @@ Eq.rec1  : forall (A : Sort 1), forall (a : A), forall (M : forall (b : A), Eq A
 
 `Nat.rec1` は型への再帰、`Nat.rec0` は命題への帰納法である（[第 7 章](07-inductive-nat.md)）。`Eq` は型引数 `A` を明示的にとるので、$\Nat$ における等式 $a = b$ は `Eq Nat a b` と書き、反射性によるその証明は `Eq.refl Nat a` である（[第 9 章](09-equality.md)）。`Eq` は `A : Sort 1` で宣言されているので、等式が使えるのは `Nat` や `List Nat` のような `Sort 1` の型に対してであり、命題に対しては使えない。
 
-一般に、帰納型 `I` の `Sort v` への再帰子は `I.recv` という名前をもつ。`List.rec0`、`List.rec1`、`Vec.rec1` などである。引数の順序は、パラメータ、動機、構成子ごとに一つの小前提（宣言順）、添字、最後に大前提である（[第 8 章](08-inductive-recipe.md)）。
+一般に、帰納型 `I` の `Sort v` への再帰子は `I.recv` という名前をもつ。`List.rec0`、`List.rec1`、`Vec.rec1` などである。引数の順序は、パラメータ、motive、構成子ごとに一つの小前提（宣言順）、添字、最後に大前提である（[第 8 章](08-inductive-recipe.md)）。
 
 ## 証明
 
@@ -165,7 +165,7 @@ goal forall (n : Nat), Eq Nat n n
 
 **`rfl`** は、ターゲットが `Eq A a b` に簡約され（`rfl expects Eq A lhs rhs`）、`a` と `b` が定義的に等しいこと（`rfl: sides are not definitionally equal`）を要求し、`Eq.refl A a` でゴールを閉じる。
 
-**`rw h`** は、`h` の型が `Eq A a b` に簡約されることを要求する（`rw expects proof of equality`）。ターゲット中の `a` の出現をすべて `b` に置き換え、書き換えたターゲットを新しいゴールとして残す。出現は束縛変数の名前の違いを除いて構文的に探される。計算した後でなければ等しくならない項は見つからず、`rw: no syntactic occurrence of lhs in goal; use change first` となる。Lean の `rw` と違い、その後に `rfl` を試さないので、`Eq A x x` の形のゴールは明示的に閉じなければならない。`a` を抽象化した結果が型の付かない動機になる場合は、証明状態が変わる前にカーネルの型エラーが報告される。
+**`rw h`** は、`h` の型が `Eq A a b` に簡約されることを要求する（`rw expects proof of equality`）。ターゲット中の `a` の出現をすべて `b` に置き換え、書き換えたターゲットを新しいゴールとして残す。出現は束縛変数の名前の違いを除いて構文的に探される。計算した後でなければ等しくならない項は見つからず、`rw: no syntactic occurrence of lhs in goal; use change first` となる。Lean の `rw` と違い、その後に `rfl` を試さないので、`Eq A x x` の形のゴールは明示的に閉じなければならない。`a` を抽象化した結果が型の付かない motive になる場合は、証明状態が変わる前にカーネルの型エラーが報告される。
 
 **`induction x`** は、`x` が添字のない帰納型に簡約される型をもつ仮定であること、そして `x` より後の仮定が `x` に言及しないこと（`induction: revert dependent hypotheses first`）を要求する。構成子ごとに一つのゴールを宣言順に作る。各ゴールの文脈には、構成子のフィールドが宣言された名前で加わり、再帰的フィールドごとに `ih` という名前の帰納法の仮定が一つ加わる（`ih` が使用済みならプライムを付け足す）。`Nat.succ` のフィールド `n` は、`n` がすでに使われていれば `k` に改名される。下の例のゴールに `k` と `ih` が現れるのはそのためである。使われる再帰子は `I.recv` で、`v` はターゲットの宇宙である。その再帰子が存在しなければメッセージは `no elimination recursor at target universe` となる。添字付きの族には対応していない（`indexed induction requires motive/index elaboration (not implemented)`）。
 

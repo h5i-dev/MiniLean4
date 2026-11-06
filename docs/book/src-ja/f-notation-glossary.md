@@ -110,7 +110,7 @@
 
 **添字（index）.** 帰納型の型構成子の引数のうち、構成子ごとに異なってよいもの。ベクトルの長さや等式の右辺など。[第 8 章](08-inductive-recipe.md)。
 
-**帰納法の仮定（induction hypothesis）.** 小前提の中で、再帰的フィールドについて動機がすでに成り立つとする仮定。[第 7 章](07-inductive-nat.md)。
+**帰納法の仮定（induction hypothesis）.** 小前提の中で、再帰的フィールドについて motive がすでに成り立つとする仮定。[第 7 章](07-inductive-nat.md)。
 
 **帰納型（inductive type）.** 構成子によって指定される型。カーネルはそこから再帰子と ι 規則を生成する。[第 7 章](07-inductive-nat.md) と [第 8 章](08-inductive-recipe.md)。
 
@@ -124,7 +124,7 @@
 
 **小前提（minor premise）.** 再帰子の引数のうち、一つの構成子に対する場合を与えるもの。[第 7 章](07-inductive-nat.md)。
 
-**動機（motive）.** 各要素に対する再帰子の結果の型を与える関数 $M$。帰納法では述語にあたる。[第 7 章](07-inductive-nat.md)。
+**motive.** 各要素に対する再帰子の結果の型を与える関数 $M$。帰納法では述語にあたる。[第 7 章](07-inductive-nat.md)。
 
 **中立項（neutral term）.** 変数を頭部とする正規項（定数があるときは、行き詰まった定数を頭部とするものも含む）。[第 14 章](14-properties.md)、[付録 D](d-proof-consistency.md)。
 
@@ -148,7 +148,7 @@
 
 **強正規化（strong normalization）.** 正しく型付けされた項から始まる簡約列はすべて有限である。[第 14 章](14-properties.md)。
 
-**主語簡約（subject reduction）.** 簡約は型を保つ。[第 14 章](14-properties.md)。
+**型保存性（subject reduction）.** 簡約は型を保つ。[第 14 章](14-properties.md)。
 
 **部分単集合（subsingleton）.** 構成子が高々一つで、そのフィールドがすべて証明または添字である命題。任意の宇宙へ消去できる。[第 8 章](08-inductive-recipe.md)。
 

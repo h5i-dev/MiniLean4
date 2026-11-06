@@ -106,7 +106,7 @@ axiom em : forall (P : Sort 0), P -> P
 recursor Nat 2
 ```
 
-`recursor I v` 为消去宇宙 `v` 生成 `I.recv`（若尚不存在），并打印 `generated I.recv`。层级 0 和 1 由 `inductive` 自动生成；当动机需要返回 `Sort 2` 或更高宇宙中的类型时使用此命令。对不允许大消去的命题，它会失败（`I is not a subsingleton proposition; cannot eliminate into Sort v`）。
+`recursor I v` 为消去宇宙 `v` 生成 `I.recv`（若尚不存在），并打印 `generated I.recv`。层级 0 和 1 由 `inductive` 自动生成；当 motive 需要返回 `Sort 2` 或更高宇宙中的类型时使用此命令。对不允许大消去的命题，它会失败（`I is not a subsingleton proposition; cannot eliminate into Sort v`）。
 
 ## 标准内核
 
@@ -127,7 +127,7 @@ Eq.rec1  : forall (A : Sort 1), forall (a : A), forall (M : forall (b : A), Eq A
 
 `Nat.rec1` 是进入类型的递归，`Nat.rec0` 是进入命题的归纳（[第 7 章](07-inductive-nat.md)）。`Eq` 显式接受类型参数 `A`，所以 $\Nat$ 中的等式 $a = b$ 写作 `Eq Nat a b`，其自反性证明是 `Eq.refl Nat a`（[第 9 章](09-equality.md)）。由于 `Eq` 以 `A : Sort 1` 声明，相等只对 `Sort 1` 中的类型可用，如 `Nat` 和 `List Nat`，对命题不可用。
 
-一般地，归纳类型 `I` 进入 `Sort v` 的递归子名为 `I.recv`：`List.rec0`、`List.rec1`、`Vec.rec1` 等等。其参数顺序为：参数、动机、每个构造子（按声明顺序）各一个小前提、索引，最后是大前提（[第 8 章](08-inductive-recipe.md)）。
+一般地，归纳类型 `I` 进入 `Sort v` 的递归子名为 `I.recv`：`List.rec0`、`List.rec1`、`Vec.rec1` 等等。其参数顺序为：参数、motive、每个构造子（按声明顺序）各一个小前提、索引，最后是大前提（[第 8 章](08-inductive-recipe.md)）。
 
 ## 证明
 
@@ -165,7 +165,7 @@ goal forall (n : Nat), Eq Nat n n
 
 **`rfl`** 要求目标归约到 `Eq A a b`（`rfl expects Eq A lhs rhs`），且 `a` 与 `b` 定义相等（`rfl: sides are not definitionally equal`），然后用 `Eq.refl A a` 关闭它。
 
-**`rw h`** 要求 `h` 的类型归约到 `Eq A a b`（`rw expects proof of equality`）。它把目标中 `a` 的每一次出现替换为 `b`，并把重写后的目标作为新目标。出现是按语法查找的，只容许约束变量名不同；仅在计算之后才相等的项找不到，此时报 `rw: no syntactic occurrence of lhs in goal; use change first`。与 Lean 的 `rw` 不同，它之后不会尝试 `rfl`，所以形如 `Eq A x x` 的目标仍须显式关闭。若抽象 `a` 产生类型不正确的动机，内核的类型错误会在证明状态改变之前报告。
+**`rw h`** 要求 `h` 的类型归约到 `Eq A a b`（`rw expects proof of equality`）。它把目标中 `a` 的每一次出现替换为 `b`，并把重写后的目标作为新目标。出现是按语法查找的，只容许约束变量名不同；仅在计算之后才相等的项找不到，此时报 `rw: no syntactic occurrence of lhs in goal; use change first`。与 Lean 的 `rw` 不同，它之后不会尝试 `rfl`，所以形如 `Eq A x x` 的目标仍须显式关闭。若抽象 `a` 产生类型不正确的 motive，内核的类型错误会在证明状态改变之前报告。
 
 **`induction x`** 要求 `x` 是一个假设，其类型归约到无索引的归纳类型，并且之后的假设都不能提到 `x`（`induction: revert dependent hypotheses first`）。它按声明顺序为每个构造子创建一个目标。每个目标的上下文获得该构造子的各字段（使用其声明的名字），以及每个递归字段对应的一个归纳假设，名为 `ih`（若 `ih` 已被占用则追加撇号）。当 `n` 已在使用中时，`Nat.succ` 中名为 `n` 的字段会被重命名为 `k`，这就是下面示例的目标里出现 `k` 和 `ih` 的原因。所用的递归子是 `I.recv`，其中 `v` 是目标的宇宙；若该递归子不存在，消息是 `no elimination recursor at target universe`。不支持索引族（`indexed induction requires motive/index elaboration (not implemented)`）。
 
@@ -268,7 +268,7 @@ leanmini 是理解内核的工具，不是证明助手。下表列出 Lean 前�
 
 | Lean 4 | leanmini |
 |---|---|
-| 隐式参数，由繁释器填入 | 每个参数都显式；写 `Eq Nat a b`，而非 `a = b` |
+| 隐式参数，由繁饰器填入 | 每个参数都显式；写 `Eq Nat a b`，而非 `a = b` |
 | 用合一求解元变量 | 没有；策略只在项已完全确定时才有效 |
 | 宇宙多态（带层级变量的 `Sort u`） | 每个层级都是数字；每个层级一个递归子 |
 | 互归纳与嵌套归纳类型 | 一次只有一个归纳类型；作为字段的 `List Tree` 会被拒绝 |
@@ -283,7 +283,7 @@ leanmini 是理解内核的工具，不是证明助手。下表列出 Lean 前�
 
 <aside class="lean" markdown="1">
 
-右列的一切都是 Lean 的繁释器和策略框架在项到达内核之前完成的工作。Lean 的内核和我们的一样，只会看到完整的项。上述限制是本仓库前端的限制，而不是类型理论的限制。
+右列的一切都是 Lean 的繁饰器和策略框架在项到达内核之前完成的工作。Lean 的内核和我们的一样，只会看到完整的项。上述限制是本仓库前端的限制，而不是类型理论的限制。
 
 </aside>
 

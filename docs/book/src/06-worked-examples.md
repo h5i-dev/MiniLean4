@@ -62,7 +62,7 @@ $$
 \Infer(\cdot, t) \;=\; \tPi{P}{\Sort{0}}{\tPi{h}{P}{\Sort{0}}}.
 $$
 
-The term $t$ is perfectly well typed; it is just not a proof of the claimed proposition. $\Check$ then compares the two types. Neither can compute any further, and no renaming of bound variables makes them equal: the innermost body is $\Sort{0}$ on one side and $P$ on the other. So $\IsDefEq$ fails and $\Check$ reports a type mismatch. ([Chapter 11](11-substitution-alpha.md#alpha-equivalence) replays this comparison step by step with the algorithm that $\IsDefEq$ uses.)
+The term $t$ is well typed, but it does not prove the claimed proposition. When $\Check$ compares the two types, neither reduces further, and renaming bound variables cannot make them equal: the innermost body is $\Sort{0}$ on one side and $P$ on the other. Thus $\IsDefEq$ fails, and $\Check$ reports a type mismatch. ([Chapter 11](11-substitution-alpha.md#alpha-equivalence) replays this comparison step by step with the algorithm that $\IsDefEq$ uses.)
 
 The error is found only because the user *stated* the proposition to be proved. A kernel that only ran $\Infer$ would accept $t$ and silently assign it a different type. This is why `goal` comes first in every script, and why `qed` checks against it.
 
@@ -74,7 +74,7 @@ qed</pre></div>
 
 <aside class="warning" markdown="1">
 
-"Well typed" and "proves the theorem" are different properties. Every closed term that passes $\Infer$ proves *something*, namely its inferred type. The kernel's job is to confirm that the something is what was claimed. Tactics ([Chapter 10](10-tactics.md)) are designed so that the claim is fixed before any term is built.
+Being well typed does not by itself mean that a term proves the stated theorem. Every closed term that passes $\Infer$ has an inferred type; the kernel must also check that it is the type claimed for the theorem. Tactics ([Chapter 10](10-tactics.md)) fix that claim before they build a term.
 
 </aside>
 

@@ -28,7 +28,7 @@ The explorer colours each bound variable like its binder and underlines free one
 
 <div class="explorer" data-kind="scope" data-term="fun (x : P) => f x y"></div>
 
-We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences of $x$ in $t$ with $s$. The only subtle case is a binder. Consider $\subst{(\tLam{y}{A}{x})}{x}{y}$. The body says "ignore the argument and return the outer $x$". Replacing $x$ by $y$ naively gives $\tLam{y}{A}{y}$, the identity function, which means something else: the free $y$ has been **captured** by the binder. Substitution must avoid this by renaming the binder first.
+We write $\subst{t}{x}{s}$ for the result of replacing the free occurrences of $x$ in $t$ with $s$. Binders make this subtle: in $\subst{(\tLam{y}{A}{x})}{x}{y}$, the body means "ignore the argument and return the outer $x$". Replacing $x$ with $y$ naively gives $\tLam{y}{A}{y}$, the identity function, because the binder has **captured** the formerly free $y$. To preserve the meaning, substitution must rename the binder first.
 
 <div class="definition" markdown="1">
 
@@ -283,7 +283,7 @@ Decide whether $\tLam{x}{A}{\tLam{y}{A}{y\;x}}$ and $\tLam{y}{A}{\tLam{x}{A}{x\;
 <details markdown="1">
 <summary>Solution</summary>
 
-Yes. After two $\alpha$-Lam steps the lists are $x, y$ and $y, x$, and the bodies are $y\;x$ and $x\;y$. $\alpha$-App compares $y$ with $x$: indices $0$ and $0$. Then $x$ with $y$: indices $1$ and $1$. Both hold. Names are swapped, positions agree.
+Yes. After two $\alpha$-Lam steps, the binder lists are $x, y$ and $y, x$, while the bodies are $y\;x$ and $x\;y$. The two $\alpha$-App comparisons match $y$ with $x$ at indices $0$ and $0$, then $x$ with $y$ at indices $1$ and $1$. The names are swapped, but their positions agree.
 
 </details>
 

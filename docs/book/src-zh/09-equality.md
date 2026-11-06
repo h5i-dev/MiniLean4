@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-要陈述关于数的事实，例如 $0 + n = n$，我们需要一种方式来表达两个东西相等。人们或许以为相等是内核的原语，带着自己的规则内置其中。并非如此。相等只是另一个归纳类型，由第 8 章的方法生成，而它的递归子正是把关于 $a$ 的事实转化为关于 $b$ 的事实的原理。本章声明这个类型，解释此时并存的两种相等概念，并证明本书第一个真正的定理。
+要陈述 $0 + n = n$ 这样的数论事实，就需要表达相等。虽然相等似乎需要内核内置专门的规则，它其实是按第 8 章的方法生成的归纳类型；利用它的递归子，可以把关于 $a$ 的事实转化为关于 $b$ 的事实。本章声明这个类型，说明它与定义相等的区别，并证明本书第一个实质性的定理。
 
 </div>
 
@@ -47,7 +47,7 @@ $$
 <details markdown="1">
 <summary>由通用方法生成的完整依赖递归子</summary>
 
-由于 $b$ 是索引，动机接受 $b$ *以及*证明 $h : \Eq{u}\;A\;a\;b$，并且只有一个小前提，对应 $\refl{u}$，没有字段也没有假设：
+由于 $b$ 是索引，motive 接受 $b$ *以及*证明 $h : \Eq{u}\;A\;a\;b$，并且只有一个小前提，对应 $\refl{u}$，没有字段也没有假设：
 
 $$
 \begin{array}{l}
@@ -57,7 +57,7 @@ $$
 \end{array}
 $$
 
-$\Eq{}$ 是子单元（一个构造子，没有字段），所以 $v$ 是任意的：相等的证明可以用来构造数据，而不只是证明。非依赖的 $\EqRec{u,v}$ 是动机忽略证明的特例：
+$\Eq{}$ 是子单元（一个构造子，没有字段），所以 $v$ 是任意的：相等的证明可以用来构造数据，而不只是证明。非依赖的 $\EqRec{u,v}$ 是 motive 忽略证明的特例：
 
 $$
 \begin{array}{l}
@@ -92,7 +92,7 @@ $$
 
 </details>
 
-例如，设 $P : \Nat \to \Sort{0}$，$a, b : \Nat$，$h : a = b$，$\mathit{pa} : P\;a$。取动机 $M = P$，得到
+例如，设 $P : \Nat \to \Sort{0}$，$a, b : \Nat$，$h : a = b$，$\mathit{pa} : P\;a$。取 motive $M = P$，得到
 
 $$
 \EqRec{1,0}\;\Nat\;a\;P\;\mathit{pa}\;b\;h \;:\; P\;b.
@@ -102,7 +102,7 @@ $$
 
 <aside class="lean" markdown="1">
 
-在 Lean 中，`Eq` 的类型参数是*隐式的*，在声明中写作 `{A}`，由繁释器填入，所以用户写 `Eq a b` 或 `a = b`。我们的内核只看到完全显式的项，因此我们写出每一个参数；填入它们是内核之上那一层的工作。在脚本语言中，这些常量是 `Eq`、`Eq.refl` 以及依赖递归子 `Eq.rec0` 和 `Eq.rec1`；非依赖的 $\EqRec{}$ 没有预先声明，但它只是一个两行的定义，见下面的演练场。由于没有宇宙多态，内核只在 $A : \Sort{1}$ 处声明一次 `Eq`，这覆盖了 $\Nat$ 和每个用户声明的数据类型；证明之间的相等则不可用。
+在 Lean 中，`Eq` 的类型参数是*隐式的*，在声明中写作 `{A}`，由繁饰器填入，所以用户写 `Eq a b` 或 `a = b`。我们的内核只看到完全显式的项，因此我们写出每一个参数；填入它们是内核之上那一层的工作。在脚本语言中，这些常量是 `Eq`、`Eq.refl` 以及依赖递归子 `Eq.rec0` 和 `Eq.rec1`；非依赖的 $\EqRec{}$ 没有预先声明，但它只是一个两行的定义，见下面的演练场。由于没有宇宙多态，内核只在 $A : \Sort{1}$ 处声明一次 `Eq`，这覆盖了 $\Nat$ 和每个用户声明的数据类型；证明之间的相等则不可用。
 
 </aside>
 
@@ -154,11 +154,11 @@ rfl</pre></div>
 
 ## 示例：证明 0 + n = n
 
-我们用归纳证明 $\tPi{n}{\Nat}{0 + n = n}$，使用 $\NatRec{0}$ 和动机 $M_0 = \tLam{n}{\Nat}{0 + n = n}$。
+我们用归纳证明 $\tPi{n}{\Nat}{0 + n = n}$，使用 $\NatRec{0}$ 和 motive $M_0 = \tLam{n}{\Nat}{0 + n = n}$。
 
 **基础情形。** 我们需要 $M_0\;0$，它可转换为 $0 + 0 = 0$。由于 $0 + 0$ 计算为 $0$，项 $\refl{1}\;\Nat\;0$ 即可。
 
-**归纳步骤。** 给定 $k : \Nat$ 和 $\mathit{ih} : 0 + k = k$，我们需要 $M_0\;(\suc\;k)$，即 $0 + \suc\;k = \suc\;k$。由第二条 ι 规则，$0 + \suc\;k$ 计算为 $\suc\;(0 + k)$，所以只需证明 $\suc\;(0 + k) = \suc\;k$。我们从 $\refl{1}\;\Nat\;(\suc\;(0 + k))$ 出发，它是 $\suc\;(0+k) = \suc\;(0+k)$ 的证明，然后用动机 $N = \tLam{b}{\Nat}{\suc\;(0 + k) = \suc\;b}$ 沿着 $\mathit{ih}$ 传输它，这把*第二个* $0 + k$ 替换为 $k$：
+**归纳步骤。** 给定 $k : \Nat$ 和 $\mathit{ih} : 0 + k = k$，我们需要 $M_0\;(\suc\;k)$，即 $0 + \suc\;k = \suc\;k$。由第二条 ι 规则，$0 + \suc\;k$ 计算为 $\suc\;(0 + k)$，所以只需证明 $\suc\;(0 + k) = \suc\;k$。我们从 $\refl{1}\;\Nat\;(\suc\;(0 + k))$ 出发，它是 $\suc\;(0+k) = \suc\;(0+k)$ 的证明，然后用 motive $N = \tLam{b}{\Nat}{\suc\;(0 + k) = \suc\;b}$ 沿着 $\mathit{ih}$ 传输它，这把*第二个* $0 + k$ 替换为 $k$：
 
 $$
 \mathit{step} = \tLam{k}{\Nat}{\tLam{\mathit{ih}}{0 + k = k}{
@@ -182,7 +182,7 @@ goal forall (n : Nat), Eq Nat (add Nat.zero n) n
 exact Nat.rec0 (fun (n : Nat) => Eq Nat (add Nat.zero n) n) (Eq.refl Nat Nat.zero) (fun (k : Nat) => fun (ih : Eq Nat (add Nat.zero k) k) => ndrec Nat (add Nat.zero k) (fun (b : Nat) => Eq Nat (Nat.succ (add Nat.zero k)) (Nat.succ b)) (Eq.refl Nat (Nat.succ (add Nat.zero k))) k ih)
 qed</pre></div>
 
-手写这样的项很繁琐，而找到正确的动机才是难点：动机 $N$ 必须恰好在 $0 + k$ 出现的两处之一提及 $b$。策略（[第 10 章](10-tactics.md)）把记账工作和动机的选择都自动化了。
+手写这样的项很繁琐，而找到正确的 motive 才是难点：motive $N$ 必须恰好在 $0 + k$ 出现的两处之一提及 $b$。策略（[第 10 章](10-tactics.md)）把记账工作和 motive 的选择都自动化了。
 
 ## 内核的变化
 
@@ -197,7 +197,7 @@ qed</pre></div>
 <details markdown="1">
 <summary>解答</summary>
 
-用动机 $\tLam{x}{\Nat}{x = a}$ 沿着 $h : a = b$ 传输证明 $\refl{}\;a : a = a$，这把 $a = a$ 变成 $b = a$：
+用 motive $\tLam{x}{\Nat}{x = a}$ 沿着 $h : a = b$ 传输证明 $\refl{}\;a : a = a$，这把 $a = a$ 变成 $b = a$：
 $\tLam{a}{\Nat}{\tLam{b}{\Nat}{\tLam{h}{a = b}{\EqRec{1,0}\;\Nat\;a\;(\tLam{x}{\Nat}{x = a})\;(\refl{1}\;\Nat\;a)\;b\;h}}}$。
 
 ```leanmini

@@ -70,7 +70,7 @@ This gives us the central idea behind a theorem prover.
 
 The kernel does not reason about truth. It implements typing rules, which say when a term has a type, and it mechanically checks that a given term has a given type under those rules. Whether that counts as proof checking depends on whether the typing rules faithfully implement a logic, which is the subject of [Chapter 4](04-logic.md). Whether the rules are *sound*, so that no term inhabits the type of a false proposition, is the subject of [Chapter 13](13-universes.md) and [Chapter 14](14-properties.md).
 
-This division of labour has a consequence that shapes the design of every serious prover. Everything that *finds* proofs (tactics, automation, decision procedures, a large language model) can be arbitrarily clever and arbitrarily buggy, because its output is just a term, and the kernel checks the term. The kernel is the only part that must be right. Keeping it small is the design goal, and the kernel in this book is under fifteen hundred lines of Rust, comments included.
+This division of labour shapes the design of every serious prover: tactics, automation, decision procedures, and even a large language model may search for proofs and may contain bugs, because the kernel checks the term they produce. Only the kernel must be correct, so the goal is to keep it small. The kernel in this book is under fifteen hundred lines of Rust, comments included.
 
 <aside class="lean" markdown="1">
 

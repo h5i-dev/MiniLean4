@@ -4,7 +4,7 @@
 
 </div>
 
-- **[Barendregt 1992]** H. P. Barendregt. Lambda calculi with types. In *Handbook of Logic in Computer Science*, volume 2, Oxford University Press, 1992. 纯类型系统的标准参考文献：把类型检查双向拆分为推断与检查（[第 5 章](05-algorithm.md)），以及[第 14 章](14-properties.md)和[附录 D](d-proof-consistency.md)用到的元理论，即类型唯一性、生成引理、合流性和主体归约。
+- **[Barendregt 1992]** H. P. Barendregt. Lambda calculi with types. In *Handbook of Logic in Computer Science*, volume 2, Oxford University Press, 1992. 纯类型系统的标准参考文献：把类型检查双向拆分为推断与检查（[第 5 章](05-algorithm.md)），以及[第 14 章](14-properties.md)和[附录 D](d-proof-consistency.md)用到的元理论，即类型唯一性、生成引理、合流性和类型保持性。
 
 - **[Carneiro 2019]** M. Carneiro. *The Type Theory of Lean*. Master's thesis, Carnegie Mellon University, 2019. 对 Lean 实际类型理论的精确刻画，包括定义性证明无关性及其带来的微妙之处；[第 13 章](13-universes.md)和[第 14 章](14-properties.md)在说明 Lean 的完整系统超出本书系统之处时引用了它。
 

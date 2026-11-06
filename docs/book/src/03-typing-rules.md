@@ -98,7 +98,7 @@ Each rule is a small piece of common sense about functions. T-Lam says how to ma
 
 ## Why application matters
 
-It is tempting to think that the interesting rules are the ones that build things (T-Lam, T-Pi) and that T-App is bookkeeping. The opposite is closer to the truth. Without T-App a hypothesis can be returned but never *used*. Roughly, the provable propositions would then be only those whose conclusion is literally one of the hypotheses, such as $P \to Q \to P$. Composition,
+The rules that build things (T-Lam and T-Pi) may seem more important than T-App, but without application a proof can return a hypothesis without ever *using* it. Roughly, only propositions whose conclusion is literally one of the hypotheses, such as $P \to Q \to P$, would be provable. Composition,
 
 $$
 (P \to Q) \to (Q \to R) \to P \to R,

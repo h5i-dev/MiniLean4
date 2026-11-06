@@ -63,7 +63,7 @@
 | decidability | 可判定性 |
 | uniqueness of types | 类型唯一性 |
 | type correctness | 类型正确性 |
-| subject reduction | 主体归约 |
+| subject reduction | 类型保持性 |
 | inductive type | 归纳类型 |
 | inductive family | 归纳族 |
 | constructor | 构造子 |
@@ -72,7 +72,7 @@
 | parameter / index | 参数 / 索引 |
 | recursive field / recursive argument | 递归字段 / 递归参数 |
 | recursor | 递归子 |
-| motive | 动机 |
+| motive | motive |
 | minor premise / major premise | 小前提 / 大前提 |
 | induction hypothesis | 归纳假设 |
 | structural recursion | 结构递归 |
@@ -98,7 +98,7 @@
 | proof state | 证明状态 |
 | partial proof term | 部分证明项 |
 | assignment (to a hole) | （对洞的）赋值 |
-| elaborator / elaboration | 繁释器 / 繁释（elaboration） |
+| elaborator / elaboration | 繁饰器 / 繁饰（elaboration） |
 | unification | 合一 |
 | trusted (kernel) | 可信的（内核） |
 | trusted computing base | 可信基 |

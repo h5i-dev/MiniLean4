@@ -127,7 +127,7 @@ def double : Nat -> Nat := fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) Nat
 
 The step marked *whnf* is the inner computation: the recursor needs its major premise to be a constructor, so $1 + 1$ is reduced at its head first. The final weak head normal form still contains a stuck inner recursor; the normal form below it is what $\Normalize$ produces by continuing inside.
 
-$\IsDefEq$ normalizes fully for simplicity, and our implementation does the same. Practical kernels compare lazily instead: they reduce both sides to weak head normal form, compare the heads, and recurse into the arguments only when needed, which avoids normalizing large terms that differ at the head. Termination of all three functions for well-typed terms is strong normalization.
+For simplicity, $\IsDefEq$ fully normalizes both terms, as our implementation does. Practical kernels instead compare lazily: they reduce both sides to weak head normal form, compare the heads, and inspect arguments only when needed. This avoids fully normalizing large terms whose heads already differ. Strong normalization guarantees that all three functions terminate on well-typed terms.
 
 ## In the code
 

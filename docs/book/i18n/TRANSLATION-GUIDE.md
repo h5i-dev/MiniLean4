@@ -40,15 +40,17 @@ leanmini comment lines, and the explorer `data-title`.
 
 - No em dashes. Use the language's own punctuation.
 - Japanese: である体 (常体). Full-width punctuation (。、). Half-width spaces
-  between Japanese and Latin words or math. Short sentences, one idea each,
-  conclusion first. Avoid the stiff patterns of machine translation
+  between Japanese and Latin words or math. Vary sentence length and connect
+  closely related thoughts when that makes the reasoning easier to follow.
+  Keep the conclusion clear. Avoid the stiff patterns of machine translation
   (「〜することができる」「〜と言えるだろう」, every sentence ending the same way).
   Keep technical terms consistent with the glossary and add the English term in
   parentheses on first use in each chapter when the Japanese term is not
   standard.
 - Chinese: Simplified characters, written register, full-width punctuation
   (，。：；“”). Half-width spaces between Chinese and Latin words or math.
-  Terminology per the glossary; add the English term in parentheses on first
+  Connect closely related clauses instead of breaking them into abrupt short
+  sentences. Terminology per the glossary; add the English term in parentheses on first
   use in each chapter when a term is not standard.
 - Rule names, keywords, and identifiers are not translated and not transliterated.
 - Keep the author's voice: direct, concrete, no filler.

@@ -25,7 +25,7 @@ m_{\mathsf{branch}} &:& \tPi{l}{\mathsf{Tree}}{\tPi{r}{\mathsf{Tree}}{M\;l \to M
 \end{array}
 $$
 
-再帰子は動機、三つのケース、そして木を受け取る。
+再帰子は motive、三つのケース、そして木を受け取る。
 
 $$
 \mathsf{Tree.rec}_v : \tPi{M}{\mathsf{Tree} \to \Sort{v}}{\;
@@ -102,7 +102,7 @@ $$
 \mathsf{cons} : \tPi{A}{\Sort{1}}{A \to \mathsf{List}\;A \to \mathsf{List}\;A}.
 $$
 
-構成子は $A$ を明示的な第一引数として受け取る。たとえば一要素のリスト $[5]$ は $\mathsf{cons}\;\Nat\;5\;(\mathsf{nil}\;\Nat)$ である。一つのリストの中で $A$ は決して変わらない。$\mathsf{cons}\;A\;a\;\mathit{as}$ の尾部もやはり $\mathsf{List}\;A$ である。すべての構成子とすべての再帰的引数で同じままである型の引数を**パラメータ**（parameter）と呼ぶ。決して変わらないので、再帰子は動機より前に一度だけ受け取り、固定されたものとして扱える。
+構成子は $A$ を明示的な第一引数として受け取る。たとえば一要素のリスト $[5]$ は $\mathsf{cons}\;\Nat\;5\;(\mathsf{nil}\;\Nat)$ である。一つのリストの中で $A$ は決して変わらない。$\mathsf{cons}\;A\;a\;\mathit{as}$ の尾部もやはり $\mathsf{List}\;A$ である。すべての構成子とすべての再帰的引数で同じままである型の引数を**パラメータ**（parameter）と呼ぶ。決して変わらないので、再帰子は motive より前に一度だけ受け取り、固定されたものとして扱える。
 
 $$
 \begin{array}{l}
@@ -154,7 +154,7 @@ $$
 \mathsf{vcons} : \tPi{A}{\Sort{1}}{\tPi{n}{\Nat}{A \to \mathsf{Vec}\;A\;n \to \mathsf{Vec}\;A\;(\suc\;n)}}.
 $$
 
-添字は変化するので、再帰子はそれをあらかじめ固定できない。代わりに動機が引数として受け取る。$M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$ であり、$\mathsf{vcons}$ のケースは
+添字は変化するので、再帰子はそれをあらかじめ固定できない。代わりに motive が引数として受け取る。$M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$ であり、$\mathsf{vcons}$ のケースは
 
 $$
 \tPi{n}{\Nat}{\tPi{a}{A}{\tPi{\mathit{xs}}{\mathsf{Vec}\;A\;n}{M\;n\;\mathit{xs} \to M\;(\suc\;n)\;(\mathsf{vcons}\;A\;n\;a\;\mathit{xs})}}}.
@@ -226,7 +226,7 @@ I.\mathsf{rec}_v :
 \tPi{\vec{\imath}}{\vec{J}}{\tPi{x}{I\;\vec{p}\;\vec{\imath}}{M\;\vec{\imath}\;x}}}}}}.
 $$
 
-パラメータが先頭に来て固定されるのはリストと同じで、動機が添字と要素を受け取るのはベクトルと同じである。小前提 $C_j$ は構成子 $c_j$ のケースを求める。そのフィールドと、再帰的フィールドごとの帰納法の仮定が与えられたとき、$c_j$ をそれらのフィールドに適用したものについて $M$ を組み立てよ、というものである。
+パラメータが先頭に来て固定されるのはリストと同じで、motive が添字と要素を受け取るのはベクトルと同じである。小前提 $C_j$ は構成子 $c_j$ のケースを求める。そのフィールドと、再帰的フィールドごとの帰納法の仮定が与えられたとき、$c_j$ をそれらのフィールドに適用したものについて $M$ を組み立てよ、というものである。
 
 $$
 \begin{array}{l}
@@ -260,7 +260,7 @@ $$
 
 - `src/inductive/mod.rs` の `Kernel::add_inductive` は四つの受理条件を順に実行し（`check_inductive_type` が条件 1、`check_constructor_fields` がフィールドが型であることを確かめて条件 4 を課し、`check_constructor_result` が条件 2）、すべて通れば型構成子と構成子を登録して `InductiveInfo` を記録する。失敗した場合、シグネチャは変更されない。
 - `src/inductive/positivity.rs` が条件 3 である。`check_recursive_field` はフィールドの型の先頭の $\Pi$ を剥がし、定義域が $I$ に言及するものを拒否する。そして標的が、$I$ をちょうどパラメータ変数に適用し、その後に $I$ に言及しない添字項を続けた形であることを要求する。戻り値は $\vec{y} : \vec{B}$ と $\vec{s}$ を記録した `RecursiveFieldInfo` で、再帰子の生成器に必要なのはこれだけである。
-- `src/inductive/recursor.rs` は上の式から再帰子の型を組み立てる。`recursor_type` がテレスコープ $\vec{p}$、動機、小前提、添字、大前提を組み合わせ、`minor_premise_type` が各 $C_j$ を、`induction_hypothesis_type` が各 $H_{j,k}$ を組み立てる。生成される束縛子の名前（`__motive`、`__minor_j`、`__ih_j_k`、`__major`）は下線二つで始まる。ユーザーの宣言ではこの形の名前を使えないので、フィールドと衝突することはない。
+- `src/inductive/recursor.rs` は上の式から再帰子の型を組み立てる。`recursor_type` がテレスコープ $\vec{p}$、motive、小前提、添字、大前提を組み合わせ、`minor_premise_type` が各 $C_j$ を、`induction_hypothesis_type` が各 $H_{j,k}$ を組み立てる。生成される束縛子の名前（`__motive`、`__minor_j`、`__ih_j_k`、`__major`）は下線二つで始まる。ユーザーの宣言ではこの形の名前を使えないので、フィールドと衝突することはない。
 - `mod.rs` の `allows_large_elimination` が部分単集合の判定を実装する。`add_inductive` は `I.rec0` を常に登録し、大消去が許されるなら `I.rec1` も登録する。より高いレベルは `register_recursor` が必要に応じて生成する。
 
 ι 規則は項としては生成されない。`whnf` が、格納された `InductiveInfo` から直接それを適用する。詳細は[第 12 章](12-reduction-conversion.md)で説明する。
@@ -329,7 +329,7 @@ $\mathsf{Bool.rec}_v : \tPi{M}{\mathsf{Bool} \to \Sort{v}}{M\;\mathsf{true} \to 
 
 覚えておくこと
 
-- 宣言は、パラメータと添字を持つ型構成子と、フィールドを持つ構成子を与える。パラメータは全体を通して固定され、添字は変化して動機の引数になる。
+- 宣言は、パラメータと添字を持つ型構成子と、フィールドを持つ構成子を与える。パラメータは全体を通して固定され、添字は変化して motive の引数になる。
 - 再帰子は構成子ごとに小前提を一つ持ち、各小前提は再帰的フィールドごとに帰納法の仮定を一つ持つ。ι 規則は構成子ごとに一つである。
 - 受理には、整形式性、一様なパラメータ、正格な正値性、宇宙の上限が必要である。再帰を停止させ、論理を整合的に保つのは正値性である。
 - 命題は、部分単集合でない限り $\Sort{0}$ へしか消去できない。

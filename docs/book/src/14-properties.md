@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-The chapters so far have made two kinds of claim about the kernel: that its algorithm terminates, and that it never accepts a proof of False. Both rest on theorems about the type system that are much harder than anything the kernel itself does. This chapter states those theorems, explains what each one buys, and sketches how consistency follows from them. The full proof of consistency is in Appendix D.
+So far we have claimed that the kernel's algorithm terminates and that it never accepts a proof of False. Both claims rely on theorems about the type system, whose proofs are much harder than the kernel's own computations. This chapter states those theorems, explains why each matters, and sketches how they establish consistency; Appendix D gives the full proof.
 
 </div>
 

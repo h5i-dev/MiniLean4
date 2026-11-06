@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Chapter 3 presented eight typing rules and promised that they are rules of logic. This chapter keeps that promise. It picks a concrete logic, translates its formulas into types, and shows that every proof in the logic becomes a term that the kernel accepts. It then identifies the property, consistency, that a kernel must have before it can be trusted at all.
+Chapter 3 presented eight typing rules as rules of logic. To make that claim precise, this chapter chooses a particular logic, translates its formulas into types, and shows that every proof in the logic becomes a term accepted by the kernel. It then explains why the kernel also needs consistency to be trustworthy.
 
 </div>
 

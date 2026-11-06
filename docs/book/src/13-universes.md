@@ -108,7 +108,7 @@ This property is called **predicativity**. For example, the identity on types $\
 
 <aside class="intuition" markdown="1">
 
-Why may propositions be impredicative when types may not? Because a proof of a proposition carries no data that a program could extract (this is what the elimination restriction of Chapter 8 enforces). Quantifying over all propositions to define a proposition is like defining a set by a property that mentions all sets: dangerous when the result is itself an object that the quantifier ranges over and can be inspected, harmless when all one can do with it is use it as a hypothesis. The paradox needs to *inspect* the thing it builds; propositions cannot be inspected.
+Why may propositions be impredicative when types may not? A proof of a proposition carries no data that a program can extract, as the elimination restriction of Chapter 8 enforces. Quantifying over all propositions to define one is like defining a set by a property that mentions all sets: trouble arises if the result falls within the quantifier's range and can be inspected, whereas using it only as a hypothesis does not create that problem. The paradox requires inspecting the object it builds, and proofs of propositions do not permit that.
 
 </aside>
 

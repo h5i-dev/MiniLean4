@@ -63,7 +63,7 @@
 | decidability | 決定可能性 |
 | uniqueness of types | 型の一意性 |
 | type correctness | 型の正しさ |
-| subject reduction | 主語簡約 |
+| subject reduction | 型保存性 |
 | inductive type | 帰納型 |
 | inductive family | 帰納族 |
 | constructor | 構成子 |
@@ -72,7 +72,7 @@
 | parameter / index | パラメータ / 添字 |
 | recursive field / recursive argument | 再帰的フィールド / 再帰的引数 |
 | recursor | 再帰子 |
-| motive | 動機 |
+| motive | motive |
 | minor premise / major premise | 小前提 / 大前提 |
 | induction hypothesis | 帰納法の仮定 |
 | structural recursion | 構造的再帰 |

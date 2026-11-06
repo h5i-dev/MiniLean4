@@ -110,7 +110,7 @@
 
 **索引（Index）。** 归纳类型构造器的参数中可在构造子之间变化的那种，如向量的长度或等式的右侧。[第 8 章](08-inductive-recipe.md)。
 
-**归纳假设（Induction hypothesis）。** 小前提中“动机对递归字段已经成立”这一假设。[第 7 章](07-inductive-nat.md)。
+**归纳假设（Induction hypothesis）。** 小前提中“motive 对递归字段已经成立”这一假设。[第 7 章](07-inductive-nat.md)。
 
 **归纳类型（Inductive type）。** 由其构造子指定的类型，内核由此生成递归子和 ι 规则。[第 7 章](07-inductive-nat.md)和[第 8 章](08-inductive-recipe.md)。
 
@@ -124,7 +124,7 @@
 
 **小前提（Minor premise）。** 递归子的参数中，给出某一构造子对应情形的那一个。[第 7 章](07-inductive-nat.md)。
 
-**动机（Motive）。** 为每个元素给出递归子结果类型的函数 $M$；对归纳而言，它是一个谓词。[第 7 章](07-inductive-nat.md)。
+**motive。** 为每个元素给出递归子结果类型的函数 $M$；对归纳而言，它是一个谓词。[第 7 章](07-inductive-nat.md)。
 
 **中性项（Neutral term）。** 以变量（或在有常量时，以卡住的常量）为头部的范式项。[第 14 章](14-properties.md)、[附录 D](d-proof-consistency.md)。
 
@@ -148,7 +148,7 @@
 
 **强规范化（Strong normalization）。** 从良类型项出发的每个归约序列都是有限的。[第 14 章](14-properties.md)。
 
-**主体归约（Subject reduction）。** 归约保持类型。[第 14 章](14-properties.md)。
+**类型保持性（Subject reduction）。** 归约保持类型。[第 14 章](14-properties.md)。
 
 **子单元（Subsingleton）。** 至多有一个构造子、且其字段全是证明或索引的命题；它可以消去到任何宇宙。[第 8 章](08-inductive-recipe.md)。
 

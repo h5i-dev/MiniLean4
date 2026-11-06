@@ -4,7 +4,7 @@
 
 </div>
 
-- **[Barendregt 1992]** H. P. Barendregt. Lambda calculi with types. In *Handbook of Logic in Computer Science*, volume 2, Oxford University Press, 1992. 純粋型システムの標準的な参照文献。型検査を推論と検査に双方向に分割する手法（[第 5 章](05-algorithm.md)）と、[第 14 章](14-properties.md)および[付録 D](d-proof-consistency.md)で用いる型の一意性、生成、合流性、主語簡約のメタ理論の出典である。
+- **[Barendregt 1992]** H. P. Barendregt. Lambda calculi with types. In *Handbook of Logic in Computer Science*, volume 2, Oxford University Press, 1992. 純粋型システムの標準的な参照文献。型検査を推論と検査に双方向に分割する手法（[第 5 章](05-algorithm.md)）と、[第 14 章](14-properties.md)および[付録 D](d-proof-consistency.md)で用いる型の一意性、生成、合流性、型保存性のメタ理論の出典である。
 
 - **[Carneiro 2019]** M. Carneiro. *The Type Theory of Lean*. Master's thesis, Carnegie Mellon University, 2019. 定義的な証明無関係性と、それがもたらす微妙な点を含む、Lean の実際の型理論の精密な説明。Lean の完全なシステムが本書のシステムを超える箇所について、[第 13 章](13-universes.md)と[第 14 章](14-properties.md)で引用する。
 

@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-So far the only types are universes and $\Pi$-types. That is enough for propositional logic, but not for mathematics: there are no numbers to reason about and no way to state that two things are equal. Lean provides both through a single mechanism, inductive types. This chapter adds constants to the kernel, declares the natural numbers, and discovers that computing with numbers and proving things about them are the same operation.
+So far we have only universes and $\Pi$-types. They suffice for propositional logic, but mathematics also needs numbers to reason about and a way to state that two things are equal. Lean supplies both through inductive types. This chapter adds constants to the kernel, declares the natural numbers, and shows how the same mechanism supports computation and proof about them.
 
 </div>
 
@@ -54,7 +54,7 @@ $$
 
 $\zero$ and $\suc$ are called **constructors**. They build values but never compute: $\suc\;(\suc\;\zero)$ is already in normal form, and it *is* the number $2$. We write $0, 1, 2, \ldots$ for $\zero$, $\suc\;\zero$, $\suc\;(\suc\;\zero)$, and so on.
 
-This gives us numbers, but nothing to do with them. A function such as addition must look at a number and act differently on $\zero$ and on $\suc\;n$, and our terms have no way to do that yet. A $\lambda$ can only pass its argument along; it cannot inspect it.
+We now have numbers, but no way to compute with them: addition must distinguish $\zero$ from $\suc\;n$, while our terms can only pass an argument along, not inspect it.
 
 ## Computing: addition
 
@@ -126,7 +126,7 @@ $$
 
 This is a structurally recursive function again, with exactly the shape of $\add$ above: $z = \mathit{base}$ and $s = \mathit{step}$. **Induction is recursion that returns proofs.**
 
-There is one difference. For $\add$, the result type $C$ was the same for every $n$. Here it depends on $n$: $f\;\zero : P\;\zero$, $f\;1 : P\;1$, and so on. So $\mathsf{rec}_C$, whose type mentions a fixed $C$, cannot express induction as it stands.
+There is one difference: $\add$ has the same result type $C$ for every $n$, whereas a proof has a type that depends on $n$, such as $f\;\zero : P\;\zero$ and $f\;1 : P\;1$. Because the type of $\mathsf{rec}_C$ mentions a fixed $C$, it cannot express induction as it stands.
 
 ## One recursor for both
 

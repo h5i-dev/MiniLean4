@@ -1,7 +1,7 @@
 # Book sources
 
 This directory holds the sources of the ebook *Implementing an Interactive
-Theorem Prover from Scratch*. The built site lives in `../ebook/`.
+Theorem Prover from Scratch*. The built site lives in `docs/` itself (GitHub Pages serves that folder at https://learn.h5i.dev/); the paper is in `docs/paper/`.
 
 ## Layout
 
@@ -15,7 +15,7 @@ Theorem Prover from Scratch*. The built site lives in `../ebook/`.
 | `build.py` | Builds `../ebook/` from `src/`, `template.html`, and `assets/`. |
 | `template.html` | The page template (sidebar, topbar, content, footer). |
 | `assets/book.css`, `assets/book.js` | Styling and the interactive widgets (steppers, trace trees, theme). |
-| `assets/playground.js`, `assets/minilean.wasm` | The in-browser kernel playground and the shared wasm loader (`window.MiniLean`). |
+| `assets/playground.js`, `assets/minilean.wasm` | The in-browser kernel playground and the shared wasm loader (`window.MiniLean`). The build copies `assets/` to `docs/assets/`. |
 | `assets/explorers.js` | The live explorers (syntax trees, derivations, reduction, scope, substitution, proof states, constructor trees, universes). |
 | `assets/katex/`, `assets/fonts/` | Vendored KaTeX and webfonts, so the book works offline. |
 | `tools/render-math.mjs`, `tools/katex.mjs` | Build-time KaTeX rendering (Node). |
@@ -28,13 +28,13 @@ only if the kernel changed, a Rust toolchain with the `wasm32-unknown-unknown`
 target.
 
 ```text
-python3 docs/book/build.py            # rebuild docs/ebook/, docs/ebook/ja/, docs/ebook/zh/ (math is pre-rendered)
+python3 docs/book/build.py            # rebuild docs/, docs/ja/, docs/zh/ (math is pre-rendered)
 python3 docs/book/build.py --only ja  # one language
 docs/book/playground/build.sh         # rebuild assets/minilean.wasm after kernel changes
 node docs/book/playground/test.mjs    # run every examples/*.leanmini through the wasm kernel
 ```
 
-Then serve the output: `cd docs/ebook && python3 -m http.server`. The
+Then serve the output: `cd docs && python3 -m http.server`. The
 playgrounds fetch the `.wasm` file, which browsers refuse to do from `file://`.
 
 ## Writing conventions
@@ -71,9 +71,9 @@ source directory exists.
 ## Publishing and SEO
 
 `locales.py` holds `SITE_URL`, the absolute URL of the published English edition
-(default `https://h5i-dev.github.io/MiniLean4/ebook/`). Every page gets a
+(`https://learn.h5i.dev/`, the custom domain in `docs/CNAME`). Every page gets a
 canonical link, `hreflang` alternates for the three editions, Open Graph and
 Twitter card metadata, and JSON-LD (`Book` on the cover, `TechArticle` on
 chapters) derived from it; the build also writes `sitemap.xml` and `robots.txt`
-into `docs/ebook/`. Change `SITE_URL` before publishing elsewhere. The social
+into `docs/`. Change `SITE_URL` before publishing elsewhere. The social
 preview images in `assets/og/` are rendered by `tools/make-og.py`.

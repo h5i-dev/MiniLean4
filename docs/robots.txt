@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://learn.h5i.dev/sitemap.xml

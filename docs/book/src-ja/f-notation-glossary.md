@@ -74,17 +74,17 @@
 
 ## 用語集
 
-**α 同値（alpha-equivalence）.** 束縛変数の改名を除いた項の等しさ。束縛変数は束縛子の位置で、自由変数は名前で比較して決定する。[第 11 章](11-substitution-alpha.md)。
+**α 同値（alpha-equivalence）.** 束縛変数の改名を除いた項の等しさで、束縛変数は束縛子の位置で、自由変数は名前で比較して決定する。[第 11 章](11-substitution-alpha.md)。
 
 **β 簡約（beta-reduction）.** 計算ステップ $(\tLam{x}{A}{t})\;s \to \subst{t}{x}{s}$。[第 3 章](03-typing-rules.md) と [第 12 章](12-reduction-conversion.md)。
 
 **捕獲（capture）.** 項の自由変数を束縛する束縛子の下にその項を代入してしまい、意味を変えてしまう誤り。束縛子を改名して回避する。[第 11 章](11-substitution-alpha.md)。
 
-**合流性（confluence）.** 簡約の順序が異なっても同じ正規形に到達するという性質。正規化によって変換を決定できるのはこの性質のおかげである。[第 12 章](12-reduction-conversion.md)。
+**合流性（confluence）.** 簡約の順序が異なっても同じ正規形に到達するという性質で、正規化によって変換を決定できるのはこの性質のおかげである。[第 12 章](12-reduction-conversion.md)。
 
-**整合性（consistency）.** 型 $\tPi{P}{\Sort{0}}{P}$ をもつ閉じた項が存在しないこと。カーネルの受理に意味を与える性質。[第 4 章](04-logic.md) と [第 14 章](14-properties.md)。
+**整合性（consistency）.** 型 $\tPi{P}{\Sort{0}}{P}$ をもつ閉じた項が存在しないことで、カーネルの受理に意味を与える性質。[第 4 章](04-logic.md) と [第 14 章](14-properties.md)。
 
-**構成子（constructor）.** $\zero$ や $\suc$ のように、帰納型の値を作る定数。構成子は決して簡約されない。[第 7 章](07-inductive-nat.md)。
+**構成子（constructor）.** $\zero$ や $\suc$ のように、帰納型の値を作る定数で、決して簡約されない。[第 7 章](07-inductive-nat.md)。
 
 **文脈（context）.** 型付けの仮定の順序付きリスト。[第 3 章](03-typing-rules.md)。
 
@@ -92,15 +92,15 @@
 
 **Curry-Howard 対応.** 命題は型であり、証明は項であり、証明の検査は型検査である。[第 1 章](01-propositions-as-types.md)。
 
-**de Bruijn インデックス.** 束縛変数を、その出現と束縛子の間にある束縛子の数で表す表現。α 同値な項が同一になる。[第 11 章](11-substitution-alpha.md)、[付録 B](b-proof-alpha.md)。
+**de Bruijn インデックス.** 束縛変数を、その出現と束縛子の間にある束縛子の数で表す表現で、α 同値な項が同一になる。[第 11 章](11-substitution-alpha.md)、[付録 B](b-proof-alpha.md)。
 
-**定義的等価（definitional equality）.** 簡約と α 同値から生成される項の同値関係。カーネルが決定する。命題的等価と対比される。[第 9 章](09-equality.md) と [第 12 章](12-reduction-conversion.md)。
+**定義的等価（definitional equality）.** 簡約と α 同値から生成される項の同値関係で、カーネルが決定する。命題的等価と対比される。[第 9 章](09-equality.md) と [第 12 章](12-reduction-conversion.md)。
 
 **δ 簡約（delta-reduction）.** 定義された定数をその本体に展開すること。[第 7 章](07-inductive-nat.md)。
 
-**依存関数型（dependent function type）.** 結果の型が引数に言及してよい $\Pi$ 型。全称命題の証明の型。[第 1 章](01-propositions-as-types.md)。
+**依存関数型（dependent function type）.** 結果の型が引数に言及してよい $\Pi$ 型で、全称命題の証明の型。[第 1 章](01-propositions-as-types.md)。
 
-**大消去（large elimination）.** 命題の再帰子を使ってデータを作ること。部分単集合に対してのみ許される。[第 8 章](08-inductive-recipe.md)。
+**大消去（large elimination）.** 命題の再帰子を使ってデータを作ることで、部分単集合に対してのみ許される。[第 8 章](08-inductive-recipe.md)。
 
 **フィールド（field）.** パラメータ以外の構成子の引数。[第 8 章](08-inductive-recipe.md)。
 
@@ -112,11 +112,11 @@
 
 **帰納法の仮定（induction hypothesis）.** 小前提の中で、再帰的フィールドについて motive がすでに成り立つとする仮定。[第 7 章](07-inductive-nat.md)。
 
-**帰納型（inductive type）.** 構成子によって指定される型。カーネルはそこから再帰子と ι 規則を生成する。[第 7 章](07-inductive-nat.md) と [第 8 章](08-inductive-recipe.md)。
+**帰納型（inductive type）.** 構成子によって指定される型で、カーネルはそこから再帰子と ι 規則を生成する。[第 7 章](07-inductive-nat.md) と [第 8 章](08-inductive-recipe.md)。
 
 **ι 簡約（iota-reduction）.** 構成子の適用に対して再帰子を走らせること。[第 7 章](07-inductive-nat.md) と [第 12 章](12-reduction-conversion.md)。
 
-**カーネル（kernel）.** $\Gamma \vdash t : A$ を決定する信頼された部品。それ以外はすべて、カーネルに渡す項を作るだけである。[第 1 章](01-propositions-as-types.md)。
+**カーネル（kernel）.** $\Gamma \vdash t : A$ を決定する信頼された部品で、それ以外はすべて、カーネルに渡す項を作るだけである。[第 1 章](01-propositions-as-types.md)。
 
 **大前提（major premise）.** 再帰子の引数のうち、その構成子が ι 規則を選ぶもの。[第 7 章](07-inductive-nat.md)。
 
@@ -132,17 +132,17 @@
 
 **パラメータ（parameter）.** 帰納型の型構成子の引数のうち、すべての構成子で同じもの。リストの要素の型など。[第 8 章](08-inductive-recipe.md)。
 
-**正格な正値性（strict positivity）.** 再帰的フィールドが帰納型に言及するのは関数の結果としてだけであり、引数としては決して言及しないという条件。停止性と整合性のために必要である。[第 8 章](08-inductive-recipe.md)。
+**正格な正値性（strict positivity）.** 再帰的フィールドが帰納型に言及するのは関数の結果としてだけであり、引数としては決して言及しないという条件で、停止性と整合性のために必要である。[第 8 章](08-inductive-recipe.md)。
 
 **述語的（predicative）.** その宇宙にわたって量化する型を含まない宇宙。$u \ge 1$ の $\Sort{u}$。[第 13 章](13-universes.md)。
 
-**証明無関係性（proof irrelevance）.** 一つの命題の任意の二つの証明は定義的に等しいという Lean の規則。MiniLean4 には実装されていない。[第 13 章](13-universes.md)。
+**証明無関係性（proof irrelevance）.** 一つの命題の任意の二つの証明は定義的に等しいという Lean の規則で、MiniLean4 には実装されていない。[第 13 章](13-universes.md)。
 
-**命題的等価（propositional equality）.** 帰納型 $\Eq{}$。その証明は項である。定義的等価と対比される。[第 9 章](09-equality.md)。
+**命題的等価（propositional equality）.** 帰納型 $\Eq{}$ で、その証明は項である。定義的等価と対比される。[第 9 章](09-equality.md)。
 
 **再帰子（recursor）.** 帰納型に対して生成される定数で、構造的再帰と帰納法を表す。[第 7 章](07-inductive-nat.md)。
 
-**シグネチャ（signature）.** 定数とその型の表。定義については本体も含む。[第 7 章](07-inductive-nat.md)。
+**シグネチャ（signature）.** 定数とその型の表で、定義については本体も含む。[第 7 章](07-inductive-nat.md)。
 
 **背骨（spine）.** 項を、頭部を引数のリストに適用したものとして見る見方。[第 2 章](02-syntax.md)。
 
@@ -150,7 +150,7 @@
 
 **型保存性（subject reduction）.** 簡約は型を保つ。[第 14 章](14-properties.md)。
 
-**部分単集合（subsingleton）.** 構成子が高々一つで、そのフィールドがすべて証明または添字である命題。任意の宇宙へ消去できる。[第 8 章](08-inductive-recipe.md)。
+**部分単集合（subsingleton）.** 構成子が高々一つで、そのフィールドがすべて証明または添字である命題で、任意の宇宙へ消去できる。[第 8 章](08-inductive-recipe.md)。
 
 **構文主導（syntax-directed）.** 項の形が適用すべき規則を決める規則体系。T-Conv を除くすべての型付け規則。[第 5 章](05-algorithm.md)。
 
@@ -158,7 +158,7 @@
 
 **テレスコープ（telescope）.** 後の型が前の変数に言及してよい束縛の列。[第 8 章](08-inductive-recipe.md)。
 
-**輸送（transport）.** $a = b$ の証明に沿って、$a$ についての事実を $b$ についての事実に移すこと。$\Eq{}$ の再帰子で行う。[第 9 章](09-equality.md)。
+**輸送（transport）.** $a = b$ の証明に沿って、$a$ についての事実を $b$ についての事実に移すことで、$\Eq{}$ の再帰子で行う。[第 9 章](09-equality.md)。
 
 **宇宙（universe）.** 要素が型であるような型。$\Sort{u}$。[第 2 章](02-syntax.md) と [第 13 章](13-universes.md)。
 

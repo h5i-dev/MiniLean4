@@ -14,7 +14,7 @@ cargo run                                  # interactive session on stdin
 cargo test                                 # the kernel's own test suite
 ```
 
-脚本是一系列行。运行器自上而下处理它们，遇到第一个错误即停止，打印消息并以状态 1 退出。空行和以 `#` 开头的行是注释，会被跳过。
+脚本是一系列行，运行器自上而下处理它们，遇到第一个错误即停止，打印消息并以状态 1 退出。空行和以 `#` 开头的行是注释，会被跳过。
 
 ```leanmini
 # 这是一行注释。
@@ -75,7 +75,7 @@ inductive Vec (A : Sort 1) (index n : Nat) : Sort 1 where
   | cons (n : Nat) (head : A) (tail : Vec A n) : Vec A (Nat.succ n)
 ```
 
-构造子以限定名注册：上面的声明添加 `Vec.nil` 和 `Vec.cons`，而 `List` 的构造子是 `List.nil` 和 `List.cons`。脚本必须使用限定形式。
+构造子以限定名注册：上面的声明添加 `Vec.nil` 和 `Vec.cons`，而 `List` 的构造子是 `List.nil` 和 `List.cons`；脚本必须使用限定形式。
 
 接受声明时会运行[第 8 章](08-inductive-recipe.md)的四个条件：`Name` 的类型是一个类型，每个构造子类型都是以 `Name` 应用于参数结尾的类型，每个提到 `Name` 的字段都严格正，并且当 `u` 至少为 1 时，没有字段位于 `Sort u` 之上的宇宙。失败时的消息包括 `non-strictly-positive / unsupported recursive field`、`field f lives in Sort w, exceeding inductive universe Sort u` 和 `inductive occurrence inside result index`。以 `_` 或 `__` 开头的绑定子名字会被拒绝（`reserved binder name`），因为内核用这类名字命名它自己生成的绑定子。
 
@@ -151,11 +151,11 @@ goal forall (n : Nat), Eq Nat n n
 
 没有目标剩余时，它打印 `No goals. Run 'qed' to kernel-check.`。命令 `show` 打印目标而不做任何改动。
 
-策略总是作用于第一个目标。交给策略的项在该目标的上下文中解析，所以假设的名字在作用域内。[第 10 章](10-tactics.md)解释每条策略对部分证明项做了什么；本节只陈述接口。
+策略总是作用于第一个目标，交给策略的项在该目标的上下文中解析，所以假设的名字在作用域内。[第 10 章](10-tactics.md)解释每条策略对部分证明项做了什么；本节只陈述接口。
 
 ### 策略
 
-**`intro x`** 要求目标归约到 `forall` 或箭头。它把 `x : A` 加入上下文，其中 `A` 是定义域，并把体设为新目标。名字不能已在上下文中（`binder name already in context`）；其他情况下的消息是 `intro expects a Pi/arrow goal`。
+**`intro x`** 要求目标归约到 `forall` 或箭头，然后把 `x : A` 加入上下文，其中 `A` 是定义域，并把体设为新目标。名字不能已在上下文中（`binder name already in context`）；其他情况下的消息是 `intro expects a Pi/arrow goal`。
 
 **`exact t`** 先把 `t` 对照目标检查，再用 `t` 关闭目标。不匹配时由内核报告 `type mismatch: actual ..., expected ...`。
 
@@ -165,11 +165,11 @@ goal forall (n : Nat), Eq Nat n n
 
 **`rfl`** 要求目标归约到 `Eq A a b`（`rfl expects Eq A lhs rhs`），且 `a` 与 `b` 定义相等（`rfl: sides are not definitionally equal`），然后用 `Eq.refl A a` 关闭它。
 
-**`rw h`** 要求 `h` 的类型归约到 `Eq A a b`（`rw expects proof of equality`）。它把目标中 `a` 的每一次出现替换为 `b`，并把重写后的目标作为新目标。出现是按语法查找的，只容许约束变量名不同；仅在计算之后才相等的项找不到，此时报 `rw: no syntactic occurrence of lhs in goal; use change first`。与 Lean 的 `rw` 不同，它之后不会尝试 `rfl`，所以形如 `Eq A x x` 的目标仍须显式关闭。若抽象 `a` 产生类型不正确的 motive，内核的类型错误会在证明状态改变之前报告。
+**`rw h`** 要求 `h` 的类型归约到 `Eq A a b`（`rw expects proof of equality`），然后把目标中 `a` 的每一次出现替换为 `b`，并把重写后的目标作为新目标。出现是按语法查找的，只容许约束变量名不同；仅在计算之后才相等的项找不到，此时报 `rw: no syntactic occurrence of lhs in goal; use change first`。与 Lean 的 `rw` 不同，它之后不会尝试 `rfl`，所以形如 `Eq A x x` 的目标仍须显式关闭。若抽象 `a` 产生类型不正确的 motive，内核的类型错误会在证明状态改变之前报告。
 
-**`induction x`** 要求 `x` 是一个假设，其类型归约到无索引的归纳类型，并且之后的假设都不能提到 `x`（`induction: revert dependent hypotheses first`）。它按声明顺序为每个构造子创建一个目标。每个目标的上下文获得该构造子的各字段（使用其声明的名字），以及每个递归字段对应的一个归纳假设，名为 `ih`（若 `ih` 已被占用则追加撇号）。当 `n` 已在使用中时，`Nat.succ` 中名为 `n` 的字段会被重命名为 `k`，这就是下面示例的目标里出现 `k` 和 `ih` 的原因。所用的递归子是 `I.recv`，其中 `v` 是目标的宇宙；若该递归子不存在，消息是 `no elimination recursor at target universe`。不支持索引族（`indexed induction requires motive/index elaboration (not implemented)`）。
+**`induction x`** 要求 `x` 是一个假设，其类型归约到无索引的归纳类型，并且之后的假设都不能提到 `x`（`induction: revert dependent hypotheses first`），然后按声明顺序为每个构造子创建一个目标，每个目标的上下文获得该构造子的各字段（使用其声明的名字），以及每个递归字段对应的一个归纳假设，名为 `ih`（若 `ih` 已被占用则追加撇号）。当 `n` 已在使用中时，`Nat.succ` 中名为 `n` 的字段会被重命名为 `k`，这就是下面示例的目标里出现 `k` 和 `ih` 的原因。所用的递归子是 `I.recv`，其中 `v` 是目标的宇宙；若该递归子不存在，消息是 `no elimination recursor at target universe`。不支持索引族（`indexed induction requires motive/index elaboration (not implemented)`）。
 
-**`qed`** 在仍有目标时失败（`N goals remain`）。否则，它从各策略步骤组装出证明项，交给内核对照原始目标检查，打印 `QED. Kernel checked proof:` 和该项，然后结束证明。系统的可靠性只取决于这最后一次检查。
+**`qed`** 在仍有目标时失败（`N goals remain`）；否则，它从各策略步骤组装出证明项，交给内核对照原始目标检查，打印 `QED. Kernel checked proof:` 和该项，然后结束证明。系统的可靠性只取决于这最后一次检查。
 
 其他任何行都会得到 `unknown command: ...`。
 
@@ -283,7 +283,7 @@ leanmini 是理解内核的工具，不是证明助手。下表列出 Lean 前�
 
 <aside class="lean" markdown="1">
 
-右列的一切都是 Lean 的繁饰器和策略框架在项到达内核之前完成的工作。Lean 的内核和我们的一样，只会看到完整的项。上述限制是本仓库前端的限制，而不是类型理论的限制。
+右列的一切都是 Lean 的繁饰器和策略框架在项到达内核之前完成的工作，而 Lean 的内核和我们的一样，只会看到完整的项。上述限制是本仓库前端的限制，而不是类型理论的限制。
 
 </aside>
 

@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-到目前为止，我们只有宇宙和 $\Pi$ 类型。它们足以处理命题逻辑，但数学还需要自然数，以及表达两个对象相等的方式。Lean 通过归纳类型提供这两者。本章给内核加入常量并声明自然数，说明同一种机制如何支持关于数的计算与证明。
+到目前为止，我们只有宇宙和 $\Pi$ 类型，它们足以处理命题逻辑，但数学还需要自然数，以及表达两个对象相等的方式。Lean 通过归纳类型提供这两者。本章给内核加入常量并声明自然数，说明同一种机制如何支持关于数的计算与证明。
 
 </div>
 
@@ -12,7 +12,7 @@ $$
 t, A, B \;::=\; \cdots \;\mid\; c
 $$
 
-**签名**（signature）$\Sigma$ 列出所有常量。每个条目要么只*声明*一个常量及其类型，写作 $c : C$；要么还给出它的体，写作 $c : C \mathrel{:=} t$。带体的条目是**定义**。例如，下文的 $\Nat : \Sort{1}$ 是声明，而本章后面的 $\add$ 是定义。在添加一个条目之前，要先在空上下文中检查它的类型确实是类型；如果有体，还要对照该类型检查它的体，正如 Lean 对每个 `def` 所做的那样。
+**签名**（signature）$\Sigma$ 列出所有常量，每个条目要么只*声明*一个常量及其类型，写作 $c : C$；要么还给出它的体，写作 $c : C \mathrel{:=} t$，带体的条目是**定义**。例如，下文的 $\Nat : \Sort{1}$ 是声明，而本章后面的 $\add$ 是定义。在添加一个条目之前，要先在空上下文中检查它的类型确实是类型；如果有体，还要对照该类型检查它的体，正如 Lean 对每个 `def` 所做的那样。
 
 签名有两种用法。其一，常量的类型就是签名给它的类型：
 
@@ -52,7 +52,7 @@ $$
 \Nat : \Sort{1}, \qquad \zero : \Nat, \qquad \suc : \Nat \to \Nat.
 $$
 
-$\zero$ 和 $\suc$ 称为**构造子**（constructor）。它们构造值，但从不计算：$\suc\;(\suc\;\zero)$ 已经是范式，它*就是*数 $2$。我们用 $0, 1, 2, \ldots$ 表示 $\zero$、$\suc\;\zero$、$\suc\;(\suc\;\zero)$ 等等。
+$\zero$ 和 $\suc$ 称为**构造子**（constructor），它们构造值，但从不计算：$\suc\;(\suc\;\zero)$ 已经是范式，它*就是*数 $2$。我们用 $0, 1, 2, \ldots$ 表示 $\zero$、$\suc\;\zero$、$\suc\;(\suc\;\zero)$ 等等。
 
 现在我们有了数，却还无法用它们计算：加法需要区分 $\zero$ 和 $\suc\;n$，而目前的项只能传递参数，无法检查它的结构。
 
@@ -70,7 +70,7 @@ $$
 f\;\zero = z, \qquad f\;(\suc\;k) = s\;k\;(f\;k),
 $$
 
-其中 $z : C$，$s : \Nat \to C \to C$。步骤函数 $s$ 同时接收 $k$ 和递归调用的结果 $f\;k$。于是我们一劳永逸地添加一个常量，它从 $z$ 和 $s$ 构造出 $f$：
+其中 $z : C$，$s : \Nat \to C \to C$，步骤函数 $s$ 同时接收 $k$ 和递归调用的结果 $f\;k$。于是我们一劳永逸地添加一个常量，它从 $z$ 和 $s$ 构造出 $f$：
 
 $$
 \mathsf{rec}_C : C \to (\Nat \to C \to C) \to \Nat \to C,
@@ -92,13 +92,13 @@ $$
 s = \tLam{k}{\Nat}{\tLam{r}{\Nat}{\suc\;r}}.
 $$
 
-我们把 $\add\;m\;n$ 写作 $m + n$。内核只用 δ、β 和 ι 步骤就能算出 $2 + 1$。下面的浏览器就是内核在做这件事，一次一个头步骤，并已加载 $\add$ 的定义。
+我们把 $\add\;m\;n$ 写作 $m + n$。内核只用 δ、β 和 ι 步骤就能算出 $2 + 1$，下面的浏览器就是内核在做这件事，一次一个头步骤，并已加载 $\add$ 的定义。
 
 <div class="explorer" data-kind="reduce" data-term="add (Nat.succ (Nat.succ Nat.zero)) (Nat.succ Nat.zero)"><pre class="prelude">def add : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) m (fun (k : Nat) => fun (r : Nat) => Nat.succ r) n</pre></div>
 
 每一行是一个头步骤：高亮部分是可归约式（redex），下一行显示它变成了什么。改动数字，或者在上下文 `n : Nat` 下试试 `add Nat.zero n`，就能看到递归子卡住。
 
-其他函数遵循同样的模式。满足 $\mathit{double}\;(\suc\;k) = \suc\;(\suc\;(\mathit{double}\;k))$ 的加倍函数是
+其他函数遵循同样的模式：满足 $\mathit{double}\;(\suc\;k) = \suc\;(\suc\;(\mathit{double}\;k))$ 的加倍函数是
 
 $$
 \mathit{double} \mathrel{:=} \tLam{n}{\Nat}{\mathsf{rec}_{\Nat}\;\zero\;(\tLam{k}{\Nat}{\tLam{r}{\Nat}{\suc\;(\suc\;r)}})\;n},
@@ -106,7 +106,7 @@ $$
 
 并且 $\mathit{double}\;2 \to \suc\;(\suc\;(\mathit{double}\;1)) \to \suc^4\;(\mathit{double}\;0) \to \suc^4\;\zero = 4$。
 
-不需要新的递归机制。归纳类型的常量，加上 $\mathsf{rec}_C$ 及其两条规则，足以表达 $\Nat$ 上所有的结构递归函数。而且与一般递归不同，这种递归总是终止：每一个 ι 步骤都从参数中去掉一个 $\suc$。
+不需要新的递归机制：归纳类型的常量，加上 $\mathsf{rec}_C$ 及其两条规则，足以表达 $\Nat$ 上所有的结构递归函数。而且与一般递归不同，这种递归总是终止：每一个 ι 步骤都从参数中去掉一个 $\suc$。
 
 <aside class="intuition" markdown="1">
 
@@ -139,7 +139,7 @@ $$
 | $\suc$ 情形 | $s : \tPi{k}{\Nat}{C \to C}$ | $\mathit{step} : \tPi{k}{\Nat}{P\;k \to P\;(\suc\;k)}$ |
 | 结果 | $\Nat \to C$ | $\tPi{n}{\Nat}{P\;n}$ |
 
-左列是右列的特例，其中 $P\;n$ 对每个 $n$ 都是同一个类型 $C$。所以我们采用右列，并把 $P$ 换成任意函数 $M : \Nat \to \Sort{u}$，它给出每个 $n$ 处结果的类型。这个函数称为 **motive**。所得的就是图 7.1 中的**递归子**（recursor）$\NatRec{u}$。它的参数依次是 motive、每个构造子对应的一个**小前提**（minor premise），最后是要对其递归的数 $n$，称为**大前提**（major premise）。它的 ι 规则就是 $\mathsf{rec}_C$ 的那两条。与 Lean 一样（那里的递归子是 `Nat.rec.{u}`），每个宇宙层级有一个递归子；由于我们没有宇宙多态，层级写成下标。
+左列是右列的特例，其中 $P\;n$ 对每个 $n$ 都是同一个类型 $C$。所以我们采用右列，并把 $P$ 换成任意函数 $M : \Nat \to \Sort{u}$，它给出每个 $n$ 处结果的类型，这个函数称为 **motive**。所得的就是图 7.1 中的**递归子**（recursor）$\NatRec{u}$，它的参数依次是 motive、每个构造子对应的一个**小前提**（minor premise），最后是要对其递归的数 $n$，称为**大前提**（major premise）。它的 ι 规则就是 $\mathsf{rec}_C$ 的那两条。与 Lean 一样（那里的递归子是 `Nat.rec.{u}`），每个宇宙层级有一个递归子；由于我们没有宇宙多态，层级写成下标。
 
 <div class="rulebox" markdown="1">
 
@@ -165,7 +165,7 @@ $$
 
 这一个递归子同时胜任两项工作，取决于 motive。
 
-**递归。** 取层级 $1$ 处的常值 motive $\tLam{\_}{\Nat}{C}$，$\NatRec{1}\;(\tLam{\_}{\Nat}{C})$ 的类型与 $\mathsf{rec}_C$ 的类型可转换。所以 $\mathsf{rec}_C$ 不过就是 $\NatRec{1}\;(\tLam{\_}{\Nat}{C})$，从现在起
+**递归。** 取层级 $1$ 处的常值 motive $\tLam{\_}{\Nat}{C}$，$\NatRec{1}\;(\tLam{\_}{\Nat}{C})$ 的类型与 $\mathsf{rec}_C$ 的类型可转换，所以 $\mathsf{rec}_C$ 不过就是 $\NatRec{1}\;(\tLam{\_}{\Nat}{C})$，从现在起
 
 $$
 \add \mathrel{:=} \tLam{m}{\Nat}{\tLam{n}{\Nat}{\NatRec{1}\;(\tLam{\_}{\Nat}{\Nat})\;m\;(\tLam{k}{\Nat}{\tLam{r}{\Nat}{\suc\;r}})\;n}},
@@ -179,9 +179,9 @@ $$
 M\;\zero \to (\forall n.\; M\;n \to M\;(\suc\;n)) \to \forall n.\; M\;n.
 $$
 
-这里 T-Pi 中选用 $\imax$ 至关重要。结论 $\tPi{n}{\Nat}{M\;n}$ 的类型是 $\Sort{\imax(1, 0)} = \Sort{0}$，所以尽管 $\Nat$ 位于 $\Sort{1}$，“对每个 $n$ 都有 $M\;n$”仍是一个命题。若改用 $\max$，它就会位于 $\Sort{1}$，关于数的陈述就根本不是命题了。
+这里 T-Pi 中选用 $\imax$ 至关重要：结论 $\tPi{n}{\Nat}{M\;n}$ 的类型是 $\Sort{\imax(1, 0)} = \Sort{0}$，所以尽管 $\Nat$ 位于 $\Sort{1}$，“对每个 $n$ 都有 $M\;n$”仍是一个命题。若改用 $\max$，它就会位于 $\Sort{1}$，关于数的陈述就根本不是命题了。
 
-$\NatRec{u}$ 的类型并不是随意给的：它可以从 $\Nat$ 的声明中直接读出。每个构造子对应一个小前提。每个小前提接收该构造子的参数，并为类型是 $\Nat$ 本身的每个参数（**递归**参数）额外接收一个归纳假设，然后返回 motive 作用于该构造子的结果。$\zero$ 没有参数，所以它的情形就是 $M\;\zero$；$\suc$ 有一个递归参数 $n$，所以它的情形是 $\tPi{n}{\Nat}{M\;n \to M\;(\suc\;n)}$。[第 8 章](08-inductive-recipe.md)把这套方法应用到越来越一般的声明上。
+$\NatRec{u}$ 的类型并不是随意给的：它可以从 $\Nat$ 的声明中直接读出。每个构造子对应一个小前提，它接收该构造子的参数，并为类型是 $\Nat$ 本身的每个参数（**递归**参数）额外接收一个归纳假设，然后返回 motive 作用于该构造子的结果。$\zero$ 没有参数，所以它的情形就是 $M\;\zero$；$\suc$ 有一个递归参数 $n$，所以它的情形是 $\tPi{n}{\Nat}{M\;n \to M\;(\suc\;n)}$。[第 8 章](08-inductive-recipe.md)把这套方法应用到越来越一般的声明上。
 
 ## 动手试试
 
@@ -200,7 +200,7 @@ qed</pre></div>
 
 <aside class="lean" markdown="1">
 
-Lean 按本章所述从 `inductive` 声明生成 `Nat.rec`，其类型与图 7.1 一致，只差约束变量的名字和隐式参数。Lean 的编译器在执行时把递归子替换为高效的机器算术；它的繁饰器允许用户用模式匹配编写递归函数，并在幕后把它们编译成递归子。但内核看到的始终只有递归子。
+Lean 按本章所述从 `inductive` 声明生成 `Nat.rec`，其类型与图 7.1 一致，只差约束变量的名字和隐式参数。Lean 的编译器在执行时把递归子替换为高效的机器算术；它的繁饰器允许用户用模式匹配编写递归函数，并在幕后把它们编译成递归子，但内核看到的始终只有递归子。
 
 </aside>
 
@@ -231,7 +231,7 @@ def mul : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (
 <details markdown="1">
 <summary>解答</summary>
 
-取 $C = \tPi{P}{\Sort{0}}{P}$ 和 $g = \tLam{x}{C}{x}$，项 $\mathsf{fix}\;g$ 的类型将是 $\tPi{P}{\Sort{0}}{P}$，即一切命题的证明，系统因此不一致。它还会永远归约到自身，所以 $\IsDefEq$ 不会终止。结构递归避免了这两个问题，因为每个 ι 步骤都消耗一个构造子。
+取 $C = \tPi{P}{\Sort{0}}{P}$ 和 $g = \tLam{x}{C}{x}$，项 $\mathsf{fix}\;g$ 的类型将是 $\tPi{P}{\Sort{0}}{P}$，即一切命题的证明，系统因此不一致；它还会永远归约到自身，所以 $\IsDefEq$ 不会终止。结构递归避免了这两个问题，因为每个 ι 步骤都消耗一个构造子。
 
 </details>
 

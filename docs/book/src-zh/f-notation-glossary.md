@@ -80,9 +80,9 @@
 
 **捕获（Capture）。** 把一个项替换到某个绑定子之下，而该绑定子恰好绑定了该项的某个自由变量，从而改变其含义的错误。通过重命名绑定子来避免。[第 11 章](11-substitution-alpha.md)。
 
-**合流性（Confluence）。** 不同的归约顺序到达同一范式的性质。正是它使得转换可以通过规范化来判定。[第 12 章](12-reduction-conversion.md)。
+**合流性（Confluence）。** 不同的归约顺序到达同一范式的性质，正是它使得转换可以通过规范化来判定。[第 12 章](12-reduction-conversion.md)。
 
-**一致性（Consistency）。** 没有闭项具有类型 $\tPi{P}{\Sort{0}}{P}$。这个性质使内核的接受有意义。[第 4 章](04-logic.md)和[第 14 章](14-properties.md)。
+**一致性（Consistency）。** 没有闭项具有类型 $\tPi{P}{\Sort{0}}{P}$，这个性质使内核的接受有意义。[第 4 章](04-logic.md)和[第 14 章](14-properties.md)。
 
 **构造子（Constructor）。** 构造归纳类型的值的常量，如 $\zero$ 和 $\suc$。构造子从不归约。[第 7 章](07-inductive-nat.md)。
 
@@ -116,7 +116,7 @@
 
 **ι 归约（Iota-reduction）。** 在构造子应用上运行递归子。[第 7 章](07-inductive-nat.md)和[第 12 章](12-reduction-conversion.md)。
 
-**内核（Kernel）。** 判定 $\Gamma \vdash t : A$ 的可信组件。其他一切只是为它生产项。[第 1 章](01-propositions-as-types.md)。
+**内核（Kernel）。** 判定 $\Gamma \vdash t : A$ 的可信组件，其他一切只是为它生产项。[第 1 章](01-propositions-as-types.md)。
 
 **大前提（Major premise）。** 递归子的参数中，由其构造子决定使用哪条 ι 规则的那一个。[第 7 章](07-inductive-nat.md)。
 
@@ -132,13 +132,13 @@
 
 **参数（Parameter）。** 归纳类型构造器的参数中在每个构造子里都相同的那种，如列表的元素类型。[第 8 章](08-inductive-recipe.md)。
 
-**严格正性（Positivity, strict）。** 递归字段只能把归纳类型用作函数的结果、绝不能用作函数参数的条件。终止性和一致性都需要它。[第 8 章](08-inductive-recipe.md)。
+**严格正性（Positivity, strict）。** 递归字段只能把归纳类型用作函数的结果、绝不能用作函数参数的条件，终止性和一致性都需要它。[第 8 章](08-inductive-recipe.md)。
 
-**谓词的（Predicative）。** 不包含对自身量化的类型的宇宙。$u \ge 1$ 时的 $\Sort{u}$。[第 13 章](13-universes.md)。
+**谓词的（Predicative）。** 不包含对自身量化的类型的宇宙，即 $u \ge 1$ 时的 $\Sort{u}$。[第 13 章](13-universes.md)。
 
-**证明无关性（Proof irrelevance）。** Lean 的规则：同一命题的任意两个证明定义相等。MiniLean4 未实现。[第 13 章](13-universes.md)。
+**证明无关性（Proof irrelevance）。** Lean 的规则：同一命题的任意两个证明定义相等；MiniLean4 未实现。[第 13 章](13-universes.md)。
 
-**命题相等（Propositional equality）。** 归纳类型 $\Eq{}$。它的证明是项；与定义相等相对。[第 9 章](09-equality.md)。
+**命题相等（Propositional equality）。** 归纳类型 $\Eq{}$，它的证明是项；与定义相等相对。[第 9 章](09-equality.md)。
 
 **递归子（Recursor）。** 为归纳类型生成的常量，表达结构递归和归纳。[第 7 章](07-inductive-nat.md)。
 
@@ -152,7 +152,7 @@
 
 **子单元（Subsingleton）。** 至多有一个构造子、且其字段全是证明或索引的命题；它可以消去到任何宇宙。[第 8 章](08-inductive-recipe.md)。
 
-**语法制导（Syntax-directed）。** 项的形状决定可用规则的规则系统。除 T-Conv 之外的所有类型规则。[第 5 章](05-algorithm.md)。
+**语法制导（Syntax-directed）。** 项的形状决定可用规则的规则系统；除 T-Conv 之外的所有类型规则。[第 5 章](05-algorithm.md)。
 
 **策略（Tactic）。** 内核之外的程序，为证明状态中的洞赋值项。[第 10 章](10-tactics.md)。
 

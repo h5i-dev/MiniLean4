@@ -6,7 +6,7 @@
 
 ## 从规则到算法
 
-图 3.1 的八条规则中有七条是*语法制导*（syntax-directed）的：看一眼项，就知道该用哪条规则。宇宙对应 T-Sort，变量对应 T-Var，$\Pi$ 对应 T-Pi，$\lambda$ 对应 T-Lam，应用对应 T-App。T-Conv 是例外。它可以在任何时刻应用于任何项，程序无法从项本身判断何时该用它，而朴素地搜索推导就只能靠猜。
+图 3.1 的八条规则中有七条是*语法制导*（syntax-directed）的：看一眼项，就知道该用哪条规则。宇宙对应 T-Sort，变量对应 T-Var，$\Pi$ 对应 T-Pi，$\lambda$ 对应 T-Lam，应用对应 T-App。T-Conv 是例外：它可以在任何时刻应用于任何项，程序无法从项本身判断何时该用它，而朴素地搜索推导就只能靠猜。
 
 标准解法 [Barendregt 1992] 是把类型检查拆成两个函数：
 
@@ -22,7 +22,7 @@ T-Conv 只在一处使用，即 $\Check$ 内部。另有两处要求类型具有
 
 ## 算法
 
-算法 5.1 用贴近 Rust 的伪代码写出。$\Infer$ 的每个分支都标注了它所实现的规则。
+算法 5.1 用贴近 Rust 的伪代码写出，$\Infer$ 的每个分支都标注了它所实现的规则。
 
 <div class="rulebox" markdown="1">
 
@@ -79,7 +79,7 @@ Freshen(Γ, x, b):
 
 <aside class="intuition" markdown="1">
 
-将工作分为 $\Infer$ 和 $\Check$，有时称为*双向*（bidirectional）类型检查，因为类型信息沿两个方向流动。推断从叶子*向上*进行：变量已有类型，应用则从其组成部分算出类型。检查从用户给出的期望类型*向下*进行，在根部将它与推断结果比较。我们的内核可以推断每个项的类型，因此检查只需再做一次比较；在更丰富的系统中，有些项必须有期望类型才能检查。
+将工作分为 $\Infer$ 和 $\Check$，有时称为*双向*（bidirectional）类型检查，因为类型信息沿两个方向流动。推断从叶子*向上*进行：变量已有类型，应用则从其组成部分算出类型；检查则从用户给出的期望类型*向下*进行，在根部将它与推断结果比较。我们的内核可以推断每个项的类型，因此检查只需再做一次比较；在更丰富的系统中，有些项必须有期望类型才能检查。
 
 </aside>
 
@@ -150,10 +150,10 @@ pub fn infer(&self, ctx: &Context, t: &Term) -> Result<Term> {
 
 有几处细节与伪代码不同。
 
-- 变量分支的上下文查找是从末尾开始的（`.rev()`）。由于 `rename_binder_if_needed` 保证名字互不相同，匹配项永远不会多于一个；但如果调用者传入了含重复名字的上下文，从末尾查找才是正确的行为。
+- 变量分支的上下文查找是从末尾开始的（`.rev()`），由于 `rename_binder_if_needed` 保证名字互不相同，匹配项永远不会多于一个；但如果调用者传入了含重复名字的上下文，从末尾查找才是正确的行为。
 - T-Pi 中的 $\imax$ 就是 `if body_level == 0` 这个表达式：体是命题的 $\Pi$ 本身是命题，否则它位于两个层级中较大的那一个。
 - 宇宙层级是 `u64`，`checked_add` 防止溢出。没有哪个真实证明会接近层级 $2^{64}$，但内核对任何输入都不应有未定义行为。
-- 应用分支在对 `f` 的推断类型作匹配之前先调用 `whnf`，与伪代码一致。没有这一步，类型写成 $\mathit{Id}\;(A \to B)$ 的函数就无法被应用。
+- 应用分支在对 `f` 的推断类型作匹配之前先调用 `whnf`，与伪代码一致；没有这一步，类型写成 $\mathit{Id}\;(A \to B)$ 的函数就无法被应用。
 
 剩下的两个函数都很短。
 
@@ -178,7 +178,7 @@ pub fn infer_sort(&self, ctx: &Context, t: &Term) -> Result<u64> {
 }
 ```
 
-`check` 以 `infer_sort(ctx, expected)` 开头。这对应 T-Conv 的前提 $\Gamma \vdash B : \Sort{u}$：期望的类型本身必须是类型。伪代码省略了它，因为算法内部的调用者传入的总是已经检查过的类型；但公开的 `check` 也会被用户提供的命题调用，所以 Rust 版本要验证这一点。
+`check` 以 `infer_sort(ctx, expected)` 开头，这对应 T-Conv 的前提 $\Gamma \vdash B : \Sort{u}$：期望的类型本身必须是类型。伪代码省略了它，因为算法内部的调用者传入的总是已经检查过的类型；但公开的 `check` 也会被用户提供的命题调用，所以 Rust 版本要验证这一点。
 
 最后是 `Freshen`：
 
@@ -221,7 +221,7 @@ fn rename_binder_if_needed(ctx: &Context, x: &str, body: &Term) -> (String, Term
 <details markdown="1">
 <summary>解答</summary>
 
-$\InferSort(\cdot, \Sort{1})$ 返回 $2$。上下文变为 $A : \Sort{1}$。对于内层 $\lambda$，$\InferSort(A : \Sort{1}, A)$ 返回 $1$，上下文变为 $A : \Sort{1}, a : A$，$\Infer$ 对体返回 $A$。于是内层结果是 $\tPi{a}{A}{A}$，外层结果是 $\tPi{A}{\Sort{1}}{\tPi{a}{A}{A}}$。对这个类型运行 $\InferSort$ 得到 $\imax(2, \imax(1, 1)) = 2$，所以该类型位于 $\Sort{2}$。
+$\InferSort(\cdot, \Sort{1})$ 返回 $2$，上下文变为 $A : \Sort{1}$。对于内层 $\lambda$，$\InferSort(A : \Sort{1}, A)$ 返回 $1$，上下文变为 $A : \Sort{1}, a : A$，$\Infer$ 对体返回 $A$。于是内层结果是 $\tPi{a}{A}{A}$，外层结果是 $\tPi{A}{\Sort{1}}{\tPi{a}{A}{A}}$。对这个类型运行 $\InferSort$ 得到 $\imax(2, \imax(1, 1)) = 2$，所以该类型位于 $\Sort{2}$。
 
 </details>
 
@@ -244,10 +244,10 @@ $\Pi$ 的体是在扩展后的上下文中检查的，所以会出现与 $\lambd
 
 要点回顾
 
-- $\Infer$ 跟随项的形状；$\Check$ 先推断，再用 $\IsDefEq$ 比较。T-Conv 只存在于 $\Check$ 内部。
+- $\Infer$ 跟随项的形状；$\Check$ 先推断，再用 $\IsDefEq$ 比较，T-Conv 只存在于 $\Check$ 内部。
 - 在需要 $\Pi$ 或宇宙的地方，$\Whnf$ 暴露出类型的最外层形状。
 - $\InferSort$ 就是“这个项是类型吗”这一测试：它的类型必须计算到一个宇宙。
-- $\Freshen$ 给会遮蔽上下文条目的绑定子改名。这是正确性的要求，不是为了方便。
+- $\Freshen$ 给会遮蔽上下文条目的绑定子改名，这是正确性的要求，而不是为了方便。
 - `src/typecheck.rs` 是算法的直接转写，约一百行。
 
 </div>

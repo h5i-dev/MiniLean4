@@ -8,9 +8,9 @@
 
 - **[Carneiro 2019]** M. Carneiro. *The Type Theory of Lean*. Master's thesis, Carnegie Mellon University, 2019. 对 Lean 实际类型理论的精确刻画，包括定义性证明无关性及其带来的微妙之处；[第 13 章](13-universes.md)和[第 14 章](14-properties.md)在说明 Lean 的完整系统超出本书系统之处时引用了它。
 
-- **[Coquand and Huet 1988]** T. Coquand and G. Huet. The calculus of constructions. *Information and Computation*, 76(2-3):95-120, 1988. 本书核心所在的系统：带有一个非谓词命题宇宙的依赖类型。它的一致性结果为[第 13 章](13-universes.md)的宇宙设计提供了依据。
+- **[Coquand and Huet 1988]** T. Coquand and G. Huet. The calculus of constructions. *Information and Computation*, 76(2-3):95-120, 1988. 本书核心所在的系统：带有一个非谓词命题宇宙的依赖类型，它的一致性结果为[第 13 章](13-universes.md)的宇宙设计提供了依据。
 
-- **[de Bruijn 1972]** N. G. de Bruijn. Lambda calculus notation with nameless dummies, a tool for automatic formula manipulation, with application to the Church-Rosser theorem. *Indagationes Mathematicae*, 34(5):381-392, 1972. 约束变量的无名表示。它是[第 11 章](11-substitution-alpha.md)中应对变量捕获的三种办法之一，也是[附录 B](b-proof-alpha.md)中连接 α 等价两种定义的桥梁。
+- **[de Bruijn 1972]** N. G. de Bruijn. Lambda calculus notation with nameless dummies, a tool for automatic formula manipulation, with application to the Church-Rosser theorem. *Indagationes Mathematicae*, 34(5):381-392, 1972. 约束变量的无名表示，它是[第 11 章](11-substitution-alpha.md)中应对变量捕获的三种办法之一，也是[附录 B](b-proof-alpha.md)中连接 α 等价两种定义的桥梁。
 
 - **[Girard 1972]** J.-Y. Girard. *Interpretation fonctionnelle et elimination des coupures de l'arithmetique d'ordre superieur*. PhD thesis, Universite Paris VII, 1972. 引入可归约性候选，即非谓词系统强规范化背后的方法（[第 14 章](14-properties.md)），以及表明包含自身的宇宙不一致的悖论（[第 13 章](13-universes.md)）。
 

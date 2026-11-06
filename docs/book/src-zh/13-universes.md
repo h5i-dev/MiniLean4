@@ -6,7 +6,7 @@
 
 ## Sort 0 的类型是什么？
 
-命题变量在类型论中以假设 $P : \Sort{0}$ 的形式出现。它可以出现在两个地方：在上下文中，如下面左边的判断；或被 $\lambda$ 或 $\Pi$ 绑定，如右边的判断：
+命题变量在类型论中以假设 $P : \Sort{0}$ 的形式出现，它可以出现在两个地方：在上下文中，如下面左边的判断；或被 $\lambda$ 或 $\Pi$ 绑定，如右边的判断：
 
 $$
 P : \Sort{0} \vdash \tLam{h}{P}{h} : P \to P
@@ -14,7 +14,7 @@ P : \Sort{0} \vdash \tLam{h}{P}{h} : P \to P
 \vdash \tLam{P}{\Sort{0}}{\tLam{h}{P}{h}} : \tPi{P}{\Sort{0}}{P \to P}.
 $$
 
-左边的判断对一个由外部提供的固定 $P$ 证明了 $P \to P$。右边的是一个封闭项，它对*每一个* $P$ 都证明了这一点，并且之后可以应用到任何具体的命题上；图 4.1 中的 $\forall$ 各行需要的正是这个。
+左边的判断对一个由外部提供的固定 $P$ 证明了 $P \to P$，而右边的是一个封闭项，它对*每一个* $P$ 都证明了这一点，并且之后可以应用到任何具体的命题上；图 4.1 中的 $\forall$ 各行需要的正是这个。
 
 两种形式都要求 $\Sort{0}$ 是一个类型。把 $P : \Sort{0}$ 加入上下文的 C-Ext，以及绑定 $P : \Sort{0}$ 的 T-Lam 和 T-Pi，都对新变量的类型 $A$ 有前提 $\Gamma \vdash A : \Sort{u}$。当 $A = \Sort{0}$ 时，这个前提就是对某个 $u$ 有 $\Gamma \vdash \Sort{0} : \Sort{u}$：命题宇宙本身必须有一个类型。问题是，是哪一个。
 
@@ -38,7 +38,7 @@ $$
 
 因此系统不一致：$\bot$ 没有证明，$\bot^\ast$ 却有一个项，于是建立在这些规则之上的内核会接受每个陈述的证明。关键的要素是一个类型 $U$，它对整个 $\mathsf{Type}$ 进行量化，同时又是 $\mathsf{Type}$ 的成员，这使得 $U$ 可以包含自身二重幂集的一个副本，而这是任何集合都做不到的。[附录 C](c-hurkens.md) 完整给出 $t_{\mathrm{H}}$，解释它的工作原理，并展示如何只改动内核的一行代码来重现这个结果。
 
-损害同样波及算法。类型保持性仍然成立，所以如果 $t_{\mathrm{H}}$ 有范式，它就会是类型为 $\tPi{p}{\mathsf{Type}}{p}$ 的一个处于范式的封闭项。[附录 D](d-proof-consistency.md) 中一致性证明里分析范式项的那一部分不用强规范化，可以搬到 $\mathsf{Type} : \mathsf{Type}$ 上；它表明这样的范式项不存在。因此 $t_{\mathrm{H}}$ 没有范式，强规范化失效，$\Normalize$ 在它上面永远运行下去。带有 $\mathsf{Type} : \mathsf{Type}$ 的内核不仅不可靠，而且在某些输入上不终止。
+损害同样波及算法：类型保持性仍然成立，所以如果 $t_{\mathrm{H}}$ 有范式，它就会是类型为 $\tPi{p}{\mathsf{Type}}{p}$ 的一个处于范式的封闭项。[附录 D](d-proof-consistency.md) 中一致性证明里分析范式项的那一部分不用强规范化，可以搬到 $\mathsf{Type} : \mathsf{Type}$ 上；它表明这样的范式项不存在。因此 $t_{\mathrm{H}}$ 没有范式，强规范化失效，$\Normalize$ 在它上面永远运行下去。带有 $\mathsf{Type} : \mathsf{Type}$ 的内核不仅不可靠，而且在某些输入上不终止。
 
 <aside class="history" markdown="1">
 
@@ -56,7 +56,7 @@ $$
 \Sort{0} : \Sort{1} : \Sort{2} : \cdots.
 $$
 
-没有宇宙包含自身。$\Pi$ 类型从一个宇宙取参数，在另一个宇宙中返回类型，所以 T-Pi 还必须说明 $\Pi$ 类型本身属于哪个宇宙。Lean 的答案使用函数 $\imax$：
+没有宇宙包含自身。$\Pi$ 类型从一个宇宙取参数，在另一个宇宙中返回类型，所以 T-Pi 还必须说明 $\Pi$ 类型本身属于哪个宇宙；Lean 的答案使用函数 $\imax$：
 
 $$
 \dfrac{\Gamma \vdash A : \Sort{u} \qquad \Gamma, x : A \vdash B : \Sort{v}}{\Gamma \vdash \tPi{x}{A}{B} : \Sort{\imax(u, v)}}\rulename{T-Pi}
@@ -118,7 +118,7 @@ $$
 
 第一，Lean 的 `Prop` 具有**定义性证明无关性**（definitional proof irrelevance）：同一个命题的任意两个证明在定义上相等。我们的转换不把证明视为相同；加上这一点会让转换依赖于类型，于是[第 12 章](12-reduction-conversion.md)那种简单的“规范化后比较”检查就不再够用。
 
-第二，Lean 有**宇宙多态**（universe polymorphism），所以定义可以对所有层级 $u$ 一次性陈述，$\imax$ 此时也要对层级*变量*起作用，诸如 $\imax(u, v) \le w$ 这样的约束要符号化求解。在我们的系统中，每个层级都是一个具体的数。
+第二，Lean 有**宇宙多态**（universe polymorphism），所以定义可以对所有层级 $u$ 一次性陈述，$\imax$ 此时也要对层级*变量*起作用，诸如 $\imax(u, v) \le w$ 这样的约束要符号化求解，而在我们的系统中，每个层级都是一个具体的数。
 
 下表总结了设计空间。
 
@@ -145,7 +145,7 @@ $$
 <details markdown="1">
 <summary>解答</summary>
 
-最内层：$P\;a : \Sort{0}$，所以 $\tPi{a}{A}{P\;a} : \Sort{\imax(1, 0)} = \Sort{0}$。接着，$A \to \Sort{0}$ 的宇宙是 $\imax(1, 1) = 1$（它的函数体 $\Sort{0}$ 的类型是 $\Sort{1}$），所以中间的 $\Pi$ 的宇宙是 $\imax(1, 0) = 0$。最后，$\Sort{1} : \Sort{2}$ 而函数体在 $\Sort{0}$ 中，得到 $\imax(2, 0) = 0$。整个陈述是一个命题。如果用 $\max$ 代替 $\imax$，它会落在 $\Sort{2}$ 中。
+最内层：$P\;a : \Sort{0}$，所以 $\tPi{a}{A}{P\;a} : \Sort{\imax(1, 0)} = \Sort{0}$。接着，$A \to \Sort{0}$ 的宇宙是 $\imax(1, 1) = 1$（它的函数体 $\Sort{0}$ 的类型是 $\Sort{1}$），所以中间的 $\Pi$ 的宇宙是 $\imax(1, 0) = 0$。最后，$\Sort{1} : \Sort{2}$ 而函数体在 $\Sort{0}$ 中，得到 $\imax(2, 0) = 0$，整个陈述是一个命题；如果用 $\max$ 代替 $\imax$，它会落在 $\Sort{2}$ 中。
 
 </details>
 
@@ -158,7 +158,7 @@ $$
 <details markdown="1">
 <summary>解答</summary>
 
-`idT` 期望一个参数 $A : \Sort{1}$。实际提供的参数是 $\tPi{A}{\Sort{1}}{A \to A}$，按 T-Pi 它的宇宙是 $\max(2, 1) = 2$，于是 $\Check$ 比较 $\Sort{2}$ 与 $\Sort{1}$ 并失败：内核在该应用处报告类型不匹配。这就是谓词性：对 $\Sort{1}$ 进行量化的类型不在 $\Sort{1}$ 中。
+`idT` 期望一个参数 $A : \Sort{1}$，而实际提供的参数是 $\tPi{A}{\Sort{1}}{A \to A}$，按 T-Pi 它的宇宙是 $\max(2, 1) = 2$，于是 $\Check$ 比较 $\Sort{2}$ 与 $\Sort{1}$ 并失败：内核在该应用处报告类型不匹配。这就是谓词性：对 $\Sort{1}$ 进行量化的类型不在 $\Sort{1}$ 中。
 
 </details>
 

@@ -34,7 +34,7 @@ $$
 
 套用两次，$\wp\wp S = (S \to \mathsf{Type}) \to \mathsf{Type}$ 就是“$S$ 的子集族”的类型。
 
-在集合论中，康托尔（Cantor）定理说，没有任何集合包含自身幂集的副本，更不用说二重幂集了：$\wp S$ 总是严格大于 $S$。这个悖论建立在一个违反该定理的类型 $U$ 之上。它包含 $\wp\wp U$ 的一个副本：函数 $\tau : \wp\wp U \to U$ 把 $U$ 的一个子集族打包成 $U$ 的单个元素，函数 $\sigma : U \to \wp\wp U$ 再把它解包。类型
+在集合论中，康托尔（Cantor）定理说，没有任何集合包含自身幂集的副本，更不用说二重幂集了：$\wp S$ 总是严格大于 $S$。这个悖论建立在一个违反该定理的类型 $U$ 之上，它包含 $\wp\wp U$ 的一个副本：函数 $\tau : \wp\wp U \to U$ 把 $U$ 的一个子集族打包成 $U$ 的单个元素，函数 $\sigma : U \to \wp\wp U$ 再把它解包。类型
 
 $$
 U \;=\; \tPi{X}{\mathsf{Type}}{\bigl((\wp\wp X \to X) \to \wp\wp X\bigr)}
@@ -82,7 +82,7 @@ $$
 
 内核在 $t_{\mathrm{H}}$ 中的多处通过 T-Conv 使用这个等式；它是一次计算，而不是一条公理。
 
-**$U$ 上的一种序。** 把 $\sigma\;x\;p$ 读作“谓词 $p$ 对 $x$ 以下的一切都成立”。这给了 $U$ 某种类似序的结构，并让我们能对谓词和元素各说一件事。
+**$U$ 上的一种序。** 把 $\sigma\;x\;p$ 读作“谓词 $p$ 对 $x$ 以下的一切都成立”，这给了 $U$ 某种类似序的结构，并让我们能对谓词和元素各说一件事。
 
 - 谓词 $p : \wp U$ 是*归纳的*（inductive），如果只要它对 $x$ 以下的一切成立，就对 $x$ 成立：即 $\tPi{x}{U}{\sigma\;x\;p \to p\;x}$。
 - 元素 $x : U$ 是*良基的*（well-founded），如果每个归纳谓词都对 $x$ 成立：即 $\tPi{p}{\wp U}{(\tPi{x}{U}{\sigma\;x\;p \to p\;x}) \to p\;x}$。
@@ -91,7 +91,7 @@ $$
 
 **三个要素。** 自下而上地读 $t_{\mathrm{H}}$：
 
-1. 最后一行 $\tLam{p}{\wp U}{\tLam{h_1}{\cdots}{h_1\;\Omega\;(\tLam{x}{U}{h_1\;(\tau\;(\sigma\;x))})}}$ 证明 $\Omega$ 是良基的。它的类型是 $\tPi{p}{\wp U}{(\tPi{x}{U}{\sigma\;x\;p \to p\;x}) \to p\;\Omega}$，也就是 $h_0$ 的类型。所以 $h_0$ 代表“$\Omega$ 是良基的”。
+1. 最后一行 $\tLam{p}{\wp U}{\tLam{h_1}{\cdots}{h_1\;\Omega\;(\tLam{x}{U}{h_1\;(\tau\;(\sigma\;x))})}}$ 证明 $\Omega$ 是良基的，它的类型是 $\tPi{p}{\wp U}{(\tPi{x}{U}{\sigma\;x\;p \to p\;x}) \to p\;\Omega}$，也就是 $h_0$ 的类型，所以 $h_0$ 代表“$\Omega$ 是良基的”。
 2. 谓词 $\Delta\;y$ 说的是“$y$ 不在自身之下”（严格地说，它谈论的是 $\tau\;(\sigma\;y)$，由上面的等式，它的行为与 $y$ 相同）。$h_0$ 的第二个参数，即以 $\tLam{x}{U}{\tLam{h_2}{\cdots}{\cdots}}$ 开头的那个长 $\lambda$，证明 $\Delta$ 是归纳的。于是 $h_0\;\Delta\;(\cdots) : \Delta\;\Omega$，也就是说，$\Omega$ 不在自身之下。
 3. 余下的参数 $\tLam{p}{\wp U}{h_0\;(\tLam{y}{U}{p\;(\tau\;(\sigma\;y))})}$ 证明 $\Omega$ *确实*在自身之下：把 $\Omega$ 的良基性应用于一个经打包等式变换过的谓词即可。
 
@@ -99,13 +99,13 @@ $$
 
 <aside class="intuition" markdown="1">
 
-这个论证就是乔装后的 Burali-Forti 悖论。序数都是良基的；全体序数的汇集 $\Omega$ 本身是一个序数，因此是自身的成员；但良基的东西都不是自身的成员。集合论的出路是拒绝让全体序数的汇集成为集合。带 $\mathsf{Type} : \mathsf{Type}$ 的类型理论没有这种拒绝，因为 $U$ 可以对一切量化，包括它自己。
+这个论证就是乔装后的 Burali-Forti 悖论。序数都是良基的；全体序数的汇集 $\Omega$ 本身是一个序数，因此是自身的成员；但良基的东西都不是自身的成员。集合论的出路是拒绝让全体序数的汇集成为集合，而带 $\mathsf{Type} : \mathsf{Type}$ 的类型理论没有这种拒绝，因为 $U$ 可以对一切量化，包括它自己。
 
 </aside>
 
 ## Type : Type 用在何处
 
-$t_{\mathrm{H}}$ 中的每一步定型都很平常，只有一处例外。在 $\sigma = \tLam{s}{U}{s\;U\;\tau}$ 中，变量 $s : U$ 被应用于类型 $U$ 自身。$s$ 的类型以 $\tPi{X}{\mathsf{Type}}{\cdots}$ 开头，所以 T-App 要求 $U : \mathsf{Type}$。但 $U$ 是一个对 $\mathsf{Type}$ 量化的 $\Pi$ 类型，而在带宇宙层级的系统里，这样的类型位于它所量化的宇宙之*上*一层：
+$t_{\mathrm{H}}$ 中的每一步定型都很平常，只有一处例外：在 $\sigma = \tLam{s}{U}{s\;U\;\tau}$ 中，变量 $s : U$ 被应用于类型 $U$ 自身，而 $s$ 的类型以 $\tPi{X}{\mathsf{Type}}{\cdots}$ 开头，所以 T-App 要求 $U : \mathsf{Type}$。但 $U$ 是一个对 $\mathsf{Type}$ 量化的 $\Pi$ 类型，而在带宇宙层级的系统里，这样的类型位于它所量化的宇宙之*上*一层：
 
 $$
 \dfrac{\Gamma \vdash \Sort{u} : \Sort{(u+1)} \qquad \Gamma, X : \Sort{u} \vdash B : \Sort{v}}{\Gamma \vdash \tPi{X}{\Sort{u}}{B} : \Sort{\max(u+1, v)}}
@@ -126,7 +126,7 @@ Term::Sort(u) => Ok(Term::Sort(u.checked_add(1).ok_or("universe overflow")?)),
 
 <aside class="warning" markdown="1">
 
-不要把这个修改留在代码里。它除了让内核不一致，还破坏了终止性：如[第 13 章](13-universes.md)所述，$t_{\mathrm{H}}$ 没有范式，所以让修改后的内核去规范化它，会一直跑到[第 12 章](12-reduction-conversion.md)的归约燃料耗尽为止。
+不要把这个修改留在代码里，它除了让内核不一致，还破坏了终止性：如[第 13 章](13-universes.md)所述，$t_{\mathrm{H}}$ 没有范式，所以让修改后的内核去规范化它，会一直跑到[第 12 章](12-reduction-conversion.md)的归约燃料耗尽为止。
 
 </aside>
 

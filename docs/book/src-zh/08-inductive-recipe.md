@@ -139,7 +139,7 @@ qed</pre></div>
 
 ## 索引：向量
 
-$\mathsf{List}\;\Nat$ 可以有任意长度。如果我们想把长度放进类型里，使 $\mathsf{Vec}\;\Nat\;0$ 和 $\mathsf{Vec}\;\Nat\;2$ 成为不同的类型，该怎么办？
+$\mathsf{List}\;\Nat$ 可以有任意长度，但如果我们想把长度放进类型里，使 $\mathsf{Vec}\;\Nat\;0$ 和 $\mathsf{Vec}\;\Nat\;2$ 成为不同的类型，该怎么办？
 
 ```lean
 inductive Vec (A : Sort 1) : Nat -> Sort 1 where
@@ -147,14 +147,14 @@ inductive Vec (A : Sort 1) : Nat -> Sort 1 where
   | vcons : (n : Nat) -> A -> Vec A n -> Vec A (succ n)
 ```
 
-元素类型 $A$ 仍然是参数。长度则不是：$\mathsf{vnil}$ 的长度为 $0$，而 $\mathsf{vcons}$ 接受一个长度为 $n$ 的向量，返回一个长度为 $\suc\;n$ 的向量。在不同构造子之间、以及构造子与其递归参数之间可以不同的类型参数称为**索引**（index）。构造子为
+元素类型 $A$ 仍然是参数，而长度则不是：$\mathsf{vnil}$ 的长度为 $0$，而 $\mathsf{vcons}$ 接受一个长度为 $n$ 的向量，返回一个长度为 $\suc\;n$ 的向量。在不同构造子之间、以及构造子与其递归参数之间可以不同的类型参数称为**索引**（index）。构造子为
 
 $$
 \mathsf{vnil} : \tPi{A}{\Sort{1}}{\mathsf{Vec}\;A\;\zero}, \qquad
 \mathsf{vcons} : \tPi{A}{\Sort{1}}{\tPi{n}{\Nat}{A \to \mathsf{Vec}\;A\;n \to \mathsf{Vec}\;A\;(\suc\;n)}}.
 $$
 
-由于索引会变化，递归子不能预先固定它。取而代之的是，motive 把它作为参数接受，$M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$，而 $\mathsf{vcons}$ 的情形是
+由于索引会变化，递归子不能预先固定它，而是由 motive 把它作为参数接受，$M : \tPi{n}{\Nat}{\mathsf{Vec}\;A\;n \to \Sort{v}}$，而 $\mathsf{vcons}$ 的情形是
 
 $$
 \tPi{n}{\Nat}{\tPi{a}{A}{\tPi{\mathit{xs}}{\mathsf{Vec}\;A\;n}{M\;n\;\mathit{xs} \to M\;(\suc\;n)\;(\mathsf{vcons}\;A\;n\;a\;\mathit{xs})}}}.
@@ -164,9 +164,9 @@ $$
 
 ## 通用方法
 
-本节给出处理带参数和索引的单个归纳类型的过程。Lean 还支持互归纳类型和嵌套归纳类型，它们不在本书范围之内。
+本节给出处理带参数和索引的单个归纳类型的过程；Lean 还支持互归纳类型和嵌套归纳类型，但它们不在本书范围之内。
 
-这一过程还回答了 T-Const 留下的一个问题。没有体的常量是一条假设：T-Const 接受 $c : \tPi{P}{\Sort{0}}{P}$ 就像接受 $\zero : \Nat$ 一样轻易，而有了它，系统就不一致了。下面生成的常量不是任意的假设。它们是一个固定模式的实例，即归纳构造演算（Calculus of Inductive Constructions）的归纳类型，其一致性是已知的 [Werner 1994]。
+这一过程还回答了 T-Const 留下的一个问题。没有体的常量是一条假设：T-Const 接受 $c : \tPi{P}{\Sort{0}}{P}$ 就像接受 $\zero : \Nat$ 一样轻易，而有了它，系统就不一致了。下面生成的常量不是任意的假设，而是一个固定模式的实例，即归纳构造演算（Calculus of Inductive Constructions）的归纳类型，其一致性是已知的 [Werner 1994]。
 
 **Telescope。** 我们用 $(\vec{x} : \vec{A})$ 表示一列绑定 $(x_1 : A_1) \cdots (x_k : A_k)$，其中每个 $A_i$ 可以提及 $x_1, \ldots, x_{i-1}$；用 $\tPi{\vec{x}}{\vec{A}}{B}$ 表示 $\tPi{x_1}{A_1}{\cdots\,\tPi{x_k}{A_k}{B}}$；用 $f\;\vec{x}$ 表示 $f\;x_1 \cdots x_k$。$\vec{x}$ 的长度记为 $|\vec{x}|$。在代码中，telescope 就是一个 `Context`，而 `src/term.rs` 中的 `telescope(binders, tail)` 构造嵌套的 $\Pi$。
 
@@ -214,7 +214,7 @@ inductive Bad where
 
 类型为 $\Nat \to \mathsf{Tree}$ 的字段是一棵有无穷多个孩子的树，每个数对应一个孩子；递归子仍然可以递归进入每个孩子 $a_k\;n$。类型为 $\mathsf{Tree} \to \Nat$ 的字段*消耗*树而不是包含树，正是这种形状使 `Bad` 导致悖论。
 
-条件 4 防止一个类型包含更大的宇宙。没有它，带构造子 $\mathsf{mk} : \Sort{1} \to T$ 的声明 $T : \Sort{1}$ 就会把整个 $\Sort{1}$ 的一份副本放进 $\Sort{1}$ 里，这正是[第 13 章](13-universes.md)证明为不一致的自我包含。对 $u = 0$ 不需要条件，因为 $\Sort{0}$ 是非谓词的。
+条件 4 防止一个类型包含更大的宇宙：没有它，带构造子 $\mathsf{mk} : \Sort{1} \to T$ 的声明 $T : \Sort{1}$ 就会把整个 $\Sort{1}$ 的一份副本放进 $\Sort{1}$ 里，这正是[第 13 章](13-universes.md)证明为不一致的自我包含。对 $u = 0$ 不需要条件，因为 $\Sort{0}$ 是非谓词的。
 
 **递归子。** 对于被接受的声明，内核为每个可容许的层级 $v$（见下文）生成一个递归子 $I.\mathsf{rec}_v$：
 
@@ -248,7 +248,7 @@ $$
 
 大前提位于第 $|\vec{p}| + 1 + n + |\vec{\imath}|$ 个位置（从零数起），构造子有 $|\vec{p}|$ 个参数和 $|\vec{a}|$ 个字段，而在良类型的可归约式中 $\vec{p}\,'$ 可转换为 $\vec{p}$，所以规则忽略它，正如列表的规则忽略 $A'$。对 $\Nat$、$\mathsf{Tree}$、$\mathsf{List}$ 和 $\mathsf{Vec}$，这一过程恰好产生本章和上一章的递归子与规则，而且递归子的类型与 Lean 4 生成的一致，至多相差约束变量的名字和隐式参数。
 
-**从命题消去。** 若 $u \ge 1$，则对每个层级 $v$ 都生成递归子。若 $u = 0$，即 $I$ 是命题，则只对 $v = 0$ 生成递归子，除非 $I$ 是**子单元**（subsingleton）：它至多有一个构造子，并且每个字段要么是证明（其类型位于 $\Sort{0}$ 中），要么出现在索引项 $\vec{t}_j$ 之中。这一限制使数据不会依赖于给出的是命题的*哪一个*证明。例如，$P \vee Q$ 有两个构造子，于是从 $P \vee Q$ 的证明到 $\Nat$ 的函数可以对其中一个返回 $0$、对另一个返回 $1$，证明便携带了计算信息。因此 Lean 的 `Or.rec` 和 `Exists.rec` 只消去到 `Prop`，而 `And.rec` 和 `Eq.rec` 可以消去到每个宇宙：`And` 只有一个构造子，其字段都是证明；`Eq`（[第 9 章](09-equality.md)）只有一个没有字段的构造子。
+**从命题消去。** 若 $u \ge 1$，则对每个层级 $v$ 都生成递归子；若 $u = 0$，即 $I$ 是命题，则只对 $v = 0$ 生成递归子，除非 $I$ 是**子单元**（subsingleton）：它至多有一个构造子，并且每个字段要么是证明（其类型位于 $\Sort{0}$ 中），要么出现在索引项 $\vec{t}_j$ 之中。这一限制使数据不会依赖于给出的是命题的*哪一个*证明。例如，$P \vee Q$ 有两个构造子，于是从 $P \vee Q$ 的证明到 $\Nat$ 的函数可以对其中一个返回 $0$、对另一个返回 $1$，证明便携带了计算信息。因此 Lean 的 `Or.rec` 和 `Exists.rec` 只消去到 `Prop`，而 `And.rec` 和 `Eq.rec` 可以消去到每个宇宙：`And` 只有一个构造子，其字段都是证明；`Eq`（[第 9 章](09-equality.md)）只有一个没有字段的构造子。
 
 于是，签名不断增长而内核的规则保持不变：一个通用过程把每个声明变成签名条目，一个归约函数运行它们的规则（[第 12 章](12-reduction-conversion.md#computation-rules-as-data)）。
 
@@ -263,11 +263,11 @@ $$
 - `src/inductive/recursor.rs` 按上面的公式构造递归子类型。`recursor_type` 组装 telescope $\vec{p}$、motive、各小前提、索引和大前提；`minor_premise_type` 构造每个 $C_j$；`induction_hypothesis_type` 构造每个 $H_{j,k}$。生成的绑定子名字（`__motive`、`__minor_j`、`__ih_j_k`、`__major`）以两个下划线开头，用户声明不得使用这种名字，因此它们永远不会与字段冲突。
 - `mod.rs` 中的 `allows_large_elimination` 实现子单元测试。`add_inductive` 总是注册 `I.rec0`，在允许大消去时还注册 `I.rec1`；`register_recursor` 按需生成更高的层级。
 
-ι 规则不会生成为项。`whnf` 直接依据存储的 `InductiveInfo` 应用它们，[第 12 章](12-reduction-conversion.md)会解释这一点。
+ι 规则不会生成为项，而是由 `whnf` 直接依据存储的 `InductiveInfo` 应用，[第 12 章](12-reduction-conversion.md)会解释这一点。
 
 </aside>
 
-生成器的核心短到可以通读。请把它与 $C_j$ 的公式对照。
+生成器的核心短到可以通读，请把它与 $C_j$ 的公式对照。
 
 ```rust
 /// C_j = Pi (as : As_j). Pi (hs : Hs_j). M ts_j (c_j ps as)

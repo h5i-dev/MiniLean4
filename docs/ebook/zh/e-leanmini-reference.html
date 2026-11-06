@@ -81,7 +81,7 @@
 cargo run                                  # interactive session on stdin
 cargo test                                 # the kernel&#x27;s own test suite
 </code></pre></div>
-<p>脚本是一系列行。运行器自上而下处理它们，遇到第一个错误即停止，打印消息并以状态 1 退出。空行和以 <code>#</code> 开头的行是注释，会被跳过。</p>
+<p>脚本是一系列行，运行器自上而下处理它们，遇到第一个错误即停止，打印消息并以状态 1 退出。空行和以 <code>#</code> 开头的行是注释，会被跳过。</p>
 <div class="codeblock" data-lang="leanmini"><pre><code class="language-leanmini"><span class="c"># 这是一行注释。</span>
 <span class="k">goal</span> <span class="k">forall</span> (P : <span class="k">Sort</span> 0), P -&gt; P
 </code></pre></div>
@@ -158,7 +158,7 @@ cargo test                                 # the kernel&#x27;s own test suite
   | nil : Vec A <span class="n">Nat.zero</span>
   | cons (n : Nat) (head : A) (tail : Vec A n) : Vec A (<span class="n">Nat.succ</span> n)
 </code></pre></div>
-<p>构造子以限定名注册：上面的声明添加 <code>Vec.nil</code> 和 <code>Vec.cons</code>，而 <code>List</code> 的构造子是 <code>List.nil</code> 和 <code>List.cons</code>。脚本必须使用限定形式。</p>
+<p>构造子以限定名注册：上面的声明添加 <code>Vec.nil</code> 和 <code>Vec.cons</code>，而 <code>List</code> 的构造子是 <code>List.nil</code> 和 <code>List.cons</code>；脚本必须使用限定形式。</p>
 <p>接受声明时会运行<a href="08-inductive-recipe.html">第 8 章</a>的四个条件：<code>Name</code> 的类型是一个类型，每个构造子类型都是以 <code>Name</code> 应用于参数结尾的类型，每个提到 <code>Name</code> 的字段都严格正，并且当 <code>u</code> 至少为 1 时，没有字段位于 <code>Sort u</code> 之上的宇宙。失败时的消息包括 <code>non-strictly-positive / unsupported recursive field</code>、<code>field f lives in Sort w, exceeding inductive universe Sort u</code> 和 <code>inductive occurrence inside result index</code>。以 <code>_</code> 或 <code>__</code> 开头的绑定子名字会被拒绝（<code>reserved binder name</code>），因为内核用这类名字命名它自己生成的绑定子。</p>
 <p>成功时运行器打印 <code>inductive Name registered</code>，内核添加类型构造器、各构造子、递归子 <code>Name.rec0</code>，以及在允许大消去时的 <code>Name.rec1</code>。命题（<code>Sort 0</code>）只有在是子单元时才获得 <code>Name.rec1</code>，如<a href="08-inductive-recipe.html">第 8 章</a>所述。</p>
 <aside class="warning">
@@ -203,16 +203,16 @@ Eq       : <span class="k">forall</span> (A : <span class="k">Sort</span> 1), A 
   ⊢ Eq Nat (add Nat.zero (Nat.succ k)) (Nat.succ k)
 </code></pre></div>
 <p>没有目标剩余时，它打印 <code>No goals. Run 'qed' to kernel-check.</code>。命令 <code>show</code> 打印目标而不做任何改动。</p>
-<p>策略总是作用于第一个目标。交给策略的项在该目标的上下文中解析，所以假设的名字在作用域内。<a href="10-tactics.html">第 10 章</a>解释每条策略对部分证明项做了什么；本节只陈述接口。</p>
+<p>策略总是作用于第一个目标，交给策略的项在该目标的上下文中解析，所以假设的名字在作用域内。<a href="10-tactics.html">第 10 章</a>解释每条策略对部分证明项做了什么；本节只陈述接口。</p>
 <h3 id="_10">策略</h3>
-<p><strong><code>intro x</code></strong> 要求目标归约到 <code>forall</code> 或箭头。它把 <code>x : A</code> 加入上下文，其中 <code>A</code> 是定义域，并把体设为新目标。名字不能已在上下文中（<code>binder name already in context</code>）；其他情况下的消息是 <code>intro expects a Pi/arrow goal</code>。</p>
+<p><strong><code>intro x</code></strong> 要求目标归约到 <code>forall</code> 或箭头，然后把 <code>x : A</code> 加入上下文，其中 <code>A</code> 是定义域，并把体设为新目标。名字不能已在上下文中（<code>binder name already in context</code>）；其他情况下的消息是 <code>intro expects a Pi/arrow goal</code>。</p>
 <p><strong><code>exact t</code></strong> 先把 <code>t</code> 对照目标检查，再用 <code>t</code> 关闭目标。不匹配时由内核报告 <code>type mismatch: actual ..., expected ...</code>。</p>
 <p><strong><code>apply f</code></strong> 推断 <code>f</code> 的类型，并逐层剥去非依赖箭头，直到结果与目标定义相等；每个剥下的定义域依次成为一个新目标。若 <code>f</code> 的类型已与目标匹配，<code>apply f</code> 的行为与 <code>exact f</code> 相同。依赖绑定子会被拒绝，报 <code>dependent apply requires elaboration/unification</code>；结果始终不匹配则报 <code>apply result does not match the goal</code>。</p>
 <p><strong><code>change T</code></strong> 把目标替换为 <code>T</code>，<code>T</code> 必须是与之定义相等的类型（<code>change expects definitionally equal target</code>）。它用于在 <code>rw</code> 之前暴露出只有经过计算才出现的子项。</p>
 <p><strong><code>rfl</code></strong> 要求目标归约到 <code>Eq A a b</code>（<code>rfl expects Eq A lhs rhs</code>），且 <code>a</code> 与 <code>b</code> 定义相等（<code>rfl: sides are not definitionally equal</code>），然后用 <code>Eq.refl A a</code> 关闭它。</p>
-<p><strong><code>rw h</code></strong> 要求 <code>h</code> 的类型归约到 <code>Eq A a b</code>（<code>rw expects proof of equality</code>）。它把目标中 <code>a</code> 的每一次出现替换为 <code>b</code>，并把重写后的目标作为新目标。出现是按语法查找的，只容许约束变量名不同；仅在计算之后才相等的项找不到，此时报 <code>rw: no syntactic occurrence of lhs in goal; use change first</code>。与 Lean 的 <code>rw</code> 不同，它之后不会尝试 <code>rfl</code>，所以形如 <code>Eq A x x</code> 的目标仍须显式关闭。若抽象 <code>a</code> 产生类型不正确的 motive，内核的类型错误会在证明状态改变之前报告。</p>
-<p><strong><code>induction x</code></strong> 要求 <code>x</code> 是一个假设，其类型归约到无索引的归纳类型，并且之后的假设都不能提到 <code>x</code>（<code>induction: revert dependent hypotheses first</code>）。它按声明顺序为每个构造子创建一个目标。每个目标的上下文获得该构造子的各字段（使用其声明的名字），以及每个递归字段对应的一个归纳假设，名为 <code>ih</code>（若 <code>ih</code> 已被占用则追加撇号）。当 <code>n</code> 已在使用中时，<code>Nat.succ</code> 中名为 <code>n</code> 的字段会被重命名为 <code>k</code>，这就是下面示例的目标里出现 <code>k</code> 和 <code>ih</code> 的原因。所用的递归子是 <code>I.recv</code>，其中 <code>v</code> 是目标的宇宙；若该递归子不存在，消息是 <code>no elimination recursor at target universe</code>。不支持索引族（<code>indexed induction requires motive/index elaboration (not implemented)</code>）。</p>
-<p><strong><code>qed</code></strong> 在仍有目标时失败（<code>N goals remain</code>）。否则，它从各策略步骤组装出证明项，交给内核对照原始目标检查，打印 <code>QED. Kernel checked proof:</code> 和该项，然后结束证明。系统的可靠性只取决于这最后一次检查。</p>
+<p><strong><code>rw h</code></strong> 要求 <code>h</code> 的类型归约到 <code>Eq A a b</code>（<code>rw expects proof of equality</code>），然后把目标中 <code>a</code> 的每一次出现替换为 <code>b</code>，并把重写后的目标作为新目标。出现是按语法查找的，只容许约束变量名不同；仅在计算之后才相等的项找不到，此时报 <code>rw: no syntactic occurrence of lhs in goal; use change first</code>。与 Lean 的 <code>rw</code> 不同，它之后不会尝试 <code>rfl</code>，所以形如 <code>Eq A x x</code> 的目标仍须显式关闭。若抽象 <code>a</code> 产生类型不正确的 motive，内核的类型错误会在证明状态改变之前报告。</p>
+<p><strong><code>induction x</code></strong> 要求 <code>x</code> 是一个假设，其类型归约到无索引的归纳类型，并且之后的假设都不能提到 <code>x</code>（<code>induction: revert dependent hypotheses first</code>），然后按声明顺序为每个构造子创建一个目标，每个目标的上下文获得该构造子的各字段（使用其声明的名字），以及每个递归字段对应的一个归纳假设，名为 <code>ih</code>（若 <code>ih</code> 已被占用则追加撇号）。当 <code>n</code> 已在使用中时，<code>Nat.succ</code> 中名为 <code>n</code> 的字段会被重命名为 <code>k</code>，这就是下面示例的目标里出现 <code>k</code> 和 <code>ih</code> 的原因。所用的递归子是 <code>I.recv</code>，其中 <code>v</code> 是目标的宇宙；若该递归子不存在，消息是 <code>no elimination recursor at target universe</code>。不支持索引族（<code>indexed induction requires motive/index elaboration (not implemented)</code>）。</p>
+<p><strong><code>qed</code></strong> 在仍有目标时失败（<code>N goals remain</code>）；否则，它从各策略步骤组装出证明项，交给内核对照原始目标检查，打印 <code>QED. Kernel checked proof:</code> 和该项，然后结束证明。系统的可靠性只取决于这最后一次检查。</p>
 <p>其他任何行都会得到 <code>unknown command: ...</code>。</p>
 <h3 id="_11">来自内核的错误</h3>
 <p>有些消息来自内核而非策略层，可能在任何命令下出现。</p>
@@ -376,7 +376,7 @@ qed</pre></div>
 </table>
 <p>最后一行有一个实际后果：<code>qed</code> 打印证明项，然后丢弃它。要复用一个结果，把它写成项展开后的 <code>def</code>，或者写成 <code>axiom</code>。</p>
 <aside class="lean">
-<p>右列的一切都是 Lean 的繁饰器和策略框架在项到达内核之前完成的工作。Lean 的内核和我们的一样，只会看到完整的项。上述限制是本仓库前端的限制，而不是类型理论的限制。</p>
+<p>右列的一切都是 Lean 的繁饰器和策略框架在项到达内核之前完成的工作，而 Lean 的内核和我们的一样，只会看到完整的项。上述限制是本仓库前端的限制，而不是类型理论的限制。</p>
 </aside>
 <div class="summary-box">
 <p>要点回顾</p>

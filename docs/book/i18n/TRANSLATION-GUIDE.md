@@ -47,6 +47,14 @@ leanmini comment lines, and the explorer `data-title`.
   Keep technical terms consistent with the glossary and add the English term in
   parentheses on first use in each chapter when the Japanese term is not
   standard.
+  Do not chop a line of reasoning into a row of short sentences ending in 。 when
+  the ideas belong together; join them with である形 and connectives
+  (「〜であり、」「〜ではなく、」「〜ので、」「〜が、」「〜て、」). Two examples
+  of the preferred form:
+    bad:  apps と spine は互いに逆である。apps(h, args) は ... を組み立て、spine はそれを分解する。
+    good: apps と spine は互いに逆であり、apps(h, args) が ... を組み立て、spine がそれを分解する。
+    bad:  項が妥当な型であるかどうかは構文的な性質ではない。それを決めるのは型検査器である。
+    good: 項が妥当な型であるかどうかは構文的な性質ではなく、型検査器が決める。
 - Chinese: Simplified characters, written register, full-width punctuation
   (，。：；“”). Half-width spaces between Chinese and Latin words or math.
   Connect closely related clauses instead of breaking them into abrupt short

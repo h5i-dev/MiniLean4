@@ -44,7 +44,7 @@ $$
 
 每一次返回类型的调用都对应推导树的一个节点，而且没有任何调用用到计算。最后，$\Check$ 把结果与所声明的类型 $\tPi{P}{\Sort{0}}{P \to P}$ 作比较。两者只差一个约束变量的名字，因为 $P \to P$ 是 $\tPi{\_}{P}{P}$ 的缩写，而 $h$ 和 $\_$ 都不出现在体中。于是 $\IsDefEq$ 成功，证明被接受。
 
-下面是由内核自己记录的同一次运行。调用视图与上面的列表一致；证明树视图与推导一致。
+下面是由内核自己记录的同一次运行：调用视图与上面的列表一致，证明树视图与推导一致。
 
 <div class="explorer" data-kind="derive" data-term="fun (P : Sort 0) => fun (h : P) => h"></div>
 
@@ -56,7 +56,7 @@ qed</pre></div>
 
 ## 一个错误的证明
 
-假设用户声称 $t = \tLam{P}{\Sort{0}}{\tLam{h}{P}{P}}$ 证明了 $\tPi{P}{\Sort{0}}{P \to P}$。它的体返回的是命题 $P$，而不是证明 $h$。内核调用 $\Check(\cdot, t, \tPi{P}{\Sort{0}}{P \to P})$，后者先调用 $\Infer$。各次调用与上面相同，只是最后一次 $\Infer(\Gamma_2, P)$ 返回 $\Sort{0}$。于是 $\Infer$ *成功*，结果为
+假设用户声称 $t = \tLam{P}{\Sort{0}}{\tLam{h}{P}{P}}$ 证明了 $\tPi{P}{\Sort{0}}{P \to P}$。它的体返回的是命题 $P$，而不是证明 $h$。内核调用 $\Check(\cdot, t, \tPi{P}{\Sort{0}}{P \to P})$，后者先调用 $\Infer$，各次调用与上面相同，只是最后一次 $\Infer(\Gamma_2, P)$ 返回 $\Sort{0}$。于是 $\Infer$ *成功*，结果为
 
 $$
 \Infer(\cdot, t) \;=\; \tPi{P}{\Sort{0}}{\tPi{h}{P}{\Sort{0}}}.
@@ -64,7 +64,7 @@ $$
 
 项 $t$ 是良类型的，却不能证明所声称的命题。$\Check$ 比较这两个类型时，发现两边都无法继续归约，重命名约束变量也不能使它们相等：最内层的体一边是 $\Sort{0}$，另一边是 $P$。因此 $\IsDefEq$ 失败，$\Check$ 报告类型不匹配。（[第 11 章](11-substitution-alpha.md#alpha-equivalence)用 $\IsDefEq$ 的算法逐步重演这次比较。）
 
-这个错误之所以能被发现，只是因为用户*声明*了要证明的命题。一个只运行 $\Infer$ 的内核会接受 $t$，并悄悄给它分配一个不同的类型。这就是为什么每个脚本都以 `goal` 开头，也是为什么 `qed` 要对照它来检查。
+这个错误之所以能被发现，只是因为用户*声明*了要证明的命题，而一个只运行 $\Infer$ 的内核会接受 $t$，并悄悄给它分配一个不同的类型。这就是为什么每个脚本都以 `goal` 开头，也是为什么 `qed` 要对照它来检查。
 
 <div class="explorer" data-kind="derive" data-term="fun (P : Sort 0) => fun (h : P) => P"></div>
 
@@ -136,7 +136,7 @@ t = \tLam{P}{\Sort{0}}{\tLam{h}{\mathit{Id}\;P}{h}}
 \tPi{P}{\Sort{0}}{P \to P}.
 $$
 
-$\Infer$ 首先检查标注 $\mathit{Id}\;P$ 是一个类型。$\InferSort(\Gamma_1, \mathit{Id}\;P)$ 进入 $\Infer$ 的应用分支：函数 $\tLam{X}{\Sort{0}}{X}$ 的类型是 $\tPi{X}{\Sort{0}}{\Sort{0}}$，参数 $P$ 通过 $\Check(\Gamma_1, P, \Sort{0})$，结果是 $\subst{\Sort{0}}{X}{P} = \Sort{0}$。所以 $\mathit{Id}\;P$ 是一个类型，而且是一个命题。接着体 $h$ 的类型是 $\mathit{Id}\;P$，于是
+$\Infer$ 首先检查标注 $\mathit{Id}\;P$ 是一个类型：$\InferSort(\Gamma_1, \mathit{Id}\;P)$ 进入 $\Infer$ 的应用分支，函数 $\tLam{X}{\Sort{0}}{X}$ 的类型是 $\tPi{X}{\Sort{0}}{\Sort{0}}$，参数 $P$ 通过 $\Check(\Gamma_1, P, \Sort{0})$，结果是 $\subst{\Sort{0}}{X}{P} = \Sort{0}$。所以 $\mathit{Id}\;P$ 是一个类型，而且是一个命题。接着体 $h$ 的类型是 $\mathit{Id}\;P$，于是
 
 $$
 \Infer(\cdot, t) \;=\; \tPi{P}{\Sort{0}}{\tPi{h}{\mathit{Id}\;P}{\mathit{Id}\;P}}.
@@ -154,7 +154,7 @@ $$
 }{\cdot \vdash t : \tPi{P}{\Sort{0}}{P \to P}}\rulename{T-Conv}
 $$
 
-算法从不决定*在哪里*应用 T-Conv。正如[第 5 章](05-algorithm.md)所述，转换隐藏在对 $\IsDefEq$ 的调用中，而它只在比较两个类型的地方运行。
+算法从不决定*在哪里*应用 T-Conv：正如[第 5 章](05-algorithm.md)所述，转换隐藏在对 $\IsDefEq$ 的调用中，而它只在比较两个类型的地方运行。
 
 实时推导显示了计算发生的位置：标注 $\mathit{Id}\;P$ 由 T-App 检查，推断出的类型一直含有 $\mathit{Id}\;P$，直到 $\Check$ 把它与目标作比较。
 
@@ -209,7 +209,7 @@ qed
 <details markdown="1">
 <summary>解答</summary>
 
-在上下文 $P : \Sort{0}, h : P$ 中，体 $h\;h$ 进入应用分支。$\Infer$ 对函数 $h$ 返回 $P$，而 $\Whnf(P) = P$ 是一个变量，不是 $\Pi$。算法在 `else fail "not a function"` 这一行失败：$P$ 的证明不是可以被应用的东西。在 Rust 中，错误信息是 `application of non-function`。
+在上下文 $P : \Sort{0}, h : P$ 中，体 $h\;h$ 进入应用分支，$\Infer$ 对函数 $h$ 返回 $P$，而 $\Whnf(P) = P$ 是一个变量，不是 $\Pi$。算法在 `else fail "not a function"` 这一行失败：$P$ 的证明不是可以被应用的东西。在 Rust 中，错误信息是 `application of non-function`。
 
 </details>
 
@@ -220,7 +220,7 @@ qed
 要点回顾
 
 - 一次 $\Infer$ 的运行对应一棵推导树；每一次返回的调用就是一个节点。
-- $\Infer$ 可以在一个并未证明所声明定理的项上成功。对照所声明的类型运行 $\Check$ 才能抓出这种情况。
+- $\Infer$ 可以在一个并未证明所声明定理的项上成功，对照所声明的类型运行 $\Check$ 才能抓出这种情况。
 - T-App 是使用假设（肯定前件）的地方，也是实例化全称命题（替换进 $\Pi$ 的体）的地方。
 - 类型内部的计算完全由 $\IsDefEq$ 处理；算法从不选择在哪里应用 T-Conv。
 

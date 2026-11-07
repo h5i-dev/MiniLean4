@@ -12,7 +12,7 @@
 
 <div class="lead" markdown="1">
 
-a Lean 4-style proof kernel, built from nothing. five kinds of terms and eight typing rules to start; inductive types, a tactic language, and the universe hierarchy that keeps it all consistent by the end. every piece is tied to a small Rust implementation you can read in an afternoon.
+This eBook walks through how interactive theorem provers like Lean 4 work by implementing a Lean 4-style proof kernel from scratch, step by step. We cover the core foundations, including inductive types, a tactic language, and the universe hierarchy. Each piece comes with a small Rust implementation.
 
 </div>
 

@@ -16,7 +16,7 @@ Build a small proof kernel in Rust and use it to see how a theorem prover checks
 
 </div>
 
-<p class="punch">proofs are programs. the kernel checks them. nothing else is trusted.</p>
+<p class="punch">Proofs are programs checked by the kernel.</p>
 
 </div>
 <div class="hero-term" markdown="1">
@@ -26,7 +26,7 @@ intro P
 intro p
 exact p
 qed</pre></div>
-<p class="hero-caption">this is the real kernel, compiled to webassembly, checking the first theorem of the book. edit the script and run it again.</p>
+<p class="hero-caption">The kernel, compiled to WebAssembly, checks the book's first theorem here. Edit the script and run it again.</p>
 </div>
 </header>
 
@@ -34,17 +34,17 @@ qed</pre></div>
 
 Interactive theorem provers such as Lean, Coq, and Agda rest on a small core: a *kernel* that decides whether a term has a given type. Everything else, including tactics, notation, and automation, is scaffolding that produces terms for the kernel to check. If the kernel is right, a bug anywhere else can make the system fail to prove a theorem, but never make it accept a false one.
 
-MiniLean4 is a small kernel based on the dependent type theory used by Lean 4, Coq, and Agda. Its Rust code is short enough to follow from term representation through proof checking. Reading it shows where a theorem prover places its trust and what the Curry-Howard correspondence means for an actual checker.
+MiniLean4 is a small kernel based on the dependent type theory used by Lean 4, Coq, and Agda. Its Rust code takes you from term representation through proof checking. You can see which parts of a theorem prover need to be trusted and how the Curry-Howard correspondence works in a checker.
 
 Each chapter gives the rule first, then shows the Rust that implements it. The kernel, tactics, and parser together are under three thousand lines with no dependencies. The book covers the whole implementation.
 
-The book is self-contained. You need to be comfortable reading a recursive function and a little set notation. No prior exposure to type theory or to Lean is assumed, although readers who know Lean will recognize much of what they see.
+You need to be comfortable reading a recursive function and a little set notation. The book assumes no prior exposure to type theory or Lean, though readers who know Lean will recognize much of what they see.
 
 ## How to read it
 
 <p>CONTENTS_GO_HERE</p>
 
-**Part I** builds a type checker for a dependent type theory and shows that it is a proof checker for a logic. **Part II** adds inductive types (natural numbers, trees, lists, vectors, and equality) and a tactic language that writes proof terms for you. **Part III** opens the black boxes that Parts I and II relied on: substitution, alpha-equivalence, and reduction, where kernel bugs hide. **Part IV** explains why universes are structured as they are, and states the metatheory. The appendices contain the full proofs, the paradox that justifies the universe design, and a reference for the script language.
+**Part I** builds a type checker for a dependent type theory and shows how it checks proofs in a logic. **Part II** adds inductive types (natural numbers, trees, lists, vectors, and equality) and a tactic language that writes proof terms for you. **Part III** examines substitution, alpha-equivalence, and reduction, which Parts I and II relied on and where kernel bugs can hide. **Part IV** explains the universe hierarchy and states the metatheory. The appendices contain the full proofs, the paradox behind the universe design, and a reference for the script language.
 
 Throughout the book you will meet four kinds of interactive element.
 

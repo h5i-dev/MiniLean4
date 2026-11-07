@@ -120,7 +120,7 @@ The three cases of $\Whnf$ have the following properties.
 - The major premise is put in weak head normal form *before* the rules are consulted, because it may become a constructor only after computation. For $2 + 1$ in Chapter 7, the major premise is the numeral $1 = \suc\;\zero$, already a constructor; for $\mathit{double}\;(1 + 1)$, it is $1 + 1$, which $\Whnf$ turns into $\suc\;(1 + 0)$ first.
 - If the major premise does not become a constructor, for instance because it is a variable, the term is **stuck** and stays as it is; this is why $0 + n$ does not reduce ([Chapter 9](09-equality.md)).
 
-Here is $\Whnf$ at work on $\mathit{double}\;(1 + 1)$, with $\mathit{double}$ as in Chapter 7, computed live. Only the head is ever reduced, but reducing the major premise forces an inner computation.
+The live computation below applies $\Whnf$ to $\mathit{double}\;(1 + 1)$, with $\mathit{double}$ as in Chapter 7. It reduces only the head, but reducing the major premise forces an inner computation.
 
 <div class="explorer" data-kind="reduce" data-term="double (add (Nat.succ Nat.zero) (Nat.succ Nat.zero))"><pre class="prelude">def add : Nat -> Nat -> Nat := fun (m : Nat) => fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) m (fun (k : Nat) => fun (r : Nat) => Nat.succ r) n
 def double : Nat -> Nat := fun (n : Nat) => Nat.rec1 (fun (_n : Nat) => Nat) Nat.zero (fun (k : Nat) => fun (r : Nat) => Nat.succ (Nat.succ r)) n</pre></div>

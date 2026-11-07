@@ -54,7 +54,7 @@ $$
 
 $\zero$ and $\suc$ are called **constructors**. They build values but never compute: $\suc\;(\suc\;\zero)$ is already in normal form, and it *is* the number $2$. We write $0, 1, 2, \ldots$ for $\zero$, $\suc\;\zero$, $\suc\;(\suc\;\zero)$, and so on.
 
-We now have numbers, but no way to compute with them: addition must distinguish $\zero$ from $\suc\;n$, while our terms can only pass an argument along, not inspect it.
+Addition must distinguish $\zero$ from $\suc\;n$. Our terms can represent numbers but can only pass them along, so we need a way to inspect a number's constructor.
 
 ## Computing: addition
 
@@ -64,7 +64,7 @@ $$
 \add\;m\;\zero = m, \qquad \add\;m\;(\suc\;k) = \suc\;(\add\;m\;k).
 $$
 
-Look at the shape of this definition. For a fixed $m$, the function $\add\;m$ is determined by two pieces of data: its value on $\zero$, which is $m$, and a way to turn its value $r$ on $k$ into its value on $\suc\;k$, which is $\suc\;r$. Every function $f : \Nat \to C$ defined by recursion of this kind, called **structural recursion**, has the same shape:
+For a fixed $m$, the function $\add\;m$ is determined by its value on $\zero$, which is $m$, and a step that turns its value $r$ on $k$ into its value $\suc\;r$ on $\suc\;k$. Every function $f : \Nat \to C$ defined by **structural recursion** has the same shape:
 
 $$
 f\;\zero = z, \qquad f\;(\suc\;k) = s\;k\;(f\;k),

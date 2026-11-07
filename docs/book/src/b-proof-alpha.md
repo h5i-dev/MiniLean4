@@ -6,7 +6,7 @@ Alpha-equivalence has two definitions in [Chapter 11](11-substitution-alpha.md):
 
 ## The idea
 
-Both definitions turn out to say the same thing: *the two terms have the same de Bruijn representation*, that is, the same shape once every bound variable is replaced by the distance to its binder. So the proof goes through a third, nameless representation of terms.
+Both definitions say that the two terms have the same de Bruijn representation: the same shape once every bound variable is replaced by the distance to its binder. The proof uses this nameless representation of terms.
 
 - Lemma B.1 shows that the algorithm compares nameless forms. This is almost immediate, because the rules of Figure 11.1 compare positions exactly as de Bruijn indices do.
 - Lemmas B.2 and B.3 establish two facts about how nameless forms behave under renaming. The key one is that renaming a bound variable does not change the nameless form.

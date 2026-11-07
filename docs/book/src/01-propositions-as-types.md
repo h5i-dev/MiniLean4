@@ -6,7 +6,7 @@ A computer cannot check a proof written in ordinary mathematical prose. It needs
 
 ## Proofs as programs
 
-Here is a proof, in ordinary mathematical prose, of the proposition "$A$ implies $B$":
+An ordinary prose proof of "$A$ implies $B$" begins like this:
 
 > Assume $A$. Then ... (some argument) ... so $B$ holds.
 
@@ -18,7 +18,7 @@ This observation is the **Curry-Howard correspondence**. It says that
 - a proof of the proposition is a term of that type, and
 - the proposition $A$ is true exactly when some term $t$ of type $A$ exists, written $t : A$.
 
-Three examples show how far this already goes. On the left is a proposition, in the middle a proof of it written as a function, and on the right the idea of the proof in words. Here $\lambda x.\,e$ denotes the function that takes $x$ and returns $e$.
+In the proofs below, $\lambda x.\,e$ denotes the function that takes $x$ and returns $e$.
 
 | Proposition | Proof | In words |
 |---|---|---|
@@ -26,7 +26,7 @@ Three examples show how far this already goes. On the left is a proposition, in 
 | $A \to B \to A$ | $\lambda a.\,\lambda b.\,a$ | Ignore the second assumption. |
 | $(A \to B) \to (B \to C) \to A \to C$ | $\lambda f.\,\lambda g.\,\lambda a.\,g\,(f\,a)$ | Compose the two implications. |
 
-Look at the third row again. To prove that implication is transitive, you assume $A \to B$ and $B \to C$, and then, given $A$, you apply the first assumption to get $B$ and the second to get $C$. The proof term says exactly that: $f$ and $g$ are the assumptions, $a$ is the proof of $A$, and $g\,(f\,a)$ applies them in order. *Using* an assumption is *applying* a function; this is the step that distinguishes real reasoning from merely restating hypotheses, and we will return to it in [Chapter 3](03-typing-rules.md).
+In the third row, $f$ and $g$ are proofs of $A \to B$ and $B \to C$. The term $a$ proves $A$. To get from $A$ to $C$, apply the first assumption to get $B$, then apply the second. The term $g\,(f\,a)$ records both applications. *Using* an assumption means *applying* a function, a step we will return to in [Chapter 3](03-typing-rules.md).
 
 <aside class="intuition" markdown="1">
 
@@ -56,11 +56,9 @@ $$
 \tLam{P}{\Sort{0}}{\tLam{p}{P}{p}}.
 $$
 
-Notice that the binders now carry types: $\lambda(P : \Sort{0})$ says that $P$ ranges over propositions, and $\lambda(p : P)$ says that $p$ is a proof of the particular $P$ that was passed in. A type checker will need these annotations.
+The binders carry types: $\lambda(P : \Sort{0})$ says that $P$ ranges over propositions, and $\lambda(p : P)$ says that $p$ is a proof of the particular $P$ that was passed in. A type checker needs these annotations.
 
 ## What the kernel does
-
-This gives us the central idea behind a theorem prover.
 
 <div class="theorem" markdown="1">
 

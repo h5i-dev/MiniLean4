@@ -40,9 +40,9 @@ Computation preserves types. This is what justifies T-Conv and the whole strateg
 
 </div>
 
-Every well-typed term reaches a normal form, whatever order reductions are performed in. This is the deep one. $\Whnf$, $\Normalize$, and therefore $\IsDefEq$ and $\Infer$ terminate on well-typed input because of it, and the next section shows that consistency rests on it too.
+Every well-typed term reaches a normal form, whatever order reductions are performed in. This result gives termination of $\Whnf$, $\Normalize$, $\IsDefEq$, and $\Infer$ on well-typed input. Consistency depends on it too, as the next section shows.
 
-The four properties support the two guarantees in a definite pattern, drawn below: the arrows read "is needed for".
+The arrows in Figure 14.1 read "is needed for".
 
 <div class="rulebox" markdown="1">
 
@@ -69,7 +69,7 @@ The four properties support the two guarantees in a definite pattern, drawn belo
 
 </div>
 
-Together these give the two guarantees we want from a kernel.
+The resulting guarantees are:
 
 - **Decidability.** Algorithm 5.1 terminates on every input, so whether a proof is correct can always be determined.
 - **Consistency.** No closed term proves False.

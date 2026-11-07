@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Every symbol, judgment, and technical term used in the book, with the chapter that introduces it. Use this appendix as a reference while reading, or as a checklist of what the book covers.
+Look up the book's symbols, judgments, and technical terms here. Each entry points to the chapter that introduces it.
 
 </div>
 

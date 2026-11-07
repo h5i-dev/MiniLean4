@@ -100,7 +100,7 @@
       <main id="content" class="content">
         <div class="notice" role="note">本中文版由作者借助 AI 翻译而成。作者并非中文母语者，译文未经人工逐句校对，可能存在错误。如发现问题，请在 <a href="https://github.com/h5i-dev/MiniLean4/issues">GitHub 上提交 issue</a>。</div>
         <header class="chapter-head"><p class="chapter-label">第 8 章</p><h1>归纳类型 II：通用方法</h1></header><div class="lead">
-<p>第 7 章手工构造了自然数的递归子。在 Lean 中，用户从不这样做：他们写下一个 <code>inductive</code> 声明，由内核检查它，并生成类型构造器、构造子、递归子及其计算规则。本章分三步建立这一过程，从更多的构造子，到参数，再到索引，最后给出一般性的表述。内核中对应的代码约有五百行。</p>
+<p>第 7 章手工构造了自然数的递归子。Lean 则检查 <code>inductive</code> 声明，再生成递归子和计算规则。我们从多个构造子入手，依次加入参数和索引，推导出一般的生成步骤。对应的内核代码约有五百行。</p>
 </div>
 <h2 id="_1">更多构造子：树</h2>
 <p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="sans-serif">N</mi><mi mathvariant="sans-serif">a</mi><mi mathvariant="sans-serif">t</mi></mrow><annotation encoding="application/x-tex">\Nat</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathsf">Nat</span></span></span></span></span> 有两个构造子，其中只有一个带递归参数。考虑一个有三个构造子的类型：</p>

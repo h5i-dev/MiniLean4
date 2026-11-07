@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">Chapter 12</p><h1>Reduction and Conversion</h1></header><div class="lead">
-<p>Chapter 11 handled names. This chapter handles computation: the three kinds of reduction step, the definition of definitional equality, and the algorithms Whnf, Normalize, and IsDefEq that Algorithm 5.1 left open. The main design point is that the computation rules of inductive types are stored as data in the signature, so one reduction function serves every inductive type ever declared.</p>
+<p>After handling variable names, we can implement computation. We define three kinds of reduction, then use them for weak head normalization, full normalization, and definitional equality. Inductive computation rules live in the signature, allowing one reduction function to handle every declared inductive type.</p>
 </div>
 <h2 id="reduction">Reduction</h2>
 <p>Applying a <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span>-abstraction to an argument is computed by substituting the argument for the bound variable:</p>
@@ -245,7 +245,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
 H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
 c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> of each recursive field with the actual parameters and field values and wraps a recursive call in the corresponding <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span>s.</p>
-<p>Rather than storing a right-hand-side <em>term</em> per rule as in the table above, the implementation computes the right-hand side from the <code>InductiveInfo</code> each time. The two are equivalent; computing on the fly avoids keeping a second copy of the constructor data in sync.</p>
+<p>The implementation computes each rule's right-hand side from <code>InductiveInfo</code> when needed. The table above specifies the same result; computing it avoids storing a second copy of the constructor data.</p>
 </aside>
 <p>One subtlety in <code>normalize_with_fuel</code> deserves mention. After normalizing the function and argument of an application, it calls <code>whnf</code> on the rebuilt term once more. Normalizing an argument can expose a new redex at the head: for a stuck recursor application whose major premise <em>becomes</em> a constructor only after its own arguments are normalized, the head must be reduced again. Without this re-check, <code>is_def_eq</code> would miss some equalities, and the test <code>conversion_renormalizes_exposed_redex</code> in <code>src/proof.rs</code> guards it.</p>
 <h2 id="exercises">Exercises</h2>

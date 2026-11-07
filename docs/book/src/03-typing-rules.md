@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-The kernel's job is to decide the judgment "term $t$ has type $A$". This chapter defines that judgment by a small set of inference rules, one for each kind of term and one extra rule that lets computation happen inside types. Reading each rule bottom-up turns it into a recipe for checking a term, and that recipe becomes the algorithm of Chapter 5.
+The judgment "term $t$ has type $A$" is decided by a rule for each kind of term, plus one rule for computation inside types. Read bottom-up, the rules suggest the algorithm in Chapter 5.
 
 </div>
 

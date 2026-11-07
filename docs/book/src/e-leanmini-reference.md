@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-The scripts in this book are written in a small language called leanmini, read by the parser in `src/syntax.rs` and the command loop in `src/main.rs`. It is deliberately explicit: every binder carries its type, every argument is written out, and nothing is inferred. This appendix is the complete reference, derived line by line from the code, together with every example script of the repository in a runnable form.
+The book's scripts use leanmini, parsed by `src/syntax.rs` and run by `src/main.rs`. Every binder has an explicit type and every argument is written out. This reference covers the language and includes runnable versions of the repository's example scripts.
 
 </div>
 

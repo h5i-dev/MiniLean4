@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">第 12 章</p><h1>簡約と変換</h1></header><div class="lead">
-<p>第 11 章では名前を扱ったのに対し、本章では計算を扱う。三種類の簡約ステップ、定義的等価の定義、そしてアルゴリズム 5.1 が未定義のまま残した Whnf、Normalize、IsDefEq のアルゴリズムである。設計上の要点は、帰納型の計算規則をシグネチャにデータとして保存することにあり、これにより、一つの簡約関数が、これまでに宣言されたあらゆる帰納型に対して働く。</p>
+<p>変数名の問題を解決したので、次は計算を実装する。三種類の簡約を定義し、それを使って弱頭正規化、正規化、定義的等価を判定する。帰納型の計算規則はシグネチャにデータとして保存するため、一つの簡約関数で宣言済みの帰納型を扱える。</p>
 </div>
 <h2 id="_1">簡約</h2>
 <p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span> 抽象を引数に適用した結果は、束縛変数に引数を代入して計算する。</p>

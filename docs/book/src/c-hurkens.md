@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-[Chapter 13](13-universes.md) claimed that a single universe containing itself makes the type theory inconsistent: there is a closed term of type $\tPi{p}{\mathsf{Type}}{p}$, a proof of everything. This appendix gives that term in full, explains the idea behind it, and shows exactly where the rule $\mathsf{Type} : \mathsf{Type}$ is used, so that you can see why the universe hierarchy blocks it.
+With the rule $\mathsf{Type} : \mathsf{Type}$, there is a closed term of type $\tPi{p}{\mathsf{Type}}{p}$: a proof of every proposition. Here is the term behind the claim in [Chapter 13](13-universes.md), including the step that depends on a universe containing itself.
 
 </div>
 

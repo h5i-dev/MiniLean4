@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">第 7 章</p><h1>帰納型 I: 自然数</h1></header><div class="lead">
-<p>ここまでに扱った型は宇宙と <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Π</mi></mrow><annotation encoding="application/x-tex">\Pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Π</span></span></span></span> 型だけであり、命題論理には足りても、数学に必要な数や等しさを表す手段はまだない。Lean はその両方を帰納型で提供する。本章ではカーネルに定数を加えて自然数を宣言し、同じ仕組みで数の計算と証明を扱えることを示す。</p>
+<p>宇宙と <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Π</mi></mrow><annotation encoding="application/x-tex">\Pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Π</span></span></span></span> 型で論理は表せるが、計算や証明の対象となる自然数はまだない。帰納型を使ってカーネルに自然数を加え、その再帰子から計算と帰納法を得る。</p>
 </div>
 <h2 id="_1">定数と定義</h2>
 <p>まず、名前のついた対象をカーネルに追加する手段が要るので、項に<strong>定数</strong>（constant）<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> を加える。</p>

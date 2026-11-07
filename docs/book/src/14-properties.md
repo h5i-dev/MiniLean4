@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-So far we have claimed that the kernel's algorithm terminates and that it never accepts a proof of False. Both claims rely on theorems about the type system, whose proofs are much harder than the kernel's own computations. This chapter states those theorems, explains why each matters, and sketches how they establish consistency; Appendix D gives the full proof.
+Why does type checking terminate, and why can the core system not prove False? The answers depend on theorems about typing and reduction, beyond what the Rust implementation itself establishes. We state the needed results and sketch the consistency argument; Appendix D supplies the full proof.
 
 </div>
 

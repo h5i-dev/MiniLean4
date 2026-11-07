@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-This chapter runs Algorithm 5.1 by hand on a handful of small terms and relates each run to the typing rules. The examples are chosen to show the algorithm doing each of its jobs: building a derivation, catching a wrong proof, using a hypothesis, instantiating a universal statement, and computing inside a type. Every trace below can be reproduced in the kernel with the playgrounds.
+Algorithm 5.1 is easier to understand when its recursive calls are visible. The examples below trace a valid derivation, a rejected proof, hypothesis use, universal instantiation, and computation inside a type. You can reproduce each trace in a playground.
 
 </div>
 

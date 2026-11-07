@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-The book cites a small number of sources. Each entry below says what the work contributes and where the book relies on it.
+These are the sources used in the book, with notes on the results cited from each one.
 
 </div>
 

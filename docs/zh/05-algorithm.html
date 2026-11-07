@@ -100,7 +100,7 @@
       <main id="content" class="content">
         <div class="notice" role="note">本中文版由作者借助 AI 翻译而成。作者并非中文母语者，译文未经人工逐句校对，可能存在错误。如发现问题，请在 <a href="https://github.com/h5i-dev/MiniLean4/issues">GitHub 上提交 issue</a>。</div>
         <header class="chapter-head"><p class="chapter-label">第 5 章</p><h1>类型检查算法</h1></header><div class="lead">
-<p>类型规则说明哪些判断成立，却没有给出判定方法。本章把工作分给两个相互递归的函数，将规则变成算法：一个计算项的类型，另一个借助定义相等，把算出的类型与期望的类型作比较。最终的 Rust 实现只有几十行。</p>
+<p>把类型规则变成判定步骤，需要两个相互递归的函数：<code>infer</code> 求出项的类型，<code>check</code> 用定义相等将它与期望类型比较。Rust 实现只有几十行。</p>
 </div>
 <h2 id="_1">从规则到算法</h2>
 <p>图 3.1 的八条规则中有七条是<em>语法制导</em>（syntax-directed）的：看一眼项，就知道该用哪条规则。宇宙对应 T-Sort，变量对应 T-Var，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Π</mi></mrow><annotation encoding="application/x-tex">\Pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Π</span></span></span></span> 对应 T-Pi，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span> 对应 T-Lam，应用对应 T-App。T-Conv 是例外：它可以在任何时刻应用于任何项，程序无法从项本身判断何时该用它，而朴素地搜索推导就只能靠猜。</p>

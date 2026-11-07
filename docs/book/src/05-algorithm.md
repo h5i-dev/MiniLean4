@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-The typing rules say which judgments hold, but not how to decide whether they hold. This chapter turns those rules into an algorithm by splitting the work between two mutually recursive functions: one computes the type of a term, while the other compares that type with the expected one using definitional equality. The result is a few dozen lines of Rust.
+The typing rules describe valid judgments; a kernel must decide them. Two mutually recursive functions do the work: `infer` computes a term's type, and `check` compares it with the expected type using definitional equality. Their Rust implementation fits in a few dozen lines.
 
 </div>
 

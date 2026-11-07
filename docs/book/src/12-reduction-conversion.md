@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Chapter 11 handled names. This chapter handles computation: the three kinds of reduction step, the definition of definitional equality, and the algorithms Whnf, Normalize, and IsDefEq that Algorithm 5.1 left open. The main design point is that the computation rules of inductive types are stored as data in the signature, so one reduction function serves every inductive type ever declared.
+After handling variable names, we can implement computation. We define three kinds of reduction, then use them for weak head normalization, full normalization, and definitional equality. Inductive computation rules live in the signature, allowing one reduction function to handle every declared inductive type.
 
 </div>
 
@@ -162,7 +162,7 @@ match reduced {
 
 `iota_reduce` finds the major premise at `recursor.major_argument_index`, puts it in weak head normal form, checks that its head is a constructor of the right inductive type applied to all of its parameters and fields, checks that the constructor's parameters are convertible to the recursor's (a well-typed redex guarantees this, but the kernel verifies rather than assumes), and then builds $m_j\;\vec{a}\;\vec{h}$ followed by any extra arguments. The induction hypotheses $\vec{h}$ are built by `induction_hypothesis`, which instantiates the stored $\vec{y} : \vec{B}$ and $\vec{s}$ of each recursive field with the actual parameters and field values and wraps a recursive call in the corresponding $\lambda$s.
 
-Rather than storing a right-hand-side *term* per rule as in the table above, the implementation computes the right-hand side from the `InductiveInfo` each time. The two are equivalent; computing on the fly avoids keeping a second copy of the constructor data in sync.
+The implementation computes each rule's right-hand side from `InductiveInfo` when needed. The table above specifies the same result; computing it avoids storing a second copy of the constructor data.
 
 </aside>
 

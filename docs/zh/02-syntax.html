@@ -100,7 +100,7 @@
       <main id="content" class="content">
         <div class="notice" role="note">本中文版由作者借助 AI 翻译而成。作者并非中文母语者，译文未经人工逐句校对，可能存在错误。如发现问题，请在 <a href="https://github.com/h5i-dev/MiniLean4/issues">GitHub 上提交 issue</a>。</div>
         <header class="chapter-head"><p class="chapter-label">第 2 章</p><h1>项的语言</h1></header><div class="lead">
-<p>内核在检查任何东西之前，先需要一种精确的项语言。我们的语言只有五种项，这已足以表达带命题量化的命题逻辑。本章确定文法、全书沿用的记法约定，以及表示项的 Rust 类型。</p>
+<p>这个内核从五种项开始，它们足以表达带命题量化的命题逻辑。编写类型检查器之前，先确定项的文法和记法，再给出对应的 Rust <code>Term</code> 类型。</p>
 </div>
 <h2 id="_1">五种项</h2>
 <p>核心语言是一个小型依赖类型论，它的项由如下文法生成</p>

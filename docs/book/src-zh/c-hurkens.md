@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-[第 13 章](13-universes.md)断言：若一个宇宙包含自身，类型理论就会变得不一致，也就是存在一个类型为 $\tPi{p}{\mathsf{Type}}{p}$ 的闭项，它是对一切命题的证明。本附录完整给出这个项，解释其背后的思想，并精确指出规则 $\mathsf{Type} : \mathsf{Type}$ 用在哪里，让你看清宇宙层级为何能挡住它。
+若允许规则 $\mathsf{Type} : \mathsf{Type}$，就存在类型为 $\tPi{p}{\mathsf{Type}}{p}$ 的闭项，任何命题都能得到证明。这里给出[第 13 章](13-universes.md)所述的项，并指出它在哪一步用到了宇宙包含自身。
 
 </div>
 

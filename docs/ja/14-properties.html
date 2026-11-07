@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">第 14 章</p><h1>体系の性質</h1></header><div class="lead">
-<p>これまで、カーネルのアルゴリズムは停止し、False の証明を受理しないと述べてきた。どちらも型システムに関する定理に依拠しており、その証明はカーネルの処理よりずっと難しい。本章では各定理の役割を説明し、そこから整合性がどう導かれるかを概説し、完全な証明は付録 D に示す。</p>
+<p>型検査はなぜ停止し、コア体系で False を証明できないのはなぜか。答えには型付けと簡約に関する定理が必要であり、Rust の実装だけからは従わない。必要な定理と整合性の証明の筋道を示し、完全な証明を付録 D に置く。</p>
 </div>
 <h2 id="_1">核となるシステム</h2>
 <p>以下の定理が扱うのは<em>核となる</em>システム、すなわち図 3.1 の規則に<a href="13-universes.html">第 13 章</a>の宇宙を加え、第 II 部の定数を除いたものである。これは Barendregt の意味での<strong>純粋型システム（Pure Type System）</strong>であり、Calculus of Constructions [Coquand 1988] の非述語的な <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="sans-serif">S</mi><mi mathvariant="sans-serif">o</mi><mi mathvariant="sans-serif">r</mi><mi mathvariant="sans-serif">t</mi></mrow><mtext> </mtext><mn>0</mn></mrow><annotation encoding="application/x-tex">\Sort{0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathsf">Sort</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord">0</span></span></span></span></span> の上に述語的な宇宙の階層を載せたもので、Luo の Extended Calculus of Constructions [Luo 1990] に近い。最初の三つの性質は、関数的な純粋型システムすべてで成り立つ [Barendregt 1992] が、強正規化は非述語性があるとはるかに難しくなり、Girard の可約性候補（reducibility candidates）の方法を必要とする [Girard 1972; Coquand 1988; Luo 1990]。帰納型を加えると何が変わるかは章末で述べる。</p>

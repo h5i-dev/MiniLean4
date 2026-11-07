@@ -100,7 +100,7 @@
       <main id="content" class="content">
         <div class="notice" role="note">本中文版由作者借助 AI 翻译而成。作者并非中文母语者，译文未经人工逐句校对，可能存在错误。如发现问题，请在 <a href="https://github.com/h5i-dev/MiniLean4/issues">GitHub 上提交 issue</a>。</div>
         <header class="chapter-head"><p class="chapter-label">附录 B</p><h1>α 等价算法的正确性</h1></header><div class="lead">
-<p><a href="11-substitution-alpha.html">第 11 章</a>给出了 α 等价的两种定义：数学定义（允许给约束变量改名的最小同余关系）和算法定义（图 11.1 的规则，同步遍历两个项，按位置比较约束变量）。定理 11.1 说二者一致，本附录证明这一点。</p>
+<p><a href="11-substitution-alpha.html">第 11 章</a>给出 α 等价的两种定义：由约束变量改名生成的同余关系，以及按位置比较约束变量的算法。定理 11.1 说二者一致；证明在这里。</p>
 </div>
 <h2 id="_1">思路</h2>
 <p>两种定义说的其实是同一件事：<em>两个项的 de Bruijn 表示相同</em>，也就是说，把每个约束变量换成它到自己绑定子的距离之后，二者形状相同。所以证明要经过第三种表示：无名的项表示。</p>

@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-[Chapter 14](14-properties.md) states that the core system is consistent: no closed term has type $\tPi{P}{\Sort{0}}{P}$ (Theorem 14.5). This appendix gives the full proof, including the standard facts about typing and conversion that the argument uses. It concerns the core system: the rules of Figure 3.1 with the universes of [Chapter 13](13-universes.md), without the constants of Part II.
+[Chapter 14](14-properties.md) states Theorem 14.5: no closed term of the core system has type $\tPi{P}{\Sort{0}}{P}$. We prove it here, including the typing and conversion lemmas it needs. The result concerns the rules of Figure 3.1 with the universes of [Chapter 13](13-universes.md), without the constants of Part II.
 
 </div>
 

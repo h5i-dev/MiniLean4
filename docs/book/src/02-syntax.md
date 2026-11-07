@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Before a kernel can check anything, it needs a precise language of terms. Ours has five kinds of term, and that is enough to express propositional logic with quantification over propositions. This chapter fixes the grammar, the notational conventions used for the rest of the book, and the Rust type that represents terms.
+Our kernel starts with five kinds of term. They are enough to express propositional logic with quantification over propositions. We need to fix their grammar and notation before writing the type checker; the Rust `Term` type follows the same grammar.
 
 </div>
 
@@ -107,7 +107,7 @@ pub enum Term {
 }
 ```
 
-Variables are represented by their names as strings, and binders store the bound name. This is the most direct representation and the easiest to read; it is also the one that makes the naming problems of [Chapter 11](11-substitution-alpha.md) unavoidable, which is deliberate, because the point of the book is to see those problems and solve them.
+Variables are strings, and binders store the names they bind. This keeps the representation readable but creates the capture and renaming problems addressed in [Chapter 11](11-substitution-alpha.md).
 
 </aside>
 

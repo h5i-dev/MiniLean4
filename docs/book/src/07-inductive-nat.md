@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-So far we have only universes and $\Pi$-types. They suffice for propositional logic, but mathematics also needs numbers to reason about and a way to state that two things are equal. Lean supplies both through inductive types. This chapter adds constants to the kernel, declares the natural numbers, and shows how the same mechanism supports computation and proof about them.
+Universes and $\Pi$-types gave us a logic, but no natural numbers to compute with or prove things about. Inductive types supply them. We add constants to the kernel, declare natural numbers, and derive computation and induction from their recursor.
 
 </div>
 

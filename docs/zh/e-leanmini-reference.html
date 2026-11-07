@@ -100,7 +100,7 @@
       <main id="content" class="content">
         <div class="notice" role="note">本中文版由作者借助 AI 翻译而成。作者并非中文母语者，译文未经人工逐句校对，可能存在错误。如发现问题，请在 <a href="https://github.com/h5i-dev/MiniLean4/issues">GitHub 上提交 issue</a>。</div>
         <header class="chapter-head"><p class="chapter-label">附录 E</p><h1>leanmini 语言</h1></header><div class="lead">
-<p>本书的脚本用一种叫 leanmini 的小语言写成，由 <code>src/syntax.rs</code> 中的解析器和 <code>src/main.rs</code> 中的命令循环读取。它刻意做到完全显式：每个绑定子都带有类型，每个参数都写出来，没有任何东西靠推断得到。本附录是逐行从代码导出的完整参考，并附上仓库中每个示例脚本的可运行版本。</p>
+<p>本书的脚本使用 leanmini，由 <code>src/syntax.rs</code> 解析，再交给 <code>src/main.rs</code> 运行。每个绑定子都有显式类型，每个参数都要写出。这份参考说明语言的规则，并收录仓库中可运行的示例脚本。</p>
 </div>
 <h2 id="_1">运行脚本</h2>
 <p>运行器是由 <code>src/main.rs</code> 构建的二进制程序 <code>mini-lean</code>。</p>

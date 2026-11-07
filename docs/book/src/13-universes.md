@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Chapter 4 showed that the typing rules implement a logic, and that the system is acceptable only if it is consistent. This chapter asks a question that has been deferred since Chapter 2: what is the type of $\Sort{0}$? The simplest answer, a single universe that contains itself, makes the system inconsistent. Lean's answer, a hierarchy $\Sort{0} : \Sort{1} : \Sort{2} : \cdots$ with an impredicative bottom universe, does not. Along the way the chapter explains the one odd-looking piece of T-Pi, the function $\imax$.
+What is the type of $\Sort{0}$? Putting it in itself makes the system inconsistent. Lean instead uses the hierarchy $\Sort{0} : \Sort{1} : \Sort{2} : \cdots$, with an impredicative bottom universe. That choice also explains the $\imax$ in the T-Pi rule.
 
 </div>
 

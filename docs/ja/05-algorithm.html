@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">第 5 章</p><h1>型検査アルゴリズム</h1></header><div class="lead">
-<p>型付け規則は、どの判断が成り立つかを述べるが、その確かめ方までは教えてくれない。本章では、仕事を相互再帰する二つの関数に分けて規則をアルゴリズムに変え、一方が項の型を計算し、もう一方が定義的等価を使ってその型を期待される型と比較する。できあがるのは、数十行の Rust である。</p>
+<p>型付け規則を判定手順にする。相互再帰する <code>infer</code> が項の型を求め、<code>check</code> が定義的等価を使って期待される型と比較する。Rust の実装は数十行である。</p>
 </div>
 <h2 id="_1">規則からアルゴリズムへ</h2>
 <p>図 3.1 の八つの規則のうち七つは<em>構文主導</em>（syntax-directed）であり、項を見ればどの規則が当てはまるか分かる。宇宙なら T-Sort、変数なら T-Var、<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Π</mi></mrow><annotation encoding="application/x-tex">\Pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Π</span></span></span></span> なら T-Pi、<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span> なら T-Lam、適用なら T-App が適用される。例外は T-Conv であり、この規則はどの項にもどの時点でも適用できるため、項を見ただけではいつ使うべきか分からない。導出を素朴に探索しようとすれば、当て推量に頼ることになる。</p>

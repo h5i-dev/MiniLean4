@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">第 8 章</p><h1>帰納型 II: 一般的な手順</h1></header><div class="lead">
-<p>第 7 章では自然数の再帰子を手作業で組み立てたが、Lean のユーザーはそのようなことをしない。<code>inductive</code> 宣言を書けば、カーネルがそれを検査し、型構成子、構成子、再帰子、そしてその計算規則を生成する。本章ではこの手続きを三段階で組み立て、まず構成子を増やし、次にパラメータ、最後に添字を扱い、そのうえで一般的な形で述べる。カーネルのこの部分のコードはおよそ五百行である。</p>
+<p>第 7 章では自然数の再帰子を手で組み立てた。Lean では、カーネルが <code>inductive</code> 宣言を検査して再帰子と計算規則を生成する。構成子を増やし、パラメータと添字を加えながら、この生成手順を導く。対応するカーネルのコードは約五百行である。</p>
 </div>
 <h2 id="_1">構成子を増やす: 木</h2>
 <p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="sans-serif">N</mi><mi mathvariant="sans-serif">a</mi><mi mathvariant="sans-serif">t</mi></mrow><annotation encoding="application/x-tex">\Nat</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathsf">Nat</span></span></span></span></span> の構成子は二つで、再帰的引数を持つのはそのうち一つだけである。構成子が三つある型を考えよう。</p>

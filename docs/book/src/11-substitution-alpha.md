@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-The previous chapters treated three operations on terms as black boxes: substitution, used by T-App, by Freshen, and by every computation step; weak head normalization, used to expose a $\Pi$ or a universe; and definitional equality, used by Check. These operations are part of the trusted kernel, and most kernel bugs hide in them, because they must handle the names of bound variables correctly. This chapter opens the first box, substitution, shows the same naming problem in contexts, and then defines when two terms are equal up to the names of their bound variables.
+Substitution replaces a variable with a term, but a careless replacement can let a binder capture a free variable. The same naming problem affects contexts and alpha-equivalence. We make substitution precise here, then define equality up to renaming bound variables. Weak head normalization, which exposes a $\Pi$ or a universe, and definitional equality follow in Chapter 12.
 
 </div>
 

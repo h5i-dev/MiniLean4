@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-[Chapter 4](04-logic.md) claimed that every proof in second-order propositional logic can be turned into a term that the kernel accepts (Theorem 4.1). This appendix makes the statement precise and proves it in full. The proof is short once the right bookkeeping is in place: it is an induction on the derivation of the logical judgment, and each case is one row of the table in Chapter 4 read from left to right.
+Theorem 4.1 claims that every derivation in second-order propositional logic yields a term accepted by the kernel. Here we prove it by induction on the derivation. Each induction case follows one row of the translation table in [Chapter 4](04-logic.md).
 
 </div>
 

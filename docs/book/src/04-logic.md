@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Chapter 3 presented eight typing rules as rules of logic. To make that claim precise, this chapter chooses a particular logic, translates its formulas into types, and shows that every proof in the logic becomes a term accepted by the kernel. It then explains why the kernel also needs consistency to be trustworthy.
+Are the typing rules of Chapter 3 really rules of logic? We can answer that for second-order propositional logic: translate its formulas into types and its derivations into terms the kernel accepts. We also need consistency, since accepting every proposition would make proof checking worthless.
 
 </div>
 

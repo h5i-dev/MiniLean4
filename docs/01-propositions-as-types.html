@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">Chapter 1</p><h1>Propositions as Types</h1></header><div class="lead">
-<p>A theorem prover has to decide whether a proof is correct. A proof written in English cannot be checked by a computer, so we need a representation of proofs that a program can inspect. This chapter introduces the idea that makes everything else possible: a proof is a program, a proposition is its type, and checking a proof is type checking.</p>
+<p>A computer cannot check a proof written in ordinary mathematical prose. It needs a proof expressed as a term with a type. Under the Curry-Howard correspondence, that type is the proposition being proved; checking the proof is type checking.</p>
 </div>
 <h2 id="proofs-as-programs">Proofs as programs</h2>
 <p>Here is a proof, in ordinary mathematical prose, of the proposition "<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span> implies <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>":</p>

@@ -12,7 +12,7 @@
 
 <div class="lead" markdown="1">
 
-This eBook walks through how interactive theorem provers like Lean 4 work by implementing a Lean 4-style proof kernel from scratch, step by step. We cover the core foundations, including inductive types, a tactic language, and the universe hierarchy. Each piece comes with a small Rust implementation.
+Build a small proof kernel in Rust and use it to see how a theorem prover checks a proof. The book starts with terms and typing rules, then adds inductive types, tactics, and universes. Each piece has code you can inspect and run.
 
 </div>
 
@@ -34,9 +34,9 @@ qed</pre></div>
 
 Interactive theorem provers such as Lean, Coq, and Agda rest on a small core: a *kernel* that decides whether a term has a given type. Everything else, including tactics, notation, and automation, is scaffolding that produces terms for the kernel to check. If the kernel is right, a bug anywhere else can make the system fail to prove a theorem, but never make it accept a false one.
 
-MiniLean4 is a proof assistant kernel at teaching scale: the same kind of dependent type theory that Lean 4, Coq, and Agda use for formal verification, cut down to what fits in a few files of Rust. If you want to understand how Lean 4 checks a proof, what the Curry-Howard correspondence buys you in practice, or where formal verification tools get their trust, this is the machinery with nothing hidden.
+MiniLean4 is a small kernel based on the dependent type theory used by Lean 4, Coq, and Agda. Its Rust code is short enough to follow from term representation through proof checking. Reading it shows where a theorem prover places its trust and what the Curry-Howard correspondence means for an actual checker.
 
-The goal here is to make that kernel concrete. Each chapter introduces one idea on paper, states it precisely, and then shows the Rust code that implements it. The whole implementation, kernel plus tactics and parser, is under three thousand lines with no dependencies, and this book covers all of it.
+Each chapter gives the rule first, then shows the Rust that implements it. The kernel, tactics, and parser together are under three thousand lines with no dependencies. The book covers the whole implementation.
 
 The book is self-contained. You need to be comfortable reading a recursive function and a little set notation. No prior exposure to type theory or to Lean is assumed, although readers who know Lean will recognize much of what they see.
 

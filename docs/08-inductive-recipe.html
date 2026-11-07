@@ -100,7 +100,7 @@
       <main id="content" class="content">
         
         <header class="chapter-head"><p class="chapter-label">Chapter 8</p><h1>Inductive Types II: The General Recipe</h1></header><div class="lead">
-<p>Chapter 7 built the recursor for the natural numbers by hand. In Lean, a user never does that: they write an <code>inductive</code> declaration, and the kernel checks it and generates the type former, the constructors, the recursor, and its computation rules. This chapter develops that procedure in three steps, from more constructors to parameters to indices, and then states it in general. The kernel's own code for it is about five hundred lines.</p>
+<p>Chapter 7 built the natural-number recursor by hand. Lean generates one from an <code>inductive</code> declaration after checking the declaration. We work up to that procedure through types with several constructors, parameters, and indices. The kernel code for it is about five hundred lines.</p>
 </div>
 <h2 id="more-constructors-trees">More constructors: trees</h2>
 <p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="sans-serif">N</mi><mi mathvariant="sans-serif">a</mi><mi mathvariant="sans-serif">t</mi></mrow><annotation encoding="application/x-tex">\Nat</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathsf">Nat</span></span></span></span></span> has two constructors, and only one of them has a recursive argument. Consider a type with three:</p>

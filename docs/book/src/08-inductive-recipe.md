@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Chapter 7 built the recursor for the natural numbers by hand. In Lean, a user never does that: they write an `inductive` declaration, and the kernel checks it and generates the type former, the constructors, the recursor, and its computation rules. This chapter develops that procedure in three steps, from more constructors to parameters to indices, and then states it in general. The kernel's own code for it is about five hundred lines.
+Chapter 7 built the natural-number recursor by hand. Lean generates one from an `inductive` declaration after checking the declaration. We work up to that procedure through types with several constructors, parameters, and indices. The kernel code for it is about five hundred lines.
 
 </div>
 

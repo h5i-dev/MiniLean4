@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-Lean users rarely write terms like the one at the end of Chapter 9 by hand. They write a tactic script, a sequence of commands that build the term step by step while the system displays what remains to be proved. This chapter shows how the common tactics construct terms in our system, and why none of them needs to be trusted.
+The proof term at the end of Chapter 9 is cumbersome to write by hand. Tactics build such terms while showing the goals that remain. We implement the common tactics and track the term each one constructs; the kernel checks the completed term.
 
 </div>
 

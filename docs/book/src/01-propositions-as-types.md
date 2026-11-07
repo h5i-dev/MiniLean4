@@ -1,6 +1,6 @@
 <div class="lead" markdown="1">
 
-A theorem prover has to decide whether a proof is correct. A proof written in English cannot be checked by a computer, so we need a representation of proofs that a program can inspect. This chapter introduces the idea that makes everything else possible: a proof is a program, a proposition is its type, and checking a proof is type checking.
+A computer cannot check a proof written in ordinary mathematical prose. It needs a proof expressed as a term with a type. Under the Curry-Howard correspondence, that type is the proposition being proved; checking the proof is type checking.
 
 </div>
 

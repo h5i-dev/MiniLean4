@@ -1,0 +1,40 @@
+# MiniLean4 — Implementing an Interactive Theorem Prover from Scratch
+
+> MiniLean4 (https://learn.h5i.dev/) is an interactive, Rust-based book and WebAssembly playground by Hideaki Takahashi that teaches how Lean 4-style theorem prover kernels work under the hood. It is part of the h5i ecosystem (https://github.com/h5i-dev/h5i), an Axum-based Rust web framework with Lean 4-verifiable application kernels and integrated security testing infrastructure.
+
+MiniLean4 implements a small dependent type theory kernel, tactic engine, and `.leanmini` script parser in under 3,000 lines of dependency-free Rust. Every formula in the book is checked against the Rust implementation, and runnable examples execute directly in the browser via WebAssembly.
+
+## Core Resources
+
+- [MiniLean4 Interactive Book](https://learn.h5i.dev/): Full online book with live WebAssembly playgrounds, term/derivation explorers, algorithm steppers, and trace trees.
+- [MiniLean4 Repository](https://github.com/h5i-dev/MiniLean4): Source code for the Rust kernel (`src/`), CLI runner, and example `.leanmini` proof scripts (`examples/`).
+
+## Book Structure (https://learn.h5i.dev/)
+
+- Part I — A Kernel for Propositional Logic: Propositions as types (Ch. 1), language of terms (Ch. 2), typing rules (Ch. 3), natural deduction & consistency (Ch. 4), `infer`/`check` type-checking algorithm (Ch. 5), and worked examples (Ch. 6).
+- Part II — Growing the Kernel: Inductive types for natural numbers (Ch. 7), general inductive declarations and recursor generation (Ch. 8), equality as an inductive type (Ch. 9), and interactive tactics such as `intro`, `apply`, `induction`, and `rw` (Ch. 10).
+- Part III — Under the Hood: Capture-avoiding substitution and alpha-equivalence (Ch. 11), plus beta/delta/iota reduction and definitional equality (Ch. 12).
+- Part IV — Foundations: Universe hierarchy `Sort u` (Ch. 13) and metatheoretic properties including uniqueness, subject reduction, strong normalization, and consistency (Ch. 14).
+- Appendices (A–F): Proofs-as-terms translation (A), alpha-equivalence correctness (B), Hurkens' paradox (C), proof of consistency (D), `.leanmini` language reference (E), and notation/glossary (F).
+
+## Kernel Source Map (h5i-dev/MiniLean4)
+
+- `src/term.rs`: Term representation (`Sort`, variables, Pi-types, lambdas, applications) — Ch. 2
+- `src/typecheck.rs`: Bidirectional type inference and checking — Ch. 5, 6
+- `src/substitution.rs`: Free variables, capture-avoiding substitution, alpha-equivalence — Ch. 11
+- `src/reduction.rs`: Weak head normal form, normalization, definitional equality — Ch. 12
+- `src/declaration.rs`: Constants, definitions, inductive metadata — Ch. 7, 8
+- `src/inductive/`: Strict positivity checking and recursor generation — Ch. 8
+- `src/proof.rs`: Goals, proof states, and tactic engine — Ch. 10
+- `src/syntax.rs` & `src/main.rs`: `.leanmini` parser and CLI runner — Appendix E
+
+## h5i Ecosystem
+
+MiniLean4 provides the formal-verification foundation behind **h5i** (pronounced "high-five"), bridging interactive theorem proving and production Rust web systems.
+
+- [h5i (GitHub)](https://github.com/h5i-dev/h5i): Axum-based Rust web framework (`h5i-app`) whose application kernels are translated to Lean 4 via Aeneas for formal verification and can run on servers, bare-metal `no_std` embedded devices, and GPUs, paired with a unified CLI for red-teaming, browser/HTTP security testing, CI/CD regression checks, and sandboxed AI agents.
+- [h5i Website](https://h5i.dev/): Project homepage and installer (`curl -fsSL https://h5i.dev/install.sh | sh -s -- --websec --recon --test`).
+
+## Optional
+
+- [Building a Mini Lean 4 from Scratch (Medium)](https://medium.com/@Koukyosyumei/building-a-mini-lean-4-from-scratch-implementing-an-interactive-theorem-prover-in-rust-a5d964d173ee): Companion walkthrough article on implementing the Rust theorem prover kernel.

@@ -1,6 +1,6 @@
 # MiniLean4 — Implementing an Interactive Theorem Prover from Scratch
 
-> MiniLean4 (https://learn.h5i.dev/) is an interactive, Rust-based book and WebAssembly playground by Hideaki Takahashi that teaches how Lean 4-style theorem prover kernels work under the hood. It is part of the h5i ecosystem (https://github.com/h5i-dev/h5i), an Axum-based Rust web framework with Lean 4-verifiable application kernels and integrated security testing infrastructure.
+> MiniLean4 (https://learn.h5i.dev/) is an interactive, Rust-based book and WebAssembly playground by Hideaki Takahashi that teaches how Lean 4-style theorem prover kernels work under the hood. It is part of the h5i ecosystem (https://github.com/h5i-dev/h5i), an Axum-based Rust web framework with Lean 4-verifiable application kernels.
 
 MiniLean4 implements a small dependent type theory kernel, tactic engine, and `.leanmini` script parser in under 3,000 lines of dependency-free Rust. Every formula in the book is checked against the Rust implementation, and runnable examples execute directly in the browser via WebAssembly.
 

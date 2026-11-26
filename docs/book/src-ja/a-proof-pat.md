@@ -1,27 +1,27 @@
 <div class="lead" markdown="1">
 
-定理 4.1 は、二階命題論理のどの導出からもカーネルが受理する項を作れると主張する。ここでは導出に関する帰納法で証明する。各場合は[第 4 章](04-logic.md)の翻訳表の一行に対応する。
+定理 4.1 は、二階命題論理のどの導出からも、カーネルが受理する項を作れることを主張しています。この付録では、導出に関する帰納法でこれを証明します。各ケースは、[第 4 章](04-logic.md)の翻訳表の一行に対応します。
 
 </div>
 
 ## 考え方
 
-論理における導出は規則適用の木であり、第 4 章の変換は各論理規則を一つの型付け規則と対にしたので、自然な方針は、導出を葉から上へたどり、各節点で、対になる型付け規則が与える型付け導出を組み立てることである。仮定は変数の参照になり、含意の導入は $\lambda$ に、含意の除去は適用になる。二つの量化子規則は、$\Sort{0}$ 上の $\lambda$ と、型への適用になる。
+論理における導出は、規則を適用してできる木です。第 4 章の変換では各論理規則を一つの型付け規則と対にしたので、自然な方針は、導出を葉から根へとたどり、各節点で対応する型付け規則を使って型付け導出を組み立てることです。仮定は変数の参照に、含意の導入は $\lambda$ に、含意の除去は適用になります。二つの量化子規則は、それぞれ $\Sort{0}$ 上の $\lambda$ と、型への適用になります。
 
-注意を要する細部が二つあり、どちらも文脈に関わる。
+注意の要る細部が二つあり、どちらも文脈にかかわります。
 
-- 論理の規則は、どの命題変数がスコープ内にあるかを述べないが、命題変数 $P$ は仮定 $P : \Sort{0}$ が文脈に入ってはじめて使えるので、型付けの側はそれを知る必要がある。そこで精密な主張は、命題変数の明示的なリスト $\Theta$ を携える。
-- 型付け規則は文脈を右側に拡張するが、第 4 章の変換 $\Delta^\ast$ は、すべての命題変数をすべての仮定の前に置く。任意の並び順を許したほうが証明は楽なので、以下で定義する意味で論理の判断を*表現する*あらゆる文脈について定理を証明する。
+- 論理の規則は、どの命題変数がスコープ内にあるかを述べません。しかし命題変数 $P$ は、仮定 $P : \Sort{0}$ が文脈に入ってはじめて使えるので、型付けの側ではそれを知っておく必要があります。そこで精密な主張では、命題変数の明示的なリスト $\Theta$ を持ち回ります。
+- 型付け規則は文脈を右側に拡張しますが、第 4 章の変換 $\Delta^\ast$ は、すべての命題変数をすべての仮定より前に置きます。並び順は任意にしておいたほうが証明が楽なので、以下で定義する意味で論理の判断を*表現する*文脈であれば、どれについても定理が成り立つことを証明します。
 
 ## 精密な主張
 
-定理 4.1 では、どの命題変数がスコープ内にあるかが暗黙になっていた。証明のためにこれを明示し、
+定理 4.1 では、どの命題変数がスコープ内にあるかを暗黙にしていました。証明のためにこれを明示して、
 
 $$
 \Theta; \Delta \vdash \varphi,
 $$
 
-と書く。ここで $\Theta$ は相異なる命題変数のリストであり、$\Delta$ または $\varphi$ に自由に現れる命題変数はすべて $\Theta$ に属する。命題変数を明示すると、第 4 章の規則は次のようになる。
+と書きます。ここで $\Theta$ は相異なる命題変数のリストで、$\Delta$ または $\varphi$ に自由に現れる命題変数はすべて $\Theta$ に属するものとします。命題変数を明示すると、第 4 章の規則は次のようになります。
 
 $$
 \dfrac{\varphi \in \Delta}{\Theta; \Delta \vdash \varphi}\rulename{Hyp}
@@ -37,57 +37,57 @@ $$
 \dfrac{\Theta; \Delta \vdash \forall P.\,\varphi \qquad \FV(\psi) \subseteq \Theta}{\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}}\rulename{$\forall$-elim}
 $$
 
-$\Delta$ に自由に現れる命題変数はすべて $\Theta$ にあり、$P$ はそこにないので、第 4 章の側条件 $P \notin \FV(\Delta)$ は、いまや $P \notin \Theta$ から従う。論理式は $\alpha$ 同値を除いて扱うので、束縛された $P$ はつねに側条件を満たすように改名できる。第 4 章と同じく、$\varphi^\ast \to \psi^\ast$ は、$x$ を新鮮な変数として $\tPi{x}{\varphi^\ast}{\psi^\ast}$ を表す。
+$\Delta$ に自由に現れる命題変数はすべて $\Theta$ にあり、$P$ はそこに含まれないので、第 4 章の側条件 $P \notin \FV(\Delta)$ は、$P \notin \Theta$ から従うようになります。論理式は $\alpha$ 同値を除いて扱うので、束縛された $P$ は、側条件を満たすようにいつでも改名できます。第 4 章と同じく、$\varphi^\ast \to \psi^\ast$ は、$x$ を新鮮な変数として $\tPi{x}{\varphi^\ast}{\psi^\ast}$ を表します。
 
-第 4 章の文脈 $\Delta^\ast$ は、命題変数を先に並べ、仮定をその後に並べるが、証明では文脈を右側に拡張する必要があるので、任意の順序を許すのが都合がよい。
+第 4 章の文脈 $\Delta^\ast$ では命題変数を先に、仮定を後に並べました。しかし証明の途中では文脈を右側に拡張する必要があるので、並び順は任意にしておくほうが好都合です。
 
 <div class="definition" markdown="1">
 
-**定義 A.1（表現）.** 文脈 $\Gamma$ が $(\Theta; \Delta)$ を*表現する*とは、$\ctxok{\Gamma}$ であり、$\Gamma$ が各 $P \in \Theta$ に対する仮定 $P : \Sort{0}$ を一つずつと、各 $\chi \in \Delta$ に対する仮定 $h : \chi^\ast$ を一つずつ、何らかの順序で並べたものからなることをいう。
+**定義 A.1（表現）.** 文脈 $\Gamma$ が $(\Theta; \Delta)$ を*表現する*とは、$\ctxok{\Gamma}$ であり、$\Gamma$ が各 $P \in \Theta$ に対する仮定 $P : \Sort{0}$ を一つずつと、各 $\chi \in \Delta$ に対する仮定 $h : \chi^\ast$ を一つずつ、何らかの順序で並べたものからなることをいいます。
 
 </div>
 
 <div class="theorem" markdown="1">
 
-**定理 A.2（定理 4.1 の精密な形）.** $\Theta; \Delta \vdash \varphi$ であり、$\Gamma$ が $(\Theta; \Delta)$ を表現するならば、ある項 $t$ について $\Gamma \vdash t : \varphi^\ast$ が成り立つ。
+**定理 A.2（定理 4.1 の精密な形）.** $\Theta; \Delta \vdash \varphi$ であり、$\Gamma$ が $(\Theta; \Delta)$ を表現するならば、ある項 $t$ について $\Gamma \vdash t : \varphi^\ast$ が成り立ちます。
 
 </div>
 
-定理 4.1 は $\Gamma = \Delta^\ast$ という特別な場合であり、$\Theta$ が自由な命題変数を列挙するとき、文脈 $\Delta^\ast$ はちょうど必要な仮定を含む。それが整形式であることは、命題変数がスコープに入れば各仮定の型 $\chi^\ast$ は命題なので、後述の補題 A.3 と規則 C-Ext から従う。
+定理 4.1 は $\Gamma = \Delta^\ast$ という特別な場合です。$\Theta$ に自由な命題変数を列挙すれば、文脈 $\Delta^\ast$ はちょうど必要な仮定を含みます。命題変数がスコープに入れば各仮定の型 $\chi^\ast$ は命題になるので、この文脈が整形式であることは、後述の補題 A.3 と規則 C-Ext から従います。
 
 ## 変換についての事実
 
-変換 $\varphi \mapsto \varphi^\ast$ は代入と可換である。
+変換 $\varphi \mapsto \varphi^\ast$ は代入と可換です。
 
 $$
 (\subst{\varphi}{P}{\psi})^\ast = \subst{\varphi^\ast}{P}{\psi^\ast}.
 $$
 
-両辺とも $P$ の自由な出現を $\psi^\ast$ で置き換えるのであり、変換は命題変数に対してその名前を保つ以外に何もしないので、これは $\varphi$ に関する定型的な帰納法で示せる。主証明の $\forall$-elim のケースはこの等式に依存する。
+両辺とも $P$ の自由な出現を $\psi^\ast$ で置き換えたものであり、変換は命題変数の名前をそのまま保つだけなので、この等式は $\varphi$ に関する定型的な帰納法で示せます。主証明の $\forall$-elim のケースは、この等式を使います。
 
-次の補題は、[第 13 章](13-universes.md)の宇宙構造が入ってくる唯一の箇所であり、変換されたすべての論理式が命題である、すなわち型 $\Sort{0}$ を持つことを述べる。これがなければ、型付け規則 T-Lam を仮定に適用できず、$\forall$-elim のケースで量化子を任意の論理式で具体化できない。
+次の補題は、[第 13 章](13-universes.md)の宇宙の構造が効いてくる唯一の箇所です。変換したどの論理式も命題である、すなわち型 $\Sort{0}$ を持つことを述べています。この補題がなければ、仮定に型付け規則 T-Lam を適用できず、$\forall$-elim のケースで量化子を任意の論理式で具体化することもできません。
 
 <div class="lemma" markdown="1">
 
-**補題 A.3（論理式は命題である）.** $\ctxok{\Gamma}$ であり、すべての $P \in \FV(\varphi)$ について $(P : \Sort{0}) \in \Gamma$ ならば、$\Gamma \vdash \varphi^\ast : \Sort{0}$ である。
+**補題 A.3（論理式は命題である）.** $\ctxok{\Gamma}$ であり、すべての $P \in \FV(\varphi)$ について $(P : \Sort{0}) \in \Gamma$ ならば、$\Gamma \vdash \varphi^\ast : \Sort{0}$ です。
 
 </div>
 
 <div class="proof" markdown="1">
 
-$\varphi$ に関する帰納法による。
+$\varphi$ に関する帰納法によります。
 
-命題変数 $P$ の場合、仮定から $(P : \Sort{0}) \in \Gamma$ なので、T-Var により $\Gamma \vdash P : \Sort{0}$ である。
+命題変数 $P$ の場合、仮定から $(P : \Sort{0}) \in \Gamma$ なので、T-Var により $\Gamma \vdash P : \Sort{0}$ です。
 
-$\varphi \to \psi$ の場合、帰納法の仮定から $\Gamma \vdash \varphi^\ast : \Sort{0}$ なので、新鮮な $x$ について $\Gamma, x : \varphi^\ast$ は C-Ext により整形式である。この拡張した文脈で $\psi$ に帰納法の仮定を適用すると $\Gamma, x : \varphi^\ast \vdash \psi^\ast : \Sort{0}$ が得られ、T-Pi により $\Gamma \vdash \tPi{x}{\varphi^\ast}{\psi^\ast} : \Sort{\imax(0, 0)} = \Sort{0}$ となる。
+$\varphi \to \psi$ の場合、帰納法の仮定から $\Gamma \vdash \varphi^\ast : \Sort{0}$ なので、新鮮な $x$ について $\Gamma, x : \varphi^\ast$ は C-Ext により整形式です。この拡張した文脈で $\psi$ に帰納法の仮定を適用すると $\Gamma, x : \varphi^\ast \vdash \psi^\ast : \Sort{0}$ が得られ、T-Pi により $\Gamma \vdash \tPi{x}{\varphi^\ast}{\psi^\ast} : \Sort{\imax(0, 0)} = \Sort{0}$ となります。
 
-$\forall Q.\,\chi$ の場合、$Q \notin \dom(\Gamma)$ となるように $Q$ を改名する。T-Sort により $\Gamma \vdash \Sort{0} : \Sort{1}$ なので、$\Gamma, Q : \Sort{0}$ は C-Ext により整形式である。この文脈で $\chi$ に帰納法の仮定を適用すると $\Gamma, Q : \Sort{0} \vdash \chi^\ast : \Sort{0}$ が得られ、T-Pi により $\Gamma \vdash \tPi{Q}{\Sort{0}}{\chi^\ast} : \Sort{\imax(1, 0)} = \Sort{0}$ となる。
+$\forall Q.\,\chi$ の場合、$Q \notin \dom(\Gamma)$ となるように $Q$ を改名します。T-Sort により $\Gamma \vdash \Sort{0} : \Sort{1}$ なので、$\Gamma, Q : \Sort{0}$ は C-Ext により整形式です。この文脈で $\chi$ に帰納法の仮定を適用すると $\Gamma, Q : \Sort{0} \vdash \chi^\ast : \Sort{0}$ が得られ、T-Pi により $\Gamma \vdash \tPi{Q}{\Sort{0}}{\chi^\ast} : \Sort{\imax(1, 0)} = \Sort{0}$ となります。
 
 </div>
 
 <aside class="note" markdown="1">
 
-最後のケースが非述語性を使う箇所であり、定義域 $\Sort{0}$ は $\Sort{1}$ に住むので、$\imax$ の代わりに $\max$ を使うと、型 $(\forall Q.\,\chi)^\ast$ は $\Sort{0}$ ではなく $\Sort{1}$ に落ちてしまう。すると、型 $\Sort{0}$ を持ち引数として許されるのは $\forall$ を含まない論理式だけになるので、後述の $\forall$-elim のケースはそうした論理式 $\psi$ についてしか成り立たなくなる。この設計上の選択は第 13 章で論じている。
+非述語性を使うのは最後のケースです。定義域 $\Sort{0}$ は $\Sort{1}$ に住むので、$\imax$ の代わりに $\max$ を使うと、型 $(\forall Q.\,\chi)^\ast$ は $\Sort{0}$ ではなく $\Sort{1}$ に入ってしまいます。そうなると、型 $\Sort{0}$ を持ち、引数として渡せるのは $\forall$ を含まない論理式だけになり、後述の $\forall$-elim のケースはそうした論理式 $\psi$ についてしか成り立たなくなります。この設計上の選択については第 13 章で論じています。
 
 </aside>
 
@@ -95,45 +95,45 @@ $\forall Q.\,\chi$ の場合、$Q \notin \dom(\Gamma)$ となるように $Q$ �
 
 <div class="proof" markdown="1">
 
-定理 A.2 を、$\Theta; \Delta \vdash \varphi$ の導出に関する帰納法で、表現するすべての文脈 $\Gamma$ について同時に証明する。各ケースは、第 4 章の表の右列に示した型付け導出を組み立てる。
+定理 A.2 を、$\Theta; \Delta \vdash \varphi$ の導出に関する帰納法で、それを表現するすべての文脈 $\Gamma$ について同時に証明します。各ケースでは、第 4 章の表の右列に示した型付け導出を組み立てます。
 
-*仮定（Hyp）.* この規則は $\varphi \in \Delta$ から $\Theta; \Delta \vdash \varphi$ を結論する。$\Gamma$ は $(\Theta; \Delta)$ を表現するので仮定 $h : \varphi^\ast$ を含み、T-Var により $\Gamma \vdash h : \varphi^\ast$ である。
+*仮定（Hyp）.* この規則は $\varphi \in \Delta$ から $\Theta; \Delta \vdash \varphi$ を結論します。$\Gamma$ は $(\Theta; \Delta)$ を表現するので仮定 $h : \varphi^\ast$ を含み、T-Var により $\Gamma \vdash h : \varphi^\ast$ です。
 
-*$\to$-intro.* 前提は $\Theta; \Delta, \varphi \vdash \psi$、結論は $\Theta; \Delta \vdash \varphi \to \psi$ である。補題 A.3 により $\Gamma \vdash \varphi^\ast : \Sort{0}$ なので、新鮮な $h$ について、文脈 $\Gamma, h : \varphi^\ast$ は C-Ext により整形式であり、$(\Theta; \Delta, \varphi)$ を表現する。前提とこの文脈に帰納法の仮定を適用すると、ある $t$ について $\Gamma, h : \varphi^\ast \vdash t : \psi^\ast$ が得られ、T-Lam により
+*$\to$-intro.* 前提は $\Theta; \Delta, \varphi \vdash \psi$、結論は $\Theta; \Delta \vdash \varphi \to \psi$ です。補題 A.3 により $\Gamma \vdash \varphi^\ast : \Sort{0}$ なので、新鮮な $h$ について、文脈 $\Gamma, h : \varphi^\ast$ は C-Ext により整形式で、$(\Theta; \Delta, \varphi)$ を表現します。前提とこの文脈に帰納法の仮定を適用すると、ある $t$ について $\Gamma, h : \varphi^\ast \vdash t : \psi^\ast$ が得られ、T-Lam により
 
 $$
 \Gamma \vdash \tLam{h}{\varphi^\ast}{t} : \tPi{h}{\varphi^\ast}{\psi^\ast}.
 $$
 
-となる。$\psi^\ast$ の自由変数は命題変数であり、$h$ はそのどれでもないので、$h$ は $\psi^\ast$ に現れず、この $\Pi$ は非依存的で、この型は $\varphi^\ast \to \psi^\ast$ である。
+となります。$\psi^\ast$ の自由変数は命題変数だけで、$h$ はそのどれでもないので、$h$ は $\psi^\ast$ に現れません。したがってこの $\Pi$ は非依存的であり、この型は $\varphi^\ast \to \psi^\ast$ です。
 
-*$\to$-elim.* 前提は $\Theta; \Delta \vdash \varphi \to \psi$ と $\Theta; \Delta \vdash \varphi$ である。帰納法の仮定から、$x \notin \FV(\psi^\ast)$ となる $\Gamma \vdash f : \tPi{x}{\varphi^\ast}{\psi^\ast}$ と、$\Gamma \vdash a : \varphi^\ast$ が得られる。T-App により $\Gamma \vdash f\;a : \subst{\psi^\ast}{x}{a}$ であり、$x$ は $\psi^\ast$ に現れないので代入は何もせず、$\subst{\psi^\ast}{x}{a} = \psi^\ast$ である。
+*$\to$-elim.* 前提は $\Theta; \Delta \vdash \varphi \to \psi$ と $\Theta; \Delta \vdash \varphi$ です。帰納法の仮定から、$x \notin \FV(\psi^\ast)$ を満たす $\Gamma \vdash f : \tPi{x}{\varphi^\ast}{\psi^\ast}$ と、$\Gamma \vdash a : \varphi^\ast$ が得られます。T-App により $\Gamma \vdash f\;a : \subst{\psi^\ast}{x}{a}$ となりますが、$x$ は $\psi^\ast$ に現れないので代入は何も変えず、$\subst{\psi^\ast}{x}{a} = \psi^\ast$ です。
 
-*$\forall$-intro.* 前提は $P \notin \Theta$ を満たす $\Theta, P; \Delta \vdash \varphi$、結論は $\Theta; \Delta \vdash \forall P.\,\varphi$ である。$\Theta$ の変数を新鮮な変数に改名しても導出が保たれることは定型的な帰納法で示せるので、必要なら $P$ を改名して $P \notin \dom(\Gamma)$ と仮定する。T-Sort と C-Ext により $\Gamma, P : \Sort{0}$ は整形式であり、$(\Theta, P; \Delta)$ を表現する。帰納法の仮定から $\Gamma, P : \Sort{0} \vdash t : \varphi^\ast$ が得られ、T-Lam により
+*$\forall$-intro.* 前提は $P \notin \Theta$ を満たす $\Theta, P; \Delta \vdash \varphi$、結論は $\Theta; \Delta \vdash \forall P.\,\varphi$ です。$\Theta$ の変数を新鮮な変数に改名しても導出が保たれることは定型的な帰納法で示せるので、必要なら $P$ を改名して、$P \notin \dom(\Gamma)$ と仮定します。T-Sort と C-Ext により $\Gamma, P : \Sort{0}$ は整形式で、$(\Theta, P; \Delta)$ を表現します。帰納法の仮定から $\Gamma, P : \Sort{0} \vdash t : \varphi^\ast$ が得られ、T-Lam により
 
 $$
 \Gamma \vdash \tLam{P}{\Sort{0}}{t} : \tPi{P}{\Sort{0}}{\varphi^\ast},
 $$
 
-となり、これは $\forall P.\,\varphi$ の変換である。
+となり、これは $\forall P.\,\varphi$ の変換です。
 
-*$\forall$-elim.* 前提は $\FV(\psi) \subseteq \Theta$ を満たす $\Theta; \Delta \vdash \forall P.\,\varphi$、結論は $\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}$ である。帰納法の仮定から $\Gamma \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast}$ が得られる。$\psi$ の命題変数はすべて $\Theta$ にあり、したがって $\Gamma$ に仮定 $Q : \Sort{0}$ を持つので、補題 A.3 により $\Gamma \vdash \psi^\ast : \Sort{0}$ である。T-App により
+*$\forall$-elim.* 前提は $\FV(\psi) \subseteq \Theta$ を満たす $\Theta; \Delta \vdash \forall P.\,\varphi$、結論は $\Theta; \Delta \vdash \subst{\varphi}{P}{\psi}$ です。帰納法の仮定から $\Gamma \vdash f : \tPi{P}{\Sort{0}}{\varphi^\ast}$ が得られます。$\psi$ の命題変数はすべて $\Theta$ にあるので、$\Gamma$ はそれぞれに対する仮定 $Q : \Sort{0}$ を含み、補題 A.3 により $\Gamma \vdash \psi^\ast : \Sort{0}$ です。T-App により
 
 $$
 \Gamma \vdash f\;\psi^\ast : \subst{\varphi^\ast}{P}{\psi^\ast} = (\subst{\varphi}{P}{\psi})^\ast,
 $$
 
-となり、最後のステップは前節の代入の等式である。
+となります。最後のステップでは、前節の代入の等式を使いました。
 
-論理のすべての規則を扱ったので、定理はあらゆる導出について成り立つ。
+論理のすべての規則を扱ったので、定理はどの導出についても成り立ちます。
 
 </div>
 
-組み立てるすべての型付け導出は、束縛変数の名前を除いて型を構文的にのみ比較するので、この証明は T-Conv を一度も必要としない。変換が必要になるのは、第 II 部の帰納型のように、論理に計算を加えたときだけである。
+ここで組み立てた型付け導出はどれも、束縛変数の名前を除いて型を構文的に比べるだけなので、この証明では T-Conv を一度も使いません。変換が必要になるのは、第 II 部の帰納型のように、論理に計算を加えたときだけです。
 
 <aside class="history" markdown="1">
 
-逆方向、すなわち型 $\varphi^\ast$ を持つすべての項が $\varphi$ の証明から来るという主張は、*保存性*と呼ばれる。第 4 章で触れたように、$\Sort{0}$ には論理式の変換ではない型が含まれ、項がそれらを経由しうるので、こちらのほうが難しい。本書はこれを必要とせず、カーネルが保証しなければならないのは整合性であり、それは[付録 D](d-proof-consistency.md)で証明する。
+逆方向の主張、つまり型 $\varphi^\ast$ を持つ項はどれも $\varphi$ の証明から来るという主張は、*保存性*と呼ばれます。第 4 章で触れたとおり、$\Sort{0}$ には論理式の変換ではない型も含まれ、項がそれらを経由することがあるので、こちらのほうが難しい問題です。本書では保存性は必要ありません。カーネルが保証しなければならないのは整合性であり、これは[付録 D](d-proof-consistency.md)で証明します。
 
 </aside>
 
@@ -141,9 +141,9 @@ $$
 
 覚えておくこと
 
-- 定理の精密な形は命題変数の明示的なリスト $\Theta$ を携え、$(\Theta; \Delta)$ を任意の順序で表現するあらゆる文脈について主張を証明する。
-- 変換されたすべての論理式は $\Sort{0}$ に住み（補題 A.3）、これは $\forall$ のケースで非述語性を使っており、$\forall$-elim が量化子を任意の論理式で具体化できるのはそのおかげである。
-- 証明は導出に関する帰納法であり、各論理規則はちょうど一つの型付け規則に対応し、Hyp は T-Var に、二つの導入は T-Lam に、二つの除去は T-App に対応する。
-- 論理には計算がないので、T-Conv は一度も使われない。
+- 定理の精密な形では命題変数の明示的なリスト $\Theta$ を持ち回り、$(\Theta; \Delta)$ を任意の順序で表現するどの文脈についても主張を証明します。
+- 変換したどの論理式も $\Sort{0}$ に住みます（補題 A.3）。$\forall$ のケースでは非述語性を使っており、$\forall$-elim で量化子を任意の論理式で具体化できるのはそのおかげです。
+- 証明は導出に関する帰納法で、各論理規則はちょうど一つの型付け規則に対応します。Hyp は T-Var に、二つの導入は T-Lam に、二つの除去は T-App に対応します。
+- 論理には計算がないので、T-Conv は一度も使われません。
 
 </div>

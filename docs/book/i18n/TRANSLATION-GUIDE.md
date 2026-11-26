@@ -39,22 +39,27 @@ leanmini comment lines, and the explorer `data-title`.
 ## Style
 
 - No em dashes. Use the language's own punctuation.
-- Japanese: である体 (常体). Full-width punctuation (。、). Half-width spaces
+- Japanese: ですます体 (敬体). Full-width punctuation (。、). Half-width spaces
   between Japanese and Latin words or math. Vary sentence length and connect
   closely related thoughts when that makes the reasoning easier to follow.
   Keep the conclusion clear. Avoid the stiff patterns of machine translation
-  (「〜することができる」「〜と言えるだろう」, every sentence ending the same way).
+  (「〜することができます」「〜と言えるでしょう」, every sentence ending the same
+  way, 「〜のです」 on every other sentence).
   Keep technical terms consistent with the glossary and add the English term in
   parentheses on first use in each chapter when the Japanese term is not
   standard.
+  Only sentence ends take ですます; clauses inside a sentence keep the plain
+  connective forms (「〜であり、」「〜ではなく、」「〜ので、」「〜て、」, 連体修飾).
+  Headings, chapter titles, theorem/lemma names, and bold run-in labels never
+  take ですます: use 体言止め or the plain form (「証明はプログラムである」).
+  Noun-phrase list items and table cells stay as noun phrases.
   Do not chop a line of reasoning into a row of short sentences ending in 。 when
-  the ideas belong together; join them with である形 and connectives
-  (「〜であり、」「〜ではなく、」「〜ので、」「〜が、」「〜て、」). Two examples
+  the ideas belong together; join them with connectives. Two examples
   of the preferred form:
-    bad:  apps と spine は互いに逆である。apps(h, args) は ... を組み立て、spine はそれを分解する。
-    good: apps と spine は互いに逆であり、apps(h, args) が ... を組み立て、spine がそれを分解する。
-    bad:  項が妥当な型であるかどうかは構文的な性質ではない。それを決めるのは型検査器である。
-    good: 項が妥当な型であるかどうかは構文的な性質ではなく、型検査器が決める。
+    bad:  apps と spine は互いに逆です。apps(h, args) は ... を組み立て、spine はそれを分解します。
+    good: apps と spine は互いに逆であり、apps(h, args) が ... を組み立て、spine がそれを分解します。
+    bad:  項が妥当な型であるかどうかは構文的な性質ではありません。それを決めるのは型検査器です。
+    good: 項が妥当な型であるかどうかは構文的な性質ではなく、型検査器が決めます。
 - Chinese: Simplified characters, written register, full-width punctuation
   (，。：；“”). Half-width spaces between Chinese and Latin words or math.
   Connect closely related clauses instead of breaking them into abrupt short
